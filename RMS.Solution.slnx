@@ -1,0 +1,18 @@
+<Solution>
+  <Folder Name="/ApplicationCoreLayer/">
+    <Project Path="RMS.Domain/RMS.Domain.csproj" />
+    <Project Path="RMS.Services/RMS.Services.csproj" />
+    <Project Path="RMS.ServicesAbstraction/RMS.ServicesAbstraction.csproj" />
+  </Folder>
+  <Folder Name="/InfrastructureLayer/">
+    <Project Path="RMS.Persistence/RMS.Persistence.csproj" />
+  </Folder>
+  <Folder Name="/PresentationLayer/">
+    <Project Path="RMS.Presentation/RMS.Presentation.csproj" />
+    <Project Path="RMS.Web/RMS.Web.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".gitignore" />
+  </Folder>
+  <Project Path="RMS.Shared/RMS.Shared.csproj" />
+</Solution>
