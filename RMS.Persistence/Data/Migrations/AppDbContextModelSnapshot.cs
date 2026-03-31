@@ -64,7 +64,7 @@ namespace RMS.Persistence.Data.Migrations
                     b.HasIndex("Phone")
                         .IsUnique();
 
-                    b.ToTable("Branches", t =>
+                    b.ToTable("Branches", null, t =>
                         {
                             t.HasCheckConstraint("BranchValidPhoneCheck", "Phone LIKE '01[0125][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]'");
                         });
@@ -116,7 +116,7 @@ namespace RMS.Persistence.Data.Migrations
                     b.HasIndex("BranchId", "IngredientId")
                         .IsUnique();
 
-                    b.ToTable("BranchStocks");
+                    b.ToTable("BranchStocks", (string)null);
                 });
 
             modelBuilder.Entity("RMS.Domain.Entities.Category", b =>
@@ -151,7 +151,7 @@ namespace RMS.Persistence.Data.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("RMS.Domain.Entities.Delivery", b =>
@@ -208,7 +208,7 @@ namespace RMS.Persistence.Data.Migrations
                     b.HasIndex("OrderId")
                         .IsUnique();
 
-                    b.ToTable("Deliveries");
+                    b.ToTable("Deliveries", (string)null);
                 });
 
             modelBuilder.Entity("RMS.Domain.Entities.Images", b =>
@@ -242,7 +242,7 @@ namespace RMS.Persistence.Data.Migrations
 
                     b.HasIndex("MenuItemId");
 
-                    b.ToTable("Images");
+                    b.ToTable("Images", (string)null);
                 });
 
             modelBuilder.Entity("RMS.Domain.Entities.Ingredient", b =>
@@ -279,7 +279,7 @@ namespace RMS.Persistence.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Ingredients");
+                    b.ToTable("Ingredients", (string)null);
                 });
 
             modelBuilder.Entity("RMS.Domain.Entities.KitchenTicket", b =>
@@ -329,7 +329,7 @@ namespace RMS.Persistence.Data.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("KitchenTickets");
+                    b.ToTable("KitchenTickets", (string)null);
                 });
 
             modelBuilder.Entity("RMS.Domain.Entities.MenuItem", b =>
@@ -377,7 +377,7 @@ namespace RMS.Persistence.Data.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("MenuItems");
+                    b.ToTable("MenuItems", (string)null);
                 });
 
             modelBuilder.Entity("RMS.Domain.Entities.Order", b =>
@@ -431,7 +431,7 @@ namespace RMS.Persistence.Data.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("Orders");
+                    b.ToTable("Orders", (string)null);
                 });
 
             modelBuilder.Entity("RMS.Domain.Entities.OrderItem", b =>
@@ -478,7 +478,7 @@ namespace RMS.Persistence.Data.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("OrderItems");
+                    b.ToTable("OrderItems", (string)null);
                 });
 
             modelBuilder.Entity("RMS.Domain.Entities.Payment", b =>
@@ -531,7 +531,7 @@ namespace RMS.Persistence.Data.Migrations
                     b.HasIndex("OrderId")
                         .IsUnique();
 
-                    b.ToTable("Payments");
+                    b.ToTable("Payments", (string)null);
                 });
 
             modelBuilder.Entity("RMS.Domain.Entities.Recipe", b =>
@@ -572,7 +572,7 @@ namespace RMS.Persistence.Data.Migrations
                     b.HasIndex("MenuItemId", "IngredientId")
                         .IsUnique();
 
-                    b.ToTable("Recipes");
+                    b.ToTable("Recipes", (string)null);
                 });
 
             modelBuilder.Entity("RMS.Domain.Entities.Role", b =>
@@ -607,7 +607,7 @@ namespace RMS.Persistence.Data.Migrations
                     b.HasIndex("RoleName")
                         .IsUnique();
 
-                    b.ToTable("Roles");
+                    b.ToTable("Roles", (string)null);
                 });
 
             modelBuilder.Entity("RMS.Domain.Entities.Table", b =>
@@ -653,7 +653,7 @@ namespace RMS.Persistence.Data.Migrations
                     b.HasIndex("BranchId", "TableNumber")
                         .IsUnique();
 
-                    b.ToTable("Tables");
+                    b.ToTable("Tables", (string)null);
                 });
 
             modelBuilder.Entity("RMS.Domain.Entities.TableOrder", b =>
@@ -695,7 +695,7 @@ namespace RMS.Persistence.Data.Migrations
 
                     b.HasIndex("TableId");
 
-                    b.ToTable("TableOrders");
+                    b.ToTable("TableOrders", (string)null);
                 });
 
             modelBuilder.Entity("RMS.Domain.Entities.User", b =>
@@ -750,7 +750,7 @@ namespace RMS.Persistence.Data.Migrations
 
                     b.HasIndex("RoleId");
 
-                    b.ToTable("Users", t =>
+                    b.ToTable("Users", null, t =>
                         {
                             t.HasCheckConstraint("UserValidEmailCheck", "Email LIKE '_%@_%._%'");
                         });
@@ -758,7 +758,7 @@ namespace RMS.Persistence.Data.Migrations
 
             modelBuilder.Entity("RMS.Domain.Entities.Branch", b =>
                 {
-                    b.OwnsOne("RMS.Domain.Entities.Address", "Address", b1 =>
+                    b.OwnsOne("RMS.Domain.Entities.Branch.Address#RMS.Domain.Entities.Address", "Address", b1 =>
                         {
                             b1.Property<int>("BranchId")
                                 .HasColumnType("int");
@@ -791,7 +791,7 @@ namespace RMS.Persistence.Data.Migrations
 
                             b1.HasKey("BranchId");
 
-                            b1.ToTable("Branches");
+                            b1.ToTable("Branches", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("BranchId");

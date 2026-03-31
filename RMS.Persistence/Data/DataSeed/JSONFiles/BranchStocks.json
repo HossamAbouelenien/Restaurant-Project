@@ -1,0 +1,104 @@
+[
+  {
+    "BranchId": 1,
+    "IngredientId": 1,
+    "QuantityAvailable": 15.0,
+    "LowThreshold": 3.0
+  },
+  {
+    "BranchId": 1,
+    "IngredientId": 2,
+    "QuantityAvailable": 200.0,
+    "LowThreshold": 30.0
+  },
+  {
+    "BranchId": 1,
+    "IngredientId": 3,
+    "QuantityAvailable": 3000.0,
+    "LowThreshold": 500.0
+  },
+  {
+    "BranchId": 1,
+    "IngredientId": 4,
+    "QuantityAvailable": 2000.0,
+    "LowThreshold": 300.0
+  },
+  {
+    "BranchId": 1,
+    "IngredientId": 5,
+    "QuantityAvailable": 4000.0,
+    "LowThreshold": 500.0
+  },
+  {
+    "BranchId": 1,
+    "IngredientId": 6,
+    "QuantityAvailable": 10000.0,
+    "LowThreshold": 2000.0
+  },
+  {
+    "BranchId": 1,
+    "IngredientId": 7,
+    "QuantityAvailable": 5.0,
+    "LowThreshold": 1.0
+  },
+  {
+    "BranchId": 1,
+    "IngredientId": 8,
+    "QuantityAvailable": 5000.0,
+    "LowThreshold": 800.0
+  },
+  {
+    "BranchId": 1,
+    "IngredientId": 9,
+    "QuantityAvailable": 10.0,
+    "LowThreshold": 2.0
+  },
+  {
+    "BranchId": 1,
+    "IngredientId": 13,
+    "QuantityAvailable": 120.0,
+    "LowThreshold": 24.0
+  },
+  {
+    "BranchId": 2,
+    "IngredientId": 1,
+    "QuantityAvailable": 8.0,
+    "LowThreshold": 2.0
+  },
+  {
+    "BranchId": 2,
+    "IngredientId": 2,
+    "QuantityAvailable": 100.0,
+    "LowThreshold": 20.0
+  },
+  {
+    "BranchId": 2,
+    "IngredientId": 9,
+    "QuantityAvailable": 6.0,
+    "LowThreshold": 1.5
+  },
+  {
+    "BranchId": 2,
+    "IngredientId": 6,
+    "QuantityAvailable": 8000.0,
+    "LowThreshold": 1500.0
+  },
+  {
+    "BranchId": 3,
+    "IngredientId": 1,
+    "QuantityAvailable": 5.0,
+    "LowThreshold": 1.0
+  },
+  {
+    "BranchId": 3,
+    "IngredientId": 9,
+    "QuantityAvailable": 4.0,
+    "LowThreshold": 1.0
+  },
+  {
+    "BranchId": 3,
+    "IngredientId": 13,
+    "QuantityAvailable": 60.0,
+    "LowThreshold": 12.0
+  }
+]

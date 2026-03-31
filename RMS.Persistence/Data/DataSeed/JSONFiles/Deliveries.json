@@ -1,0 +1,18 @@
+[
+  {
+    "OrderId": 2,
+    "DriverId": 6,
+    "DeliveryStatus": "Delivered",
+    "DeliveredAt": "2024-03-11T14:55:00",
+    "CashCollected": null,
+    "DeliveryAddress": "14 Nile Corniche, Apt 3, Dokki, Cairo"
+  },
+  {
+    "OrderId": 5,
+    "DriverId": 10,
+    "DeliveryStatus": "Assigned",
+    "DeliveredAt": null,
+    "CashCollected": null,
+    "DeliveryAddress": "7 El Laselky St, Maadi, Cairo"
+  }
+]

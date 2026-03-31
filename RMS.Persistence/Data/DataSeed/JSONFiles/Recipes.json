@@ -1,0 +1,197 @@
+[
+  {
+    "MenuItemId": 1,
+    "IngredientId": 1,
+    "QuantityRequired": 0.2
+  },
+  {
+    "MenuItemId": 1,
+    "IngredientId": 2,
+    "QuantityRequired": 1.0
+  },
+  {
+    "MenuItemId": 1,
+    "IngredientId": 3,
+    "QuantityRequired": 30.0
+  },
+  {
+    "MenuItemId": 1,
+    "IngredientId": 4,
+    "QuantityRequired": 20.0
+  },
+  {
+    "MenuItemId": 1,
+    "IngredientId": 5,
+    "QuantityRequired": 30.0
+  },
+  {
+    "MenuItemId": 2,
+    "IngredientId": 1,
+    "QuantityRequired": 0.4
+  },
+  {
+    "MenuItemId": 2,
+    "IngredientId": 2,
+    "QuantityRequired": 1.0
+  },
+  {
+    "MenuItemId": 2,
+    "IngredientId": 3,
+    "QuantityRequired": 60.0
+  },
+  {
+    "MenuItemId": 3,
+    "IngredientId": 9,
+    "QuantityRequired": 0.2
+  },
+  {
+    "MenuItemId": 3,
+    "IngredientId": 2,
+    "QuantityRequired": 1.0
+  },
+  {
+    "MenuItemId": 3,
+    "IngredientId": 4,
+    "QuantityRequired": 20.0
+  },
+  {
+    "MenuItemId": 4,
+    "IngredientId": 6,
+    "QuantityRequired": 250.0
+  },
+  {
+    "MenuItemId": 4,
+    "IngredientId": 7,
+    "QuantityRequired": 0.1
+  },
+  {
+    "MenuItemId": 4,
+    "IngredientId": 8,
+    "QuantityRequired": 100.0
+  },
+  {
+    "MenuItemId": 5,
+    "IngredientId": 6,
+    "QuantityRequired": 250.0
+  },
+  {
+    "MenuItemId": 5,
+    "IngredientId": 7,
+    "QuantityRequired": 0.1
+  },
+  {
+    "MenuItemId": 5,
+    "IngredientId": 9,
+    "QuantityRequired": 0.15
+  },
+  {
+    "MenuItemId": 5,
+    "IngredientId": 8,
+    "QuantityRequired": 80.0
+  },
+  {
+    "MenuItemId": 6,
+    "IngredientId": 6,
+    "QuantityRequired": 250.0
+  },
+  {
+    "MenuItemId": 6,
+    "IngredientId": 7,
+    "QuantityRequired": 0.1
+  },
+  {
+    "MenuItemId": 6,
+    "IngredientId": 17,
+    "QuantityRequired": 80.0
+  },
+  {
+    "MenuItemId": 6,
+    "IngredientId": 8,
+    "QuantityRequired": 80.0
+  },
+  {
+    "MenuItemId": 7,
+    "IngredientId": 9,
+    "QuantityRequired": 0.3
+  },
+  {
+    "MenuItemId": 7,
+    "IngredientId": 10,
+    "QuantityRequired": 0.03
+  },
+  {
+    "MenuItemId": 8,
+    "IngredientId": 1,
+    "QuantityRequired": 0.3
+  },
+  {
+    "MenuItemId": 8,
+    "IngredientId": 9,
+    "QuantityRequired": 0.3
+  },
+  {
+    "MenuItemId": 8,
+    "IngredientId": 10,
+    "QuantityRequired": 0.05
+  },
+  {
+    "MenuItemId": 9,
+    "IngredientId": 11,
+    "QuantityRequired": 80.0
+  },
+  {
+    "MenuItemId": 9,
+    "IngredientId": 5,
+    "QuantityRequired": 60.0
+  },
+  {
+    "MenuItemId": 9,
+    "IngredientId": 12,
+    "QuantityRequired": 40.0
+  },
+  {
+    "MenuItemId": 9,
+    "IngredientId": 10,
+    "QuantityRequired": 0.02
+  },
+  {
+    "MenuItemId": 10,
+    "IngredientId": 4,
+    "QuantityRequired": 60.0
+  },
+  {
+    "MenuItemId": 10,
+    "IngredientId": 5,
+    "QuantityRequired": 50.0
+  },
+  {
+    "MenuItemId": 10,
+    "IngredientId": 3,
+    "QuantityRequired": 30.0
+  },
+  {
+    "MenuItemId": 11,
+    "IngredientId": 13,
+    "QuantityRequired": 1.0
+  },
+  {
+    "MenuItemId": 12,
+    "IngredientId": 14,
+    "QuantityRequired": 0.5
+  },
+  {
+    "MenuItemId": 13,
+    "IngredientId": 15,
+    "QuantityRequired": 80.0
+  },
+  {
+    "MenuItemId": 13,
+    "IngredientId": 16,
+    "QuantityRequired": 0.05
+  },
+  {
+    "MenuItemId": 14,
+    "IngredientId": 16,
+    "QuantityRequired": 0.1
+  }
+]

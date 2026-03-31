@@ -1,0 +1,74 @@
+[
+  {
+    "Name": "Beef Patty",
+    "Unit": "Kg"
+  },
+  {
+    "Name": "Burger Bun",
+    "Unit": "Piece"
+  },
+  {
+    "Name": "Cheddar Cheese",
+    "Unit": "Gram"
+  },
+  {
+    "Name": "Lettuce",
+    "Unit": "Gram"
+  },
+  {
+    "Name": "Tomato",
+    "Unit": "Gram"
+  },
+  {
+    "Name": "Pizza Dough",
+    "Unit": "Gram"
+  },
+  {
+    "Name": "Tomato Sauce",
+    "Unit": "Liter"
+  },
+  {
+    "Name": "Mozzarella",
+    "Unit": "Gram"
+  },
+  {
+    "Name": "Chicken Breast",
+    "Unit": "Kg"
+  },
+  {
+    "Name": "Olive Oil",
+    "Unit": "Liter"
+  },
+  {
+    "Name": "Cucumber",
+    "Unit": "Gram"
+  },
+  {
+    "Name": "Feta Cheese",
+    "Unit": "Gram"
+  },
+  {
+    "Name": "Soft Drink Can",
+    "Unit": "Piece"
+  },
+  {
+    "Name": "Mineral Water",
+    "Unit": "Liter"
+  },
+  {
+    "Name": "Chocolate",
+    "Unit": "Gram"
+  },
+  {
+    "Name": "Cream",
+    "Unit": "Liter"
+  },
+  {
+    "Name": "Mushrooms",
+    "Unit": "Gram"
+  },
+  {
+    "Name": "Bell Pepper",
+    "Unit": "Gram"
+  }
+]

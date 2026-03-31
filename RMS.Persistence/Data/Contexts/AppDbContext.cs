@@ -36,5 +36,6 @@ public class AppDbContext : DbContext
     public DbSet<Table> Tables { get; set; }
     public DbSet<TableOrder> TableOrders { get; set; }
     public DbSet<Delivery> Deliveries { get; set; }
+    public DbSet<Images> Images { get; set; }
 
 }

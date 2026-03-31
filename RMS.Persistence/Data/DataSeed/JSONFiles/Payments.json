@@ -1,0 +1,44 @@
+[
+  {
+    "OrderId": 1,
+    "PaymentMethod": "Cash",
+    "PaymentStatus": "Paid",
+    "PaidAmount": 214.0,
+    "PaidAt": "2024-03-10T13:15:00"
+  },
+  {
+    "OrderId": 2,
+    "PaymentMethod": "Card",
+    "PaymentStatus": "Paid",
+    "PaidAmount": 259.0,
+    "PaidAt": "2024-03-11T14:50:00"
+  },
+  {
+    "OrderId": 3,
+    "PaymentMethod": "Card",
+    "PaymentStatus": "Paid",
+    "PaidAmount": 95.0,
+    "PaidAt": "2024-03-12T11:05:00"
+  },
+  {
+    "OrderId": 4,
+    "PaymentMethod": "Cash",
+    "PaymentStatus": "Pending",
+    "PaidAmount": 0.0,
+    "PaidAt": null
+  },
+  {
+    "OrderId": 5,
+    "PaymentMethod": "Card",
+    "PaymentStatus": "Pending",
+    "PaidAmount": 0.0,
+    "PaidAt": null
+  },
+  {
+    "OrderId": 6,
+    "PaymentMethod": "Cash",
+    "PaymentStatus": "Refunded",
+    "PaidAmount": 0.0,
+    "PaidAt": null
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "Name": "Downtown Branch",
+    "Phone": "01012345678",
+    "IsActive": true,
+    "BuildingNumber": 12,
+    "Street": "Tahrir Square St",
+    "City": "Cairo",
+    "Note": "Main flagship branch",
+    "SpecialMark": "Next to the metro station"
+  },
+  {
+    "Name": "Maadi Branch",
+    "Phone": "01123456789",
+    "IsActive": true,
+    "BuildingNumber": 7,
+    "Street": "Road 9, Maadi",
+    "City": "Cairo",
+    "Note": null,
+    "SpecialMark": "Opposite the Carrefour"
+  },
+  {
+    "Name": "Alexandria Branch",
+    "Phone": "01234567890",
+    "IsActive": true,
+    "BuildingNumber": 33,
+    "Street": "Corniche El Nile",
+    "City": "Alexandria",
+    "Note": "Sea-view seating available",
+    "SpecialMark": "Near Stanley Bridge"
+  }
+]

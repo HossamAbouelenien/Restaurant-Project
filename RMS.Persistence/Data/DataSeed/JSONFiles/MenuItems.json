@@ -1,0 +1,100 @@
+[
+  {
+    "Name": "Classic Beef Burger",
+    "Price": 89.0,
+    "IsAvailable": true,
+    "PrepTimeMinutes": 15,
+    "CategoryId": 1
+  },
+  {
+    "Name": "Double Smash Burger",
+    "Price": 120.0,
+    "IsAvailable": true,
+    "PrepTimeMinutes": 18,
+    "CategoryId": 1
+  },
+  {
+    "Name": "Crispy Chicken Burger",
+    "Price": 95.0,
+    "IsAvailable": true,
+    "PrepTimeMinutes": 20,
+    "CategoryId": 1
+  },
+  {
+    "Name": "Margherita Pizza",
+    "Price": 130.0,
+    "IsAvailable": true,
+    "PrepTimeMinutes": 25,
+    "CategoryId": 2
+  },
+  {
+    "Name": "BBQ Chicken Pizza",
+    "Price": 155.0,
+    "IsAvailable": true,
+    "PrepTimeMinutes": 28,
+    "CategoryId": 2
+  },
+  {
+    "Name": "Mushroom Pizza",
+    "Price": 140.0,
+    "IsAvailable": true,
+    "PrepTimeMinutes": 25,
+    "CategoryId": 2
+  },
+  {
+    "Name": "Grilled Chicken",
+    "Price": 110.0,
+    "IsAvailable": true,
+    "PrepTimeMinutes": 30,
+    "CategoryId": 3
+  },
+  {
+    "Name": "Mixed Grill Platter",
+    "Price": 220.0,
+    "IsAvailable": true,
+    "PrepTimeMinutes": 40,
+    "CategoryId": 3
+  },
+  {
+    "Name": "Greek Salad",
+    "Price": 60.0,
+    "IsAvailable": true,
+    "PrepTimeMinutes": 10,
+    "CategoryId": 4
+  },
+  {
+    "Name": "Caesar Salad",
+    "Price": 70.0,
+    "IsAvailable": true,
+    "PrepTimeMinutes": 10,
+    "CategoryId": 4
+  },
+  {
+    "Name": "Soft Drink",
+    "Price": 25.0,
+    "IsAvailable": true,
+    "PrepTimeMinutes": 2,
+    "CategoryId": 5
+  },
+  {
+    "Name": "Mineral Water",
+    "Price": 15.0,
+    "IsAvailable": true,
+    "PrepTimeMinutes": 1,
+    "CategoryId": 5
+  },
+  {
+    "Name": "Chocolate Lava Cake",
+    "Price": 75.0,
+    "IsAvailable": true,
+    "PrepTimeMinutes": 15,
+    "CategoryId": 6
+  },
+  {
+    "Name": "Cream Brulee",
+    "Price": 65.0,
+    "IsAvailable": false,
+    "PrepTimeMinutes": 20,
+    "CategoryId": 6
+  }
+]
