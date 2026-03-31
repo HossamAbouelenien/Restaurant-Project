@@ -13,7 +13,6 @@
   <ItemGroup>
     <Folder Include="Data\DataSeed\" />
     <Folder Include="Data\Migrations\" />
-    <Folder Include="Repositries\" />
   </ItemGroup>
 
   <ItemGroup>
