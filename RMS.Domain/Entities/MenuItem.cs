@@ -19,7 +19,6 @@ public class MenuItem : BaseEntity
     [Range(1, 300)]
     public int PrepTimeMinutes { get; set; }
 
-    public string? ImageUrl { get; set; }
 
     // ── FK → Category ─────────────────────────────────────────────────────────
     [Required]
@@ -31,4 +30,6 @@ public class MenuItem : BaseEntity
     // ── Navigation ───────────────────────────────────────────────────────────
     public ICollection<Recipe> Recipes { get; set; } = new List<Recipe>();
     public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+    
+    public List<Images> ImageUrl { get; set; } = new List<Images>();
 }
