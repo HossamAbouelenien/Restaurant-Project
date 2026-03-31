@@ -1,0 +1,44 @@
+[
+  {
+    "BranchId": 1,
+    "CustomerId": 13,
+    "OrderType": "DineIn",
+    "Status": "Delivered",
+    "TotalAmount": 214.0
+  },
+  {
+    "BranchId": 1,
+    "CustomerId": 14,
+    "OrderType": "Delivery",
+    "Status": "Delivered",
+    "TotalAmount": 259.0
+  },
+  {
+    "BranchId": 1,
+    "CustomerId": 15,
+    "OrderType": "Pickup",
+    "Status": "Ready",
+    "TotalAmount": 95.0
+  },
+  {
+    "BranchId": 2,
+    "CustomerId": 13,
+    "OrderType": "DineIn",
+    "Status": "Preparing",
+    "TotalAmount": 385.0
+  },
+  {
+    "BranchId": 2,
+    "CustomerId": 14,
+    "OrderType": "Delivery",
+    "Status": "Received",
+    "TotalAmount": 155.0
+  },
+  {
+    "BranchId": 3,
+    "CustomerId": 15,
+    "OrderType": "DineIn",
+    "Status": "Cancelled",
+    "TotalAmount": 0.0
+  }
+]

@@ -1,0 +1,62 @@
+[
+  {
+    "BranchId": 1,
+    "TableNumber": "T01",
+    "IsOccupied": false,
+    "Capacity": 4
+  },
+  {
+    "BranchId": 1,
+    "TableNumber": "T02",
+    "IsOccupied": true,
+    "Capacity": 2
+  },
+  {
+    "BranchId": 1,
+    "TableNumber": "T03",
+    "IsOccupied": false,
+    "Capacity": 6
+  },
+  {
+    "BranchId": 1,
+    "TableNumber": "T04",
+    "IsOccupied": true,
+    "Capacity": 4
+  },
+  {
+    "BranchId": 1,
+    "TableNumber": "T05",
+    "IsOccupied": false,
+    "Capacity": 8
+  },
+  {
+    "BranchId": 2,
+    "TableNumber": "T01",
+    "IsOccupied": false,
+    "Capacity": 4
+  },
+  {
+    "BranchId": 2,
+    "TableNumber": "T02",
+    "IsOccupied": true,
+    "Capacity": 4
+  },
+  {
+    "BranchId": 2,
+    "TableNumber": "T03",
+    "IsOccupied": false,
+    "Capacity": 6
+  },
+  {
+    "BranchId": 3,
+    "TableNumber": "T01",
+    "IsOccupied": false,
+    "Capacity": 4
+  },
+  {
+    "BranchId": 3,
+    "TableNumber": "T02",
+    "IsOccupied": false,
+    "Capacity": 10
+  }
+]

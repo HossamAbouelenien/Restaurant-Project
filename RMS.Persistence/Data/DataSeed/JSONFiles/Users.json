@@ -1,0 +1,107 @@
+[
+  {
+    "Name": "Omar Hassan",
+    "Email": "admin@rms.com",
+    "PasswordHash": "$2a$11$hashedpassword_admin001",
+    "RoleId": 1,
+    "BranchId": null
+  },
+  {
+    "Name": "Ahmed Nour",
+    "Email": "waiter1.downtown@rms.com",
+    "PasswordHash": "$2a$11$hashedpassword_waiter01",
+    "RoleId": 2,
+    "BranchId": 1
+  },
+  {
+    "Name": "Sara Khalil",
+    "Email": "waiter2.downtown@rms.com",
+    "PasswordHash": "$2a$11$hashedpassword_waiter02",
+    "RoleId": 2,
+    "BranchId": 1
+  },
+  {
+    "Name": "Mahmoud Fathy",
+    "Email": "chef1.downtown@rms.com",
+    "PasswordHash": "$2a$11$hashedpassword_chef001",
+    "RoleId": 3,
+    "BranchId": 1
+  },
+  {
+    "Name": "Nadia Samir",
+    "Email": "cashier1.downtown@rms.com",
+    "PasswordHash": "$2a$11$hashedpassword_cashier1",
+    "RoleId": 4,
+    "BranchId": 1
+  },
+  {
+    "Name": "Karim Adel",
+    "Email": "driver1.downtown@rms.com",
+    "PasswordHash": "$2a$11$hashedpassword_driver01",
+    "RoleId": 5,
+    "BranchId": 1
+  },
+  {
+    "Name": "Layla Mostafa",
+    "Email": "waiter1.maadi@rms.com",
+    "PasswordHash": "$2a$11$hashedpassword_waiter03",
+    "RoleId": 2,
+    "BranchId": 2
+  },
+  {
+    "Name": "Youssef Gamal",
+    "Email": "chef1.maadi@rms.com",
+    "PasswordHash": "$2a$11$hashedpassword_chef002",
+    "RoleId": 3,
+    "BranchId": 2
+  },
+  {
+    "Name": "Dina Ramadan",
+    "Email": "cashier1.maadi@rms.com",
+    "PasswordHash": "$2a$11$hashedpassword_cashier2",
+    "RoleId": 4,
+    "BranchId": 2
+  },
+  {
+    "Name": "Tamer Ibrahim",
+    "Email": "driver1.maadi@rms.com",
+    "PasswordHash": "$2a$11$hashedpassword_driver02",
+    "RoleId": 5,
+    "BranchId": 2
+  },
+  {
+    "Name": "Hana Wael",
+    "Email": "chef1.alex@rms.com",
+    "PasswordHash": "$2a$11$hashedpassword_chef003",
+    "RoleId": 3,
+    "BranchId": 3
+  },
+  {
+    "Name": "Rania Sherif",
+    "Email": "waiter1.alex@rms.com",
+    "PasswordHash": "$2a$11$hashedpassword_waiter04",
+    "RoleId": 2,
+    "BranchId": 3
+  },
+  {
+    "Name": "Ali Hassan",
+    "Email": "ali.hassan@gmail.com",
+    "PasswordHash": "$2a$11$hashedpassword_cust001",
+    "RoleId": 6,
+    "BranchId": null
+  },
+  {
+    "Name": "Mona Tarek",
+    "Email": "mona.tarek@gmail.com",
+    "PasswordHash": "$2a$11$hashedpassword_cust002",
+    "RoleId": 6,
+    "BranchId": null
+  },
+  {
+    "Name": "Bassem Nagi",
+    "Email": "bassem.nagi@gmail.com",
+    "PasswordHash": "$2a$11$hashedpassword_cust003",
+    "RoleId": 6,
+    "BranchId": null
+  }
+]
