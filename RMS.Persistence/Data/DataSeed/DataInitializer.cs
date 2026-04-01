@@ -162,8 +162,13 @@ namespace RMS.Persistence.Data.DataSeed
         #region Helper Methods
         private async Task SeedDataFromJsonAsync<T>(string fileName, DbSet<T> dbSet) where T : BaseEntity
         {
-            
-            var filePath = @"..\RMS.Persistence\Data\DataSeed\JSONFiles\" + fileName;
+
+            var filePath = string.Empty; //@"..\RMS.Persistence\Data\DataSeed\JSONFiles\" + fileName;
+            bool isDevelopment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
+            if(isDevelopment) 
+                filePath = Path.Combine("..", "RMS.Persistence", "Data", "DataSeed", "JSONFiles", fileName);
+            else 
+                filePath = Path.Combine("Data", "DataSeed", "JSONFiles", fileName);
             if (!File.Exists(filePath)) throw new FileNotFoundException($"File {fileName} Is Not Exists");
 
             try
