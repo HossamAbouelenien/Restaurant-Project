@@ -7,11 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RMS.ServicesAbstraction\RMS.ServicesAbstraction.csproj" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.3.9" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
+    <ProjectReference Include="..\RMS.ServicesAbstraction\RMS.ServicesAbstraction.csproj" />
   </ItemGroup>
-
+	
+<ItemGroup>
+	<FrameworkReference Include="Microsoft.AspNetCore.App"/>
+</ItemGroup>	
+	
 </Project>

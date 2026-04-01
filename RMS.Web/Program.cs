@@ -4,6 +4,9 @@ using RMS.Domain.Contracts;
 using RMS.Persistence.Data.Contexts;
 using RMS.Persistence.Data.DataSeed;
 using RMS.Persistence.Repositories;
+using RMS.Services.MappingProfiles;
+using RMS.Services.MenuItemsServices;
+using RMS.ServicesAbstraction;
 using RMS.Web.Extensions;
 
 namespace RMS.Web
@@ -27,6 +30,8 @@ namespace RMS.Web
             });
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
             builder.Services.AddScoped<IDataInitializer, DataInitializer>();
+            builder.Services.AddAutoMapper(X => X.AddProfile<MenuItemProfile>(), typeof(MenuItemProfile).Assembly);
+            builder.Services.AddScoped<IMenuItemService, MenuItemService>();
 
             var app = builder.Build();
             #region Data Seeding
