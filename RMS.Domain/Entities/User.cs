@@ -1,29 +1,23 @@
+using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RMS.Domain.Entities;
 
-public class User : BaseEntity
+public class User : IdentityUser
 {
     [Required]
     [MaxLength(100)]
     public string Name { get; set; } = string.Empty;
 
-    [Required]
-    [MaxLength(150)]
-    [EmailAddress]
-    public string Email { get; set; } = string.Empty;
-
-    [Required]
-    [MaxLength(256)]
-    public string PasswordHash { get; set; } = string.Empty;
+    public DateTime CreatedAt { get; set; }
+    public DateTime? UpdatedAt { get; set; }
+    public DateTime? DeletedAt { get; set; }
+    public bool IsDeleted { get; set; } = false;
 
     // ── FK → Role (required) ─────────────────────────────────────────────────
     [Required]
-    public int RoleId { get; set; }
-
-    [ForeignKey(nameof(RoleId))]
-    public Role? Role { get; set; }
+    public string RoleId { get; set; }
 
     // ── FK → Branch (nullable — Admin has no branch) ─────────────────────────
     public int? BranchId { get; set; }
@@ -33,5 +27,6 @@ public class User : BaseEntity
 
     // ── Navigation ───────────────────────────────────────────────────────────
     public ICollection<Order> Orders { get; set; } = new List<Order>();
+
     public ICollection<Delivery> Deliveries { get; set; } = new List<Delivery>();
 }

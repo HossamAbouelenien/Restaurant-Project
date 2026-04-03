@@ -13,7 +13,8 @@ namespace RMS.Persistence.Repositories
         {
             _dbContext = dbContext;
         }
-        public IGenericRepository<TEntity> GetRepository<TEntity>() where TEntity : BaseEntity
+
+        public IGenericRepository<TEntity> GetRepository<TEntity>() where TEntity : class
         {
             var entityType = typeof(TEntity);
 

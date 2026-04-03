@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace RMS.Domain.Contracts
 {
-    public interface ISpecifications<TEntity>  where TEntity : BaseEntity
+    public interface ISpecifications<TEntity> where TEntity : class
     {
         public ICollection<Expression<Func<TEntity, object>>> IncludeExpressions { get; }
 

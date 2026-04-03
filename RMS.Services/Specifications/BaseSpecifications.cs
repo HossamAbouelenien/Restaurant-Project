@@ -9,10 +9,11 @@ using System.Threading.Tasks;
 
 namespace RMS.Services.Specifications
 {
-    internal abstract class BaseSpecifications<TEntity> : ISpecifications<TEntity> where TEntity : BaseEntity
+    public abstract class BaseSpecifications<TEntity> : ISpecifications<TEntity> where TEntity : class
     {
         #region Sorting
-        public Expression<Func<TEntity, object>> OrderBy { get; private set; } =default!;
+
+        public Expression<Func<TEntity, object>> OrderBy { get; private set; } = default!;
 
         public Expression<Func<TEntity, object>> OrderByDescending { get; private set; } = default!;
 
@@ -20,35 +21,42 @@ namespace RMS.Services.Specifications
         {
             OrderBy = orderByExpression;
         }
+
         protected void AddOrderByDescending(Expression<Func<TEntity, object>> orderByDescendingExpression)
         {
             OrderByDescending = orderByDescendingExpression;
         }
 
-
-        #endregion
+        #endregion Sorting
 
         #region Criteria
-        public Expression<Func<TEntity, bool>> Criteria { get; } 
+
+        public Expression<Func<TEntity, bool>> Criteria { get; }
+
         protected BaseSpecifications(Expression<Func<TEntity, bool>> criteriaExpression)
         {
             Criteria = criteriaExpression;
         }
-        #endregion
+
+        #endregion Criteria
 
         #region Includes
+
         public ICollection<Expression<Func<TEntity, object>>> IncludeExpressions { get; } = [];
+
         protected void AddInclude(Expression<Func<TEntity, object>> includeExp)
         {
             IncludeExpressions.Add(includeExp);
         }
-        #endregion
+
+        #endregion Includes
 
         #region Pagination
 
         public int Take { get; private set; }
         public int Skip { get; private set; }
         public bool IsPaginated { get; private set; }
+
         protected void ApplyPagination(int PageSize, int pageIndex)
         {
             IsPaginated = true;
@@ -56,8 +64,6 @@ namespace RMS.Services.Specifications
             Skip = (pageIndex - 1) * PageSize;
         }
 
-        #endregion
-
-        
+        #endregion Pagination
     }
 }

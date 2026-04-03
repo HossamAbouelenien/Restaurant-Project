@@ -2,6 +2,8 @@
 {
     public interface IDataInitializer
     {
-        Task InitializeAsync();  
+        Task InitializeAsync();
+
+        Task IdentityDataSeedAsync();
     }
 }
