@@ -17,6 +17,6 @@ namespace RMS.Shared.DTOs.MenuItemsDTOs
         public bool IsAvailable { get; set; } = true;
         public int PrepTimeMinutes { get; set; }
         public string Category { get; set; } = default!;
-        public List<string> ImageUrl { get; set; } = new List<string>();
+        public string ImageUrl { get; set; } = default!;
     }
 }

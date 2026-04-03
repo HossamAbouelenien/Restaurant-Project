@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace RMS.Services.MappingProfiles
 {
-    public class MenuItemImagesUrlResolver : IValueResolver<MenuItem, MenuItemDTO, List<string>>
+    public class MenuItemImagesUrlResolver : IValueResolver<MenuItem, MenuItemDTO, string>
     {
         private readonly IConfiguration _configuration;
 
@@ -18,22 +18,19 @@ namespace RMS.Services.MappingProfiles
         {
             _configuration = configuration;
         }
-        public List<string> Resolve(MenuItem source, MenuItemDTO destination, List<string> destMember, ResolutionContext context)
+        public string Resolve(MenuItem source, MenuItemDTO destination, string destMember, ResolutionContext context)
         {
-            List<string> result = new List<string>();
-            var baseUrl = _configuration.GetSection("URLs")["BaseUrl"];
-            if (source.ImageUrl is null) return [];
-            foreach (var item in source.ImageUrl)
-            {
-                if(item is null) continue;
-                if (item.ImageUrl.StartsWith("http")) 
-                    result.Add(item.ImageUrl);
+            if (string.IsNullOrEmpty(source.ImageUrl))
+                return string.Empty;
 
-                if(baseUrl is null) continue;
-                var imageUrl = $"{baseUrl}{item.ImageUrl}";
-                result.Add(imageUrl);
-            }
-            return result;
+            if (source.ImageUrl.StartsWith("http"))
+                return source.ImageUrl;
+
+            var baseUrl = _configuration.GetSection("URLs")["BaseUrl"];
+            if (string.IsNullOrEmpty(baseUrl))
+                return string.Empty;
+            var imageUrl = $"{baseUrl}{source.ImageUrl}";
+            return imageUrl;
         }
     }
 }
