@@ -1,20 +1,18 @@
-﻿
-using RMS.Domain.Entities;
+﻿using RMS.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using RMS.Domain.Contracts;
 
 namespace RMS.Persistence
 {
-    public static class SpecificationsEvaluator 
+    public static class SpecificationsEvaluator
     {
-        public static IQueryable<TEntity> CreateQuery<TEntity>(IQueryable<TEntity> entryPoint, 
-                                                      ISpecifications<TEntity> specifications) where TEntity : BaseEntity
+        public static IQueryable<TEntity> CreateQuery<TEntity>(IQueryable<TEntity> entryPoint,
+                                                      ISpecifications<TEntity> specifications) where TEntity : class
         {
             var Query = entryPoint; // _dbContext.Products
             if (specifications is not null)
             {
-
-                if(specifications.Criteria is not null)
+                if (specifications.Criteria is not null)
                 {
                     Query = Query.Where(specifications.Criteria); // _dbContext.Products.Where(Criteria)
                 }
@@ -28,7 +26,6 @@ namespace RMS.Persistence
 
                     Query = specifications.IncludeExpressions.Aggregate(Query,
                         (CurrentQuery, IncludeExp) => CurrentQuery.Include(IncludeExp));
-
                 }
 
                 if (specifications.OrderBy is not null)

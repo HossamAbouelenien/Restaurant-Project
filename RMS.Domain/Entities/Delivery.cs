@@ -2,9 +2,7 @@ using RMS.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-
 namespace RMS.Domain.Entities;
-
 
 public class Delivery : BaseEntity
 {
@@ -17,7 +15,7 @@ public class Delivery : BaseEntity
 
     // ── FK → User (driver) ────────────────────────────────────────────────────
     [Required]
-    public int DriverId { get; set; }
+    public string DriverId { get; set; }
 
     [ForeignKey(nameof(DriverId))]
     public User? Driver { get; set; }
@@ -29,7 +27,7 @@ public class Delivery : BaseEntity
 
     [Required]
     [MaxLength(30)]
-    public DeliveryStatus DeliveryStatus { get; set; } 
+    public DeliveryStatus DeliveryStatus { get; set; }
 
     [Column(TypeName = "decimal(10,2)")]
     public decimal? CashCollected { get; set; }

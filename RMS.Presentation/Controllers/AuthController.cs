@@ -1,0 +1,129 @@
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using RMS.Domain.Entities;
+using RMS.ServicesAbstraction.IIdentityService;
+using RMS.Shared.DTOs.IdentityDTOs;
+
+namespace RMS.Presentation.Controllers
+{
+    [ApiController]
+    [Route("api/[Controller]")]
+    public class AuthController(IAuthService authService) : ControllerBase
+    {
+        private readonly IAuthService _authService = authService;
+
+        [HttpPost("register")]
+        public async Task<ActionResult<UserDTO>> Register([FromBody] RegisterationRequestDTO registerationRequestDTO)
+        {
+            try
+            {
+                if (registerationRequestDTO == null)
+                {
+                    return BadRequest("Registeration data is required");
+                }
+
+                if (await _authService.IsEmailExistsAsync(registerationRequestDTO.Email))
+                {
+                    return Conflict($"User with email '{registerationRequestDTO.Email}' already exists");
+                }
+
+                var user = await _authService.RegisterAsync(registerationRequestDTO);
+
+                if (user == null)
+                {
+                    return BadRequest("Registration failed");
+                }
+
+                var response = new
+                {
+                    Message = "User registered successfully",
+                    Data = user
+                };
+
+                return StatusCode(StatusCodes.Status201Created, response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    Message = "An error occurred during registration",
+                    Error = ex.Message
+                });
+            }
+        }
+
+        [HttpPost("login")]
+        public async Task<ActionResult<TokenDTO>> Login([FromBody] LoginRequestDTO loginRequestDTO)
+        {
+            try
+            {
+                if (loginRequestDTO == null)
+                {
+                    return BadRequest("Login data is required");
+                }
+
+                var loginResponse = await _authService.LoginAsync(loginRequestDTO);
+
+                if (loginResponse == null)
+                {
+                    return BadRequest("Login failed. Please check your credentials.");
+                }
+
+                var response = new
+                {
+                    Message = "Login successfully",
+                    Data = loginResponse
+                };
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    Message = "An error occurred during login",
+                    Error = ex.Message
+                });
+            }
+        }
+
+        [HttpPost("refresh-token")]
+        public async Task<ActionResult<UserDTO>> RefreshAccessToken([FromBody] RefreshTokenRequestDTO refreshTokenRequestDTO)
+        {
+            try
+            {
+                if (refreshTokenRequestDTO == null || String.IsNullOrEmpty(refreshTokenRequestDTO.RefreshToken))
+                {
+                    return BadRequest("Refresh Token is required");
+                }
+
+                var tokenResponse = await _authService.RefreshAccessTokenAsync(refreshTokenRequestDTO);
+
+                if (tokenResponse == null)
+                {
+                    return Unauthorized(new
+                    {
+                        StatusCode = 401,
+                        Message = "Invalid or expired refresh token. If token reuse was detected, all your sessions have been terminated for security. Please login again."
+                    });
+                }
+
+                var response = new
+                {
+                    Message = "Token refreshed successfully",
+                    Data = tokenResponse
+                };
+
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new
+                {
+                    Message = "An error occurred during token refresh",
+                    Error = ex.Message
+                });
+            }
+        }
+    }
+}

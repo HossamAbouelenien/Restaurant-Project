@@ -8,22 +8,9 @@ public class UserConfigurations : IEntityTypeConfiguration<User>
 {
     public void Configure(EntityTypeBuilder<User> builder)
     {
-        builder.HasKey(u => u.Id);
-
         builder.Property(u => u.Name)
                .IsRequired()
                .HasMaxLength(100);
-
-        builder.Property(u => u.Email)
-               .IsRequired()
-               .HasMaxLength(150);
-
-        builder.HasIndex(u => u.Email)
-               .IsUnique();
-
-        builder.Property(u => u.PasswordHash)
-               .IsRequired()
-               .HasMaxLength(256);
 
         builder.Property(u => u.CreatedAt)
                .HasDefaultValueSql("GETDATE()");
@@ -32,12 +19,6 @@ public class UserConfigurations : IEntityTypeConfiguration<User>
         {
             Tb.HasCheckConstraint("UserValidEmailCheck", "Email LIKE '_%@_%._%'");
         });
-
-        // ── FK → Role ─────────────────────────────────────────────────────────
-        builder.HasOne(u => u.Role)
-               .WithMany(r => r.Users)
-               .HasForeignKey(u => u.RoleId)
-               .OnDelete(DeleteBehavior.Restrict);
 
         // ── FK → Branch (nullable) ────────────────────────────────────────────
         builder.HasOne(u => u.Branch)

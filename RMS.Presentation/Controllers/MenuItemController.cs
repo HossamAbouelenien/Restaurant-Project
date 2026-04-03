@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RMS.ServicesAbstraction;
 using System;
 using System.Collections.Generic;
@@ -20,6 +21,7 @@ namespace RMS.Presentation.Controllers
             _menuItemService = menuItemService;
         }
 
+        //[Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAllMenuItems()
         {

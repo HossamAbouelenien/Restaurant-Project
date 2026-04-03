@@ -17,7 +17,7 @@ public class Order : BaseEntity
 
     // ── FK → User (customer) ─────────────────────────────────────────────────
     [Required]
-    public int CustomerId { get; set; }
+    public string CustomerId { get; set; }
 
     [ForeignKey(nameof(CustomerId))]
     public User? Customer { get; set; }
@@ -36,6 +36,7 @@ public class Order : BaseEntity
 
     // ── Navigation ───────────────────────────────────────────────────────────
     public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+
     public ICollection<KitchenTicket> KitchenTickets { get; set; } = new List<KitchenTicket>();
     public Payment? Payment { get; set; }       // 1-to-1, FK lives on Payment
     public Delivery? Delivery { get; set; }     // 1-to-1, FK lives on Delivery
