@@ -33,6 +33,109 @@ namespace RMS.Web
             builder.Services.AddAutoMapper(X => X.AddProfile<MenuItemProfile>(), typeof(MenuItemProfile).Assembly);
             builder.Services.AddScoped<IMenuItemService, MenuItemService>();
 
+
+
+
+
+            //================= Mahmoud (40 : 55) =================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            //================= Amr (55 : 70) =================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            //================= Mustafa (70 : 85) =================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            //================= Hossam (85 : 100) =================
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
+            //================= Arwa (100 : 115) =================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            //================= Areej (115 : 135) =================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             var app = builder.Build();
             #region Data Seeding
 

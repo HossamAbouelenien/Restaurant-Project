@@ -31,5 +31,5 @@ public class MenuItem : BaseEntity
     public ICollection<Recipe> Recipes { get; set; } = new List<Recipe>();
     public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
     
-    public List<Images> ImageUrl { get; set; } = new List<Images>();
+    public string? ImageUrl { get; set; }
 }

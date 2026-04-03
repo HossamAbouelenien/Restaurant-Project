@@ -4,97 +4,124 @@
     "Price": 89.0,
     "IsAvailable": true,
     "PrepTimeMinutes": 15,
-    "CategoryId": 1
+    "CategoryId": 1,
+    "ImageUrl": "Images/MenuItem/Burger/classicBurgger.jpeg"
   },
   {
     "Name": "Double Smash Burger",
     "Price": 120.0,
     "IsAvailable": true,
     "PrepTimeMinutes": 18,
-    "CategoryId": 1
+    "CategoryId": 1,
+    "ImageUrl": "Images/MenuItem/Burger/DoubleSmashBurger.jpeg"
+
   },
   {
     "Name": "Crispy Chicken Burger",
     "Price": 95.0,
     "IsAvailable": true,
     "PrepTimeMinutes": 20,
-    "CategoryId": 1
+    "CategoryId": 1,
+    "ImageUrl": "Images/MenuItem/Burger/CrispyChickenBurger.jpeg"
+
   },
   {
     "Name": "Margherita Pizza",
     "Price": 130.0,
     "IsAvailable": true,
     "PrepTimeMinutes": 25,
-    "CategoryId": 2
+    "CategoryId": 2,
+    "ImageUrl": "Images/MenuItem/Pizza/margheritaPizza.jpeg"
+
   },
   {
     "Name": "BBQ Chicken Pizza",
     "Price": 155.0,
     "IsAvailable": true,
     "PrepTimeMinutes": 28,
-    "CategoryId": 2
+    "CategoryId": 2,
+    "ImageUrl": "Images/MenuItem/Pizza/chickenPizza.jpeg"
+
   },
   {
     "Name": "Mushroom Pizza",
     "Price": 140.0,
     "IsAvailable": true,
     "PrepTimeMinutes": 25,
-    "CategoryId": 2
+    "CategoryId": 2,
+    "ImageUrl": "Images/MenuItem/Pizza/mushroomPizza.jpeg"
+
   },
   {
     "Name": "Grilled Chicken",
     "Price": 110.0,
     "IsAvailable": true,
     "PrepTimeMinutes": 30,
-    "CategoryId": 3
+    "CategoryId": 3,
+    "ImageUrl": "Images/MenuItem/Chicken/GrilledChicken.jpeg"
+
   },
   {
     "Name": "Mixed Grill Platter",
     "Price": 220.0,
     "IsAvailable": true,
     "PrepTimeMinutes": 40,
-    "CategoryId": 3
+    "CategoryId": 3,
+    "ImageUrl": "Images/MenuItem/Chicken/MixedGrillPlatter.jpeg"
+
   },
   {
     "Name": "Greek Salad",
     "Price": 60.0,
     "IsAvailable": true,
     "PrepTimeMinutes": 10,
-    "CategoryId": 4
+    "CategoryId": 4,
+    "ImageUrl": "Images/MenuItem/Salad/GreekSalad.jpeg"
+
   },
   {
     "Name": "Caesar Salad",
     "Price": 70.0,
     "IsAvailable": true,
     "PrepTimeMinutes": 10,
-    "CategoryId": 4
+    "CategoryId": 4,
+    "ImageUrl": "Images/MenuItem/Salad/CaesarSalad.jpeg"
+
   },
   {
     "Name": "Soft Drink",
     "Price": 25.0,
     "IsAvailable": true,
     "PrepTimeMinutes": 2,
-    "CategoryId": 5
+    "CategoryId": 5,
+    "ImageUrl": "Images/MenuItem/Drinks/SoftDrink.jpeg"
+
   },
   {
     "Name": "Mineral Water",
     "Price": 15.0,
     "IsAvailable": true,
     "PrepTimeMinutes": 1,
-    "CategoryId": 5
+    "CategoryId": 5,
+    "ImageUrl": "Images/MenuItem/Drinks/MineralWater.jpeg"
+
   },
   {
     "Name": "Chocolate Lava Cake",
     "Price": 75.0,
     "IsAvailable": true,
     "PrepTimeMinutes": 15,
-    "CategoryId": 6
+    "CategoryId": 6,
+    "ImageUrl": "Images/MenuItem/Desserts/ChocolateLavaCake.jpeg"
+
   },
   {
     "Name": "Cream Brulee",
     "Price": 65.0,
     "IsAvailable": false,
     "PrepTimeMinutes": 20,
-    "CategoryId": 6
+    "CategoryId": 6,
+    "ImageUrl": "Images/MenuItem/Desserts/CreamBrulee.jpeg"
+
   }
 ]

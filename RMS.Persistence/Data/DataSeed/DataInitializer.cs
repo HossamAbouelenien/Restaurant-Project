@@ -25,7 +25,6 @@ namespace RMS.Persistence.Data.DataSeed
                 var hasCategories = await _dbContext.Categories.AnyAsync();
                 var hasIngredients = await _dbContext.Ingredients.AnyAsync();
                 var hasMenuItems = await _dbContext.MenuItems.AnyAsync();
-                var hasImages = await _dbContext.Images.AnyAsync();
                 var hasRecipes = await _dbContext.Recipes.AnyAsync();
                 var hasTables = await _dbContext.Tables.AnyAsync();
                 var hasBranchStocks = await _dbContext.BranchStocks.AnyAsync();
@@ -36,7 +35,7 @@ namespace RMS.Persistence.Data.DataSeed
                 var hasDeliveries = await _dbContext.Deliveries.AnyAsync();
                 var hasTableOrders = await _dbContext.TableOrders.AnyAsync();
 
-                if (hasRoles && hasBranches && hasUsers && hasCategories && hasIngredients && hasMenuItems && hasImages &&
+                if (hasRoles && hasBranches && hasUsers && hasCategories && hasIngredients && hasMenuItems &&
                     hasRecipes && hasTables && hasBranchStocks && hasOrders && hasOrderItems && hasKitchenTickets && hasPayments
                     && hasDeliveries && hasTableOrders) return;
 
@@ -82,70 +81,63 @@ namespace RMS.Persistence.Data.DataSeed
                     await _dbContext.SaveChangesAsync();
                 }
 
-                // ── 7. Images (depends on: MenuItems) ─────────────────────────────────────
-                if (!hasImages)
-                {
-                    await SeedDataFromJsonAsync<Images>("Images.json", _dbContext.Images);
-                    await _dbContext.SaveChangesAsync();
-                }
-
-                // ── 8. Recipes (depends on: MenuItems, Ingredients) ───────────────────────
+                // ── 7. Recipes (depends on: MenuItems, Ingredients) ───────────────────────
                 if (!hasRecipes)
                 {
                     await SeedDataFromJsonAsync<Recipe>("Recipes.json", _dbContext.Recipes);
                     await _dbContext.SaveChangesAsync();
                 }
 
-                // ── 9. Tables (depends on: Branches) ──────────────────────────────────────
+                // ── 8. Tables (depends on: Branches) ──────────────────────────────────────
                 if (!hasTables)
                 {
                     await SeedDataFromJsonAsync<Table>("Tables.json", _dbContext.Tables);
                     await _dbContext.SaveChangesAsync();
                 }
 
-                // ── 10. BranchStocks (depends on: Branches, Ingredients) ──────────────────
+                // ── 9. BranchStocks (depends on: Branches, Ingredients) ──────────────────
                 if (!hasBranchStocks)
                 {
                     await SeedDataFromJsonAsync<BranchStock>("BranchStocks.json", _dbContext.BranchStocks);
                     await _dbContext.SaveChangesAsync();
                 }
 
-                // ── 11. Orders (depends on: Branches, Users) ──────────────────────────────
+                // ── 10. Orders (depends on: Branches, Users) ──────────────────────────────
                 if (!hasOrders)
                 {
                     await SeedDataFromJsonAsync<Order>("Orders.json", _dbContext.Orders);
                     await _dbContext.SaveChangesAsync();
                 }
 
-                // ── 12. OrderItems (depends on: Orders, MenuItems) ────────────────────────
+                // ── 11. OrderItems (depends on: Orders, MenuItems) ────────────────────────
                 if (!hasOrderItems)
                 {
                     await SeedDataFromJsonAsync<OrderItem>("OrderItems.json", _dbContext.OrderItems);
                     await _dbContext.SaveChangesAsync();
                 }
 
-                // ── 13. KitchenTickets (depends on: Orders) ───────────────────────────────
+                // ── 12. KitchenTickets (depends on: Orders) ───────────────────────────────
                 if (!hasKitchenTickets)
                 {
                     await SeedDataFromJsonAsync<KitchenTicket>("KitchenTickets.json", _dbContext.KitchenTickets);
                     await _dbContext.SaveChangesAsync();
                 }
 
-                // ── 14. Payments (depends on: Orders) — 1-to-1 ───────────────────────────
+                // ── 13. Payments (depends on: Orders) — 1-to-1 ───────────────────────────
                 if (!hasPayments)
                 {
                     await SeedDataFromJsonAsync<Payment>("Payments.json", _dbContext.Payments);
                     await _dbContext.SaveChangesAsync();
                 }
 
-                // ── 15. Deliveries (depends on: Orders, Users[Driver]) — 1-to-1 ──────────
+                // ── 14. Deliveries (depends on: Orders, Users[Driver]) — 1-to-1 ──────────
                 if (!hasDeliveries)
                 {
                     await SeedDataFromJsonAsync<Delivery>("Deliveries.json", _dbContext.Deliveries);
                     await _dbContext.SaveChangesAsync();
                 }
 
-                // ── 16. TableOrders (depends on: Tables, Orders) — 1-to-1 ────────────────
+                // ── 15. TableOrders (depends on: Tables, Orders) — 1-to-1 ────────────────
                 if (!hasTableOrders)
                 {
                     await SeedDataFromJsonAsync<TableOrder>("TableOrders.json", _dbContext.TableOrders);
