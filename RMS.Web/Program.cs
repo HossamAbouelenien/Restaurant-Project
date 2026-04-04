@@ -14,8 +14,10 @@ using RMS.Services.IdentityService;
 using RMS.Services.IngredientServices;
 using RMS.Services.MappingProfiles;
 using RMS.Services.MenuItemsServices;
+using RMS.Services.UserServices;
 using RMS.ServicesAbstraction;
 using RMS.ServicesAbstraction.IIdentityService;
+using RMS.ServicesAbstraction.IUserServices;
 using RMS.Web.Extensions;
 using System.Text;
 
@@ -132,7 +134,7 @@ namespace RMS.Web
                  });
             });
 
-
+            builder.Services.AddScoped<IUserService, UserService>();
 
 
 
