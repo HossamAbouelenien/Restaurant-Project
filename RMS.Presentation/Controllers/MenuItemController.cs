@@ -27,8 +27,8 @@ namespace RMS.Presentation.Controllers
 
         //[Authorize]
         [HttpGet]
-       
-        public async Task<ActionResult<PaginatedResult<MenuItemDTO>>> GetAllMenuItems ([FromQuery] MenuItemQueryParams queryParams)
+
+        public async Task<ActionResult<PaginatedResult<MenuItemDTO>>> GetAllMenuItems([FromQuery] MenuItemQueryParams queryParams)
         {
             var result = await _menuItemService.GetAllMenuItemsAsync(queryParams);
             return Ok(result);
@@ -40,6 +40,54 @@ namespace RMS.Presentation.Controllers
             var result = await _menuItemService.GetMenuItemByIdAsync(id);
             if (result is null) return NotFound();
             return Ok(result);
+        }
+
+
+        [HttpPost]
+
+        public async Task<ActionResult<MenuItemDetailsDTO>> CreateMenuItem([FromForm] CreateMenuItemDTO dto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            try
+            {
+                var result = await _menuItemService.CreateMenuItemAsync(dto);
+                return CreatedAtAction(nameof(GetMenuItemById), new { id = result.Id }, result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult<MenuItemDetailsDTO>> UpdateMenuItem(int id, [FromForm] UpdateMenuItemDTO dto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            try
+            {
+                var result = await _menuItemService.UpdateMenuItemAsync(id, dto);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+
+        [HttpPatch("{id}/toggle-availability")]
+        public async Task<ActionResult> ToggleAvailability(int id)
+        {
+            await _menuItemService.ToggleAvailabilityAsync(id);
+            return Ok(); 
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteMenuItem(int id)
+        {
+            await _menuItemService.DeleteMenuItemAsync(id);
+            return Ok(); 
         }
     }
 }

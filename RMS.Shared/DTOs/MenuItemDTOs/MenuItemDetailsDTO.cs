@@ -15,9 +15,9 @@ namespace RMS.Shared.DTOs.MenuItemDTOs
         public bool IsAvailable { get; set; }
         public int PrepTimeMinutes { get; set; }
 
-        public string CategoryName { get; set; } = string.Empty;
+        public string CategoryName { get; set; } = default!;
 
-        public string ImageUrl { get; set; } = string.Empty;
+        public string ImageUrl { get; set; } = default!;
 
         public List<RecipeDTO> Recipes { get; set; } = new();
     }
