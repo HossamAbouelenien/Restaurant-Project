@@ -41,5 +41,12 @@ namespace RMS.Persistence.Repositories
             return await SpecificationsEvaluator.CreateQuery(_dbContex.Set<TEntity>(), specifications).CountAsync();
 
         }
+
+        //public async Task<TEntity?> GetByIdIgnoreFiltersAsync(int id)
+        //{
+        //    return await _dbContex.Set<TEntity>()
+        //               .IgnoreQueryFilters()
+        //               .FirstOrDefaultAsync(e => EF.Property<int>(e, "Id") == id);
+        //}
     }
 }

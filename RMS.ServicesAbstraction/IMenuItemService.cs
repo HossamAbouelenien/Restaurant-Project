@@ -14,5 +14,9 @@ namespace RMS.ServicesAbstraction
     {
         Task<PaginatedResult<MenuItemDTO>> GetAllMenuItemsAsync(MenuItemQueryParams queryParams);
         Task<MenuItemDetailsDTO?> GetMenuItemByIdAsync(int id);
+        Task<MenuItemDetailsDTO> CreateMenuItemAsync(CreateMenuItemDTO dto);
+        Task<MenuItemDetailsDTO> UpdateMenuItemAsync(int id, UpdateMenuItemDTO dto);
+        public Task ToggleAvailabilityAsync(int id);
+        public Task DeleteMenuItemAsync(int id);
     }
 }

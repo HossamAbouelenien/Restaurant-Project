@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace RMS.Services.MappingProfiles
 {
-    public class MenuItemImagesUrlResolver : IValueResolver<MenuItem, MenuItemDTO, string>
+    public class MenuItemImagesUrlResolver<TDestination> : IValueResolver<MenuItem, TDestination, string>
     {
         private readonly IConfiguration _configuration;
 
@@ -18,7 +18,7 @@ namespace RMS.Services.MappingProfiles
         {
             _configuration = configuration;
         }
-        public string Resolve(MenuItem source, MenuItemDTO destination, string destMember, ResolutionContext context)
+        public string Resolve(MenuItem source, TDestination destination, string destMember, ResolutionContext context)
         {
             if (string.IsNullOrEmpty(source.ImageUrl))
                 return string.Empty;
