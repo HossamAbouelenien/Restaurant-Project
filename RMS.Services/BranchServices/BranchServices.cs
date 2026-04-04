@@ -34,18 +34,30 @@ namespace RMS.Services.BranchServices
                         return _mapper.Map<BranchDTO>(Branch);
         }
 
-        public Task<BranchDTO> UpdateBranchAsync(int Id, BranchDTO BranchDTO)
+        public async Task<BranchDTO> UpdateBranchAsync(int Id, BranchDTO BranchDTO)
         {
-            throw new NotImplementedException();
+            var Repo = _unitOfWork.GetRepository<Branch>();
+            var Branch = await Repo.GetByIdAsync(Id);
+            _mapper.Map(BranchDTO, Branch);
+            Repo.Update(Branch!);
+            await _unitOfWork.SaveChangesAsync();
+            return _mapper.Map<BranchDTO>(Branch);
         }
-        public Task<BranchDTO> CreateBranchAsync(BranchDTO BranchDTO)
+        public async Task<BranchDTO> CreateBranchAsync(BranchDTO BranchDTO)
         {
-            throw new NotImplementedException();
+            var Repo = _unitOfWork.GetRepository<Branch>();
+            var Branch = _mapper.Map<Branch>(BranchDTO);
+            await Repo.AddAsync(Branch);
+            await _unitOfWork.SaveChangesAsync();
+            return _mapper.Map<BranchDTO>(Branch);
         }
-
-        public Task DeleteBranchAsync(int Id)
+        public async Task DeleteBranchAsync(int Id)
         {
-            throw new NotImplementedException();
+            var Repo = _unitOfWork.GetRepository<Branch>();
+            var Branch = await Repo.GetByIdAsync(Id);
+            Branch!.IsActive = false;  
+            Repo.Update(Branch);
+            await _unitOfWork.SaveChangesAsync();
         }
 
     }

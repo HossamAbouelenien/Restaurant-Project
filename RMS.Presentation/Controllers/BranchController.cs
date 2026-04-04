@@ -13,7 +13,7 @@ namespace RMS.Presentation.Controllers
 {
     [ApiController]
     [Route("api/[Controller]")]
-    public class BranchController :ControllerBase
+    public class BranchController : ControllerBase
     {
         private readonly IBranchService _branchService;
         public BranchController(IBranchService branchService)
@@ -21,7 +21,7 @@ namespace RMS.Presentation.Controllers
             _branchService = branchService;
         }
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<BranchStockDTO>>>GetAllBranches()
+        public async Task<ActionResult<IEnumerable<BranchStockDTO>>> GetAllBranches()
         {
             var BranchStocks = await _branchService.GetAllBranchesAsync();
             return Ok(BranchStocks);
@@ -37,6 +37,12 @@ namespace RMS.Presentation.Controllers
         {
             var BranchStock = await _branchService.UpdateBranchAsync(id, updateBranch);
             return Ok(BranchStock);
+        }
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteBranchStock(int id)
+        {
+            await _branchService.DeleteBranchAsync(id);
+            return Ok();
         }
     }
 }
