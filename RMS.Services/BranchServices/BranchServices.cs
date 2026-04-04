@@ -27,9 +27,11 @@ namespace RMS.Services.BranchServices
             return _mapper.Map<IEnumerable<BranchDTO>>(Branches);
         }
 
-        public Task<BranchDTO> GetBranchByIdAsync(int Id)
+        public async Task<BranchDTO> GetBranchByIdAsync(int Id)
         {
-            throw new NotImplementedException();
+
+            var Branch = await _unitOfWork.GetRepository<Branch>().GetByIdAsync(Id);
+                        return _mapper.Map<BranchDTO>(Branch);
         }
 
         public Task<BranchDTO> UpdateBranchAsync(int Id, BranchDTO BranchDTO)

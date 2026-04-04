@@ -8,6 +8,7 @@ using RMS.Domain.Entities;
 using RMS.Persistence.Data.Contexts;
 using RMS.Persistence.Data.DataSeed;
 using RMS.Persistence.Repositories;
+using RMS.Services.BranchServices;
 using RMS.Services.BranchStockServices;
 using RMS.Services.IdentityService;
 using RMS.Services.IngredientServices;
@@ -179,7 +180,7 @@ namespace RMS.Web
 
             //================= Areej (180 : 200) =================
 
-
+            builder.Services.AddScoped<IBranchService, BranchServices>();
 
 
 

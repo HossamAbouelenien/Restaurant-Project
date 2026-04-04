@@ -14,7 +14,12 @@ namespace RMS.Services.MappingProfiles
     {
         public BranchProfile()
         {
-            CreateMap<Branch, BranchDTO>();
+            CreateMap<Branch, BranchDTO>()
+                 .ForMember(dest => dest.BuildingNumber, opt => opt.MapFrom(src => src.Address.BuildingNumber))
+                .ForMember(dest => dest.Street, opt => opt.MapFrom(src => src.Address.Street))
+                .ForMember(dest => dest.City, opt => opt.MapFrom(src => src.Address.City))
+                .ForMember(dest => dest.Note, opt => opt.MapFrom(src => src.Address.Note))
+                .ForMember(dest => dest.SpecialMark, opt => opt.MapFrom(src => src.Address.SpecialMark)); 
         }
 
     }
