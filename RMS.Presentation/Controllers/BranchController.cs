@@ -39,7 +39,7 @@ namespace RMS.Presentation.Controllers
             return Ok(BranchStock);
         }
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteBranchStock(int id)
+        public async Task<ActionResult> DeleteBranch(int id)
         {
             await _branchService.DeleteBranchAsync(id);
             return Ok();
