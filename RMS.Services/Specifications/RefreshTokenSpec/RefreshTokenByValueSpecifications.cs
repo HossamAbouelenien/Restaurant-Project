@@ -1,6 +1,6 @@
 ﻿using RMS.Domain.Entities;
 
-namespace RMS.Services.Specifications
+namespace RMS.Services.Specifications.RefreshTokenSpec
 {
     public class RefreshTokenByValueSpecifications : BaseSpecifications<RefreshToken>
 

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RMS.Services.Specifications
+namespace RMS.Services.Specifications.RefreshTokenSpec
 {
     public class RefreshTokenFamilySpecifications : BaseSpecifications<RefreshToken>
     {
