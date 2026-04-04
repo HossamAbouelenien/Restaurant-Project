@@ -17,7 +17,7 @@ public class User : IdentityUser
 
     // ── FK → Role (required) ─────────────────────────────────────────────────
     [Required]
-    public string RoleId { get; set; }
+    public string RoleId { get; set; } //Defult
 
     // ── FK → Branch (nullable — Admin has no branch) ─────────────────────────
     public int? BranchId { get; set; }

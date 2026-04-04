@@ -180,6 +180,9 @@ namespace RMS.Persistence.Data.DataSeed
         {
             try
             {
+                var customerRole = string.Empty;
+                var adminRole = string.Empty;
+
                 if (!_roleManager.Roles.Any())
                 {
                     await _roleManager.CreateAsync(new IdentityRole(SD.Role_Customer));
@@ -187,6 +190,8 @@ namespace RMS.Persistence.Data.DataSeed
                     await _roleManager.CreateAsync(new IdentityRole(SD.Role_Driver));
                     await _roleManager.CreateAsync(new IdentityRole(SD.Role_Chef));
                     await _roleManager.CreateAsync(new IdentityRole(SD.Role_Admin));
+                    customerRole = await _roleManager.GetRoleIdAsync(new IdentityRole(SD.Role_Customer));
+                    adminRole = await _roleManager.GetRoleIdAsync(new IdentityRole(SD.Role_Admin));
                 }
                 if (!_userManager.Users.Any())
                 {
@@ -195,11 +200,21 @@ namespace RMS.Persistence.Data.DataSeed
                         Name = "Mustafa Saad",
                         Email = "mustafa@gmai.com",
                         UserName = "mustafasaad",
-                        PhoneNumber = "0123456789"
+                        PhoneNumber = "0123456789",
+                        RoleId = adminRole
+                    };
+
+                    var User02 = new User
+                    {
+                        Name = "Areej Kammoush",
+                        Email = "areej@gmai.com",
+                        UserName = "areejkammoush",
+                        PhoneNumber = "0123456789",
+                        RoleId = customerRole
                     };
 
                     await _userManager.CreateAsync(User01, "P@ssw0rd");
-                    await _userManager.AddToRoleAsync(User01, SD.Role_Admin);
+                    await _userManager.CreateAsync(User02, "P@ssw0rd");
                 }
                 await _dbContext.SaveChangesAsync();
             }
