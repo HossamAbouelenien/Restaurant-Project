@@ -19,7 +19,17 @@ namespace RMS.Services.MappingProfiles
                 .ForMember(dest => dest.Street, opt => opt.MapFrom(src => src.Address.Street))
                 .ForMember(dest => dest.City, opt => opt.MapFrom(src => src.Address.City))
                 .ForMember(dest => dest.Note, opt => opt.MapFrom(src => src.Address.Note))
-                .ForMember(dest => dest.SpecialMark, opt => opt.MapFrom(src => src.Address.SpecialMark)); 
+                .ForMember(dest => dest.SpecialMark, opt => opt.MapFrom(src => src.Address.SpecialMark));
+            // Reverse mapping for creating/updating Branch from BranchDTO
+            CreateMap<BranchDTO, Branch>()
+                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => new Address
+                {
+                    BuildingNumber = src.BuildingNumber,
+                    Street = src.Street,
+                    City = src.City,
+                    Note = src.Note,
+                    SpecialMark = src.SpecialMark
+                }));
         }
 
     }
