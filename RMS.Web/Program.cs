@@ -9,6 +9,7 @@ using RMS.Persistence.Data.Contexts;
 using RMS.Persistence.Data.DataSeed;
 using RMS.Persistence.Repositories;
 using RMS.Services.IdentityService;
+using RMS.Services.IngredientServices;
 using RMS.Services.MappingProfiles;
 using RMS.Services.MenuItemsServices;
 using RMS.ServicesAbstraction;
@@ -104,6 +105,7 @@ namespace RMS.Web
             //================= Hossam (85 : 100) =================
 
             //================= Arwa (100 : 115) =================
+            builder.Services.AddScoped<IIngredientService, IngredientService>();
 
             //================= Areej (115 : 135) =================
 
