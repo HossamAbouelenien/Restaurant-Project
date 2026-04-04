@@ -35,5 +35,11 @@ namespace RMS.Persistence.Repositories
         {
             return await SpecificationsEvaluator.CreateQuery(_dbContex.Set<TEntity>(), specifications).FirstOrDefaultAsync();
         }
+
+        public async Task<int> CountAsync(ISpecifications<TEntity> specifications)
+        {
+            return await SpecificationsEvaluator.CreateQuery(_dbContex.Set<TEntity>(), specifications).CountAsync();
+
+        }
     }
 }

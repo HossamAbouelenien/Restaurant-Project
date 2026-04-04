@@ -48,6 +48,11 @@ namespace RMS.Services.Specifications
         {
             IncludeExpressions.Add(includeExp);
         }
+        public ICollection<string> IncludeStrings { get; } = [];
+        protected void AddInclude(string includeString)
+        {
+            IncludeStrings.Add(includeString);
+        }
 
         #endregion Includes
 

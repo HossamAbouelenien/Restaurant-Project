@@ -1,4 +1,7 @@
-﻿using RMS.Shared.DTOs.MenuItemsDTOs;
+﻿using RMS.Shared;
+using RMS.Shared.DTOs.MenuItemDTOs;
+using RMS.Shared.DTOs.MenuItemsDTOs;
+using RMS.Shared.QueryParams;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +12,7 @@ namespace RMS.ServicesAbstraction
 {
     public interface IMenuItemService
     {
-        Task<IEnumerable<MenuItemDTO>> GetAllMenuItemsAsync();
+        Task<PaginatedResult<MenuItemDTO>> GetAllMenuItemsAsync(MenuItemQueryParams queryParams);
+        Task<MenuItemDetailsDTO?> GetMenuItemByIdAsync(int id);
     }
 }

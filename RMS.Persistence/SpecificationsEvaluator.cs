@@ -1,6 +1,7 @@
-﻿using RMS.Domain.Entities;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using RMS.Domain.Contracts;
+using RMS.Domain.Entities;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace RMS.Persistence
 {
@@ -26,6 +27,11 @@ namespace RMS.Persistence
 
                     Query = specifications.IncludeExpressions.Aggregate(Query,
                         (CurrentQuery, IncludeExp) => CurrentQuery.Include(IncludeExp));
+                }
+                if (specifications.IncludeStrings is not null && specifications.IncludeStrings.Any())
+                {
+                    Query = specifications.IncludeStrings
+                       .Aggregate(Query, (CurrentQuery, includeString) => CurrentQuery.Include(includeString));
                 }
 
                 if (specifications.OrderBy is not null)
