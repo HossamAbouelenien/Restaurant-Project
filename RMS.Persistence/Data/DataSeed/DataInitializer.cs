@@ -28,6 +28,8 @@ namespace RMS.Persistence.Data.DataSeed
         {
             try
             {
+                var customerId = string.Empty;
+
                 var hasBranches = await _dbContext.Branches.AnyAsync();
                 var hasCategories = await _dbContext.Categories.AnyAsync();
                 var hasIngredients = await _dbContext.Ingredients.AnyAsync();
@@ -165,6 +167,20 @@ namespace RMS.Persistence.Data.DataSeed
                 });
                 if (data is not null)
                 {
+                    // Special handling for Orders to set CustomerId based on email (since JSON won't have FK references)
+                    if ( typeof(T) == typeof(Order) && fileName == "Orders.json")
+                    {
+                        foreach (var item in data)
+                        {
+                            var order = item as Order;
+                            var user = await _userManager.FindByEmailAsync("areej@gmai.com");
+                            if (user is not null)
+                            {
+                                order.CustomerId = user.Id;
+                                order.Customer = null;
+                            }
+                        }
+                    }
                     await dbSet.AddRangeAsync(data);
                 }
             }
