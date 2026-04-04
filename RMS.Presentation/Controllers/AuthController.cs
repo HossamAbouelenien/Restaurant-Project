@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RMS.Domain.Entities;
 using RMS.ServicesAbstraction.IIdentityService;
 using RMS.Shared.DTOs.IdentityDTOs;
+using System.Security.Claims;
 
 namespace RMS.Presentation.Controllers
 {
@@ -125,5 +127,34 @@ namespace RMS.Presentation.Controllers
                 });
             }
         }
+
+
+        [Authorize]
+        [HttpGet("CurrentUser")]
+        public async Task<ActionResult<UserDTO>> GetCurrentUser()
+        {
+            var email = User.FindFirst(ClaimTypes.Email)?.Value;
+
+            if (email == null)
+                return Unauthorized();
+            var user = await _authService.GetCurrentUserAsync(email);
+            return Ok(user);
+
+        }
+
+
+        [Authorize]
+        [HttpPut]
+        public async Task<ActionResult<UserDTO>> UpdateCurrentUserAsync(string email,[FromBody] UpdateCurrentUserDTO dto)
+        {
+            if (email == null)
+                return Unauthorized();
+            var updatedUser = await _authService.UpdateCurrentUserAsync(email, dto);
+            return Ok(updatedUser);
+
+        }
+
+
+
     }
 }
