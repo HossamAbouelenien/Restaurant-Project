@@ -176,5 +176,41 @@ namespace RMS.Services.IdentityService
                 throw new InvalidOperationException("An unexpected error occurred during token refresh", ex);
             }
         }
+
+        public async Task<UserDTO?> GetCurrentUserAsync(string email)
+        {
+            var User = await _userManager.FindByEmailAsync(email) ?? throw new KeyNotFoundException($"User with email {email} not found");
+            return new UserDTO() { Name = User.Name, Email = User.Email!, Role = User.RoleId };
+        }
+
+
+        public async Task<UserDTO> UpdateCurrentUserAsync(string email, UpdateCurrentUserDTO dto)
+        {
+            var user = await _userManager.FindByEmailAsync(email)
+                       ?? throw new KeyNotFoundException();
+
+            _mapper.Map(dto, user); 
+
+            
+            if (!string.IsNullOrEmpty(dto.NewPassword))
+            {
+                await _userManager.RemovePasswordAsync(user);
+                await _userManager.AddPasswordAsync(user, dto.NewPassword);
+            }
+
+            var result = await _userManager.UpdateAsync(user);
+
+            if (!result.Succeeded)
+                throw new Exception(string.Join(", ", result.Errors.Select(e => e.Description)));
+
+            var role = await _userManager.GetRolesAsync(user);
+
+            return new UserDTO
+            {
+                Name = user.Name,
+                Email = user.Email!,
+                Role = role.FirstOrDefault() ?? "Customer"
+            };
+        }
     }
 }
