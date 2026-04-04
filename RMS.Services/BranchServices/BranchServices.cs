@@ -53,12 +53,20 @@ namespace RMS.Services.BranchServices
         }
         public async Task DeleteBranchAsync(int id)
         {
+            //var repo = _unitOfWork.GetRepository<Branch>();
+            //var Branch = await repo.GetByIdAsync(id);
+            //if (Branch is null)
+            //    throw new Exception("Branch with id not found");
+            //Branch!.IsDeleted = true; 
+            //repo.Update(Branch);
+            //await _unitOfWork.SaveChangesAsync();
             var repo = _unitOfWork.GetRepository<Branch>();
-            var branch = await repo.GetByIdAsync(id);
-            if (branch is null)
-                throw new Exception("Branch not found.");
-            branch.IsActive = false;
-            repo.Update(branch);
+            var Branch = await repo.GetByIdAsync(id);
+
+            if (Branch is null) return;
+
+            Branch.IsDeleted = true;
+            repo.Update(Branch);
             await _unitOfWork.SaveChangesAsync();
         }
 
