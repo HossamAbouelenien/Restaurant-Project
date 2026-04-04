@@ -20,8 +20,8 @@ namespace RMS.Web.Extensions
         {
             await using var scope = app.Services.CreateAsyncScope();
             var dataInitializerService = scope.ServiceProvider.GetRequiredService<IDataInitializer>();
-            await dataInitializerService.InitializeAsync();
             await dataInitializerService.IdentityDataSeedAsync();
+            await dataInitializerService.InitializeAsync();
             return app;
         }
     }
