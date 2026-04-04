@@ -40,11 +40,39 @@ namespace RMS.Web
             builder.Services.AddScoped<IDataInitializer, DataInitializer>();
             builder.Services.AddAutoMapper(X => X.AddProfile<MenuItemProfile>(), typeof(MenuItemProfile).Assembly);
             builder.Services.AddScoped<IMenuItemService, MenuItemService>();
-            //================= Mahmoud (40 : 55) =================
 
-            //================= Amr (55 : 70) =================
+
+            //================= Mahmoud (45 : 60) =================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            //================= Amr (60 : 75) =====================
+
+
+
+
+
+
+
+
+
+
+
+
+
             builder.Services.AddScoped<IBranchStockService, BranchStockService>();
-            //================= Mustafa (70 : 85) =================
+            //================= Mustafa (75 : 150) =================
             builder.Services.AddIdentity<User, IdentityRole>()
                           .AddEntityFrameworkStores<AppDbContext>()
                           .AddDefaultTokenProviders();
@@ -103,12 +131,79 @@ namespace RMS.Web
                  });
             });
 
-            //================= Hossam (85 : 100) =================
 
-            //================= Arwa (100 : 115) =================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            //================= Hossam (150 : 165) =================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            //================= Arwa (165 : 180) =================
             builder.Services.AddScoped<IIngredientService, IngredientService>();
 
-            //================= Areej (115 : 135) =================
+
+
+
+
+
+
+
+
+
+
+
+
+            //================= Areej (180 : 200) =================
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            //=====================================================
+
+
+
+
 
             var app = builder.Build();
 
