@@ -8,6 +8,7 @@ using RMS.Domain.Entities;
 using RMS.Persistence.Data.Contexts;
 using RMS.Persistence.Data.DataSeed;
 using RMS.Persistence.Repositories;
+using RMS.Services.BranchStockServices;
 using RMS.Services.IdentityService;
 using RMS.Services.MappingProfiles;
 using RMS.Services.MenuItemsServices;
@@ -41,7 +42,7 @@ namespace RMS.Web
             //================= Mahmoud (40 : 55) =================
 
             //================= Amr (55 : 70) =================
-
+            builder.Services.AddScoped<IBranchStockService, BranchStockService>();
             //================= Mustafa (70 : 85) =================
             builder.Services.AddIdentity<User, IdentityRole>()
                           .AddEntityFrameworkStores<AppDbContext>()
