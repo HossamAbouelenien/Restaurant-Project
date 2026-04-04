@@ -10,6 +10,7 @@ namespace RMS.Shared.DTOs.BranchStockDTOs
 {
     public class BranchStockDTO
     {
+        public int Id { get; set; }
         public int BranchId { get; set; }
         public string? BranchName { get; set; }
         public int IngredientId { get; set; }
