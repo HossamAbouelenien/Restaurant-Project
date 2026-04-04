@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using RMS.Domain.Contracts;
 using RMS.Domain.Entities;
 using RMS.Services.Specifications;
+using RMS.Services.Specifications.RefreshTokenSpec;
 using RMS.ServicesAbstraction.IIdentityService;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;

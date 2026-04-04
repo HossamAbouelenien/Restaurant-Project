@@ -2,6 +2,7 @@
 using RMS.Domain.Contracts;
 using RMS.Domain.Entities;
 using RMS.Services.Specifications;
+using RMS.Services.Specifications.BranchStockSpec;
 using RMS.ServicesAbstraction;
 using RMS.Shared.DTOs.BranchStockDTOs;
 using RMS.Shared.QueryParams;
