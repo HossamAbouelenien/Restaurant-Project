@@ -17,5 +17,6 @@ namespace RMS.Domain.Contracts
         Task<IEnumerable<TEntity>> GetAllAsync(ISpecifications<TEntity> specifications);
 
         Task<TEntity?> GetByIdAsync(ISpecifications<TEntity> specifications);
+        Task<int> CountAsync(ISpecifications<TEntity> specifications);
     }
 }

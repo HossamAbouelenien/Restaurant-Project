@@ -1,6 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RMS.ServicesAbstraction;
+using RMS.Shared;
+using RMS.Shared.DTOs.MenuItemDTOs;
+using RMS.Shared.DTOs.MenuItemsDTOs;
+using RMS.Shared.QueryParams;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -23,10 +27,19 @@ namespace RMS.Presentation.Controllers
 
         //[Authorize]
         [HttpGet]
-        public async Task<IActionResult> GetAllMenuItems()
+       
+        public async Task<ActionResult<PaginatedResult<MenuItemDTO>>> GetAllMenuItems ([FromQuery] MenuItemQueryParams queryParams)
         {
-            var menuItems = await _menuItemService.GetAllMenuItemsAsync();
-            return Ok(menuItems);
+            var result = await _menuItemService.GetAllMenuItemsAsync(queryParams);
+            return Ok(result);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<MenuItemDetailsDTO>> GetMenuItemById(int id)
+        {
+            var result = await _menuItemService.GetMenuItemByIdAsync(id);
+            if (result is null) return NotFound();
+            return Ok(result);
         }
     }
 }
