@@ -51,14 +51,17 @@ namespace RMS.Services.BranchServices
             await _unitOfWork.SaveChangesAsync();
             return _mapper.Map<BranchDTO>(Branch);
         }
-        public async Task DeleteBranchAsync(int Id)
+        public async Task DeleteBranchAsync(int id)
         {
-            var Repo = _unitOfWork.GetRepository<Branch>();
-            var Branch = await Repo.GetByIdAsync(Id);
-            Branch!.IsActive = false;  
-            Repo.Update(Branch);
+            var repo = _unitOfWork.GetRepository<Branch>();
+            var branch = await repo.GetByIdAsync(id);
+            if (branch is null)
+                throw new Exception("Branch not found.");
+            branch.IsActive = false;
+            repo.Update(branch);
             await _unitOfWork.SaveChangesAsync();
         }
+
 
     }
 }
