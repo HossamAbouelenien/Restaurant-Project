@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using RMS.Domain.Contracts;
 using RMS.Domain.Entities;
+using RMS.Domain.Enums;
 using RMS.Services.Specifications.MenuItemSpec;
 using RMS.Services.Specifications.OrderSpec;
 using RMS.ServicesAbstraction;
@@ -28,9 +29,27 @@ namespace RMS.Services.OrderServices
         }
         public async Task<OrderDTO> CreateOrderAsync(CreateOrderDTO orderDto)
         {
+            // ── 1. Parse OrderType ───────────────────────────────────────────────────── 
+            if (!Enum.TryParse<OrderType>(orderDto.OrderType, ignoreCase: true, out var orderType))
+                throw new Exception($"Invalid OrderType: {orderDto.OrderType}");
             var Repo = _unitOfWork.GetRepository<Order>();
             var ItemRepo = _unitOfWork.GetRepository<MenuItem>();
             var orderItems = new List<OrderItemDTO>();
+            // ── 2. Validate OrderType-specific fields ─────────────────────────────────
+            if (orderType == OrderType.DineIn && !orderDto.TableId.HasValue)
+                throw new Exception("TableId is required for DineIn orders");
+
+            if (orderType == OrderType.Delivery && orderDto.DeliveryAddress is null)
+                throw new Exception("DeliveryAddress is required for Delivery orders");
+
+            // ── 3. Validate Items ─────────────────────────────────────────────────────
+            if (orderDto.Items == null || !orderDto.Items.Any())
+                throw new Exception("Order must have at least one item");
+
+            var duplicateItems = orderDto.Items.GroupBy(i => i.MenuItemId).Where(g => g.Count() > 1);
+            if (duplicateItems.Any())
+                throw new Exception("Duplicate MenuItems are not allowed");
+
             // Validate branch and customer existence
             var branchExists = await _unitOfWork.GetRepository<Branch>().GetByIdAsync(orderDto.BranchId) != null;
             var UserSpec = new UserSpecification(orderDto.CustomerId!);
@@ -45,6 +64,42 @@ namespace RMS.Services.OrderServices
             orderDto.Items = orderItems;
             var order = _mapper.Map<Order>(orderDto);                 
             order.TotalAmount = orderItems.Sum(i => i.Quantity * i.UnitPrice);
+
+
+            // ── 8. OrderType-specific records ─────────────────────────────────────────
+            if (orderType == OrderType.DineIn)
+            {
+                // Validate Table belongs to same Branch
+                var table = await _unitOfWork.GetRepository<Table>().GetByIdAsync(orderDto.TableId!.Value);
+                if (table is null)
+                    throw new Exception("Table not found");
+                if (table.BranchId != orderDto.BranchId)
+                    throw new Exception("Table does not belong to this Branch");
+                if (table.IsOccupied)
+                    throw new Exception("Table is already occupied");
+
+                // Create TableOrder (SeatedAt = CreatedAt handled by EF)
+                order.TableOrder = new TableOrder
+                {
+                    TableId = orderDto.TableId!.Value
+                };
+
+                // Mark table as occupied
+                table.IsOccupied = true;
+            }
+            else if (orderType == OrderType.Delivery)
+            {
+                // Create Delivery record (AssignedAt = CreatedAt, Driver assigned later)
+                order.Delivery = new Delivery
+                {
+                    DeliveryAddress = _mapper.Map<Address>(orderDto.DeliveryAddress),
+                    DeliveryStatus = DeliveryStatus.Assigned,
+                    //DriverId = "0"  // ← assigned later by Admin
+                };
+            }
+
+
+            /////////////////////////////////////////////////////////////////////////////////
             await Repo.AddAsync(order);
             var result = await _unitOfWork.SaveChangesAsync();
             if (result > 0)

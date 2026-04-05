@@ -21,5 +21,6 @@ namespace RMS.Shared.DTOs.OrderDTOs
         public OrderDeliveryDTO? Delivery { get; set; }     
 
         public decimal TotalAmount { get; set; }
+        public string? Tablenumber { get; set; }
     }
 }

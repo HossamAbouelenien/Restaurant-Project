@@ -14,8 +14,7 @@ public class Delivery : BaseEntity
     public Order? Order { get; set; }
 
     // ── FK → User (driver) ────────────────────────────────────────────────────
-    [Required]
-    public string DriverId { get; set; }
+    public string? DriverId { get; set; }
 
     [ForeignKey(nameof(DriverId))]
     public User? Driver { get; set; }
@@ -33,6 +32,5 @@ public class Delivery : BaseEntity
     public decimal? CashCollected { get; set; }
 
     [Required]
-    [MaxLength(300)]
-    public string DeliveryAddress { get; set; } = string.Empty;
+    public Address DeliveryAddress { get; set; } =default!;
 }
