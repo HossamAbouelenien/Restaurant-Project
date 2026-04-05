@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using RMS.Persistence.Data.Contexts;
 
@@ -11,9 +12,11 @@ using RMS.Persistence.Data.Contexts;
 namespace RMS.Persistence.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260405195019_Modify Delivery Address")]
+    partial class ModifyDeliveryAddress
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -318,6 +321,7 @@ namespace RMS.Persistence.Data.Migrations
                         .HasDefaultValue("Assigned");
 
                     b.Property<string>("DriverId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("IsDeleted")
@@ -1008,7 +1012,8 @@ namespace RMS.Persistence.Data.Migrations
                     b.HasOne("RMS.Domain.Entities.User", "Driver")
                         .WithMany("Deliveries")
                         .HasForeignKey("DriverId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("RMS.Domain.Entities.Order", "Order")
                         .WithOne("Delivery")

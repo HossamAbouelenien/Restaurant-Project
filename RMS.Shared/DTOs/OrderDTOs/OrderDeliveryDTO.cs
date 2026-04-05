@@ -17,6 +17,6 @@ namespace RMS.Shared.DTOs.OrderDTOs
         public DateTime? DeliveredAt { get; set; }
         public string DeliveryStatus { get; set; }=default!;
         public decimal? CashCollected { get; set; }
-        public string DeliveryAddress { get; set; } = string.Empty;
+        public OrderAddressDTO DeliveryAddress { get; set; } =default!;
     }
 }
