@@ -15,5 +15,11 @@ namespace RMS.Services.Specifications.OrderSpec
         {
             
         }
+
+        public OrderCountSpecification(OrderQueryParams queryParams, string customerId)
+            : base(OrderSpecificationHelper.GetOrderCriteria(queryParams, customerId))
+        {
+            
+        }
     }
 }

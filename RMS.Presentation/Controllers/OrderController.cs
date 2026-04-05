@@ -1,12 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RMS.ServicesAbstraction;
 using RMS.Shared;
 using RMS.Shared.DTOs.MenuItemsDTOs;
 using RMS.Shared.DTOs.OrderDTOs;
+using RMS.Shared.DTOs.Utility;
 using RMS.Shared.QueryParams;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -67,5 +70,27 @@ namespace RMS.Presentation.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+
+        [HttpGet("my")]
+        [Authorize(Roles = SD.Role_Customer)]
+        public async Task<ActionResult<PaginatedResult<OrderDTO>>> GetCustomerOrdersHistory([FromQuery] OrderQueryParams queryParams)
+        {
+            try
+            {
+                var customerId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(customerId))
+                {
+                    return Unauthorized();
+                }
+                var result = await _orderService.GetCustomerOrdersHistoryAsync(queryParams, customerId);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
         }
+    }
 }

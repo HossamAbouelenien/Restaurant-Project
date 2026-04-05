@@ -27,6 +27,14 @@ namespace RMS.Services.Specifications.OrderSpec
             ApplyPagination(queryParams.PageSize, queryParams.PageIndex);
         }
 
+        public OrderWithBranchAndCustomerAndOrderItemsSpecification(OrderQueryParams queryParams, string customerId)
+            : base(OrderSpecificationHelper.GetOrderCriteria(queryParams, customerId))
+        {
+            AddInclude(o => o.Customer!);
+            AddInclude(o => o.Branch!);
+            AddInclude(o => o.OrderItems);
+            ApplyPagination(queryParams.PageSize, queryParams.PageIndex);
+        }
 
     }
 }
