@@ -11,8 +11,8 @@ namespace RMS.ServicesAbstraction
     {
         Task<IEnumerable<BranchDTO>> GetAllBranchesAsync();
         Task<BranchDTO> GetBranchByIdAsync(int Id);
-        Task<BranchDTO> CreateBranchAsync(BranchDTO BranchDTO);
-         Task<BranchDTO> UpdateBranchAsync(int Id, BranchDTO BranchDTO);
+        Task<BranchDTO> CreateBranchAsync(CreateBranchDTO BranchDTO);
+         Task<BranchDTO> UpdateBranchAsync(int Id, UpdateBranchDTO BranchDTO);
          Task DeleteBranchAsync(int Id);
         
 
