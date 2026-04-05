@@ -5,17 +5,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RMS.Shared.DTOs.KitchenDTOs
+namespace RMS.Shared.DTOs.OrderDTOs
 {
-    public class OrderKitchenTicketDTO
+    public class OrderKitchenTicketsDTO
     {
             public int Id { get; set; }
 
-            public int OrderId { get; set; }
-
             public string Station { get; set; } = string.Empty;
 
-            public TicketStatus Status { get; set; }
+            public string Status { get; set; }=default!;
 
             public DateTime? StartedAt { get; set; }
 

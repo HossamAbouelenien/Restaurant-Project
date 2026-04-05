@@ -28,15 +28,15 @@ namespace RMS.Services.KitchenServices
             var repo = _unitOfWork.GetRepository<KitchenTicket>();
             var spec = new KitchenTicketsGroupedByStatusForCurrentBranchSpecification(queryParams);
             var kitchenTickets = await repo.GetAllAsync(spec);
-            var data = _mapper.Map<List<KitchenTicketDTO>>(kitchenTickets);
+            var data = _mapper.Map<List<OrderKitchenTicketDTO>>(kitchenTickets);
             var grouped = data
                 .GroupBy(t => t.Status)
                 .ToDictionary(g => g.Key, g => g.ToList());
             return new KitchenBoardDto
             {
-                Pending = grouped.GetValueOrDefault(TicketStatus.Pending, new List<KitchenTicketDTO>()),
-                Preparing = grouped.GetValueOrDefault(TicketStatus.Preparing, new List<KitchenTicketDTO>()),
-                Done = grouped.GetValueOrDefault(TicketStatus.Done, new List<KitchenTicketDTO>())
+                Pending = grouped.GetValueOrDefault(TicketStatus.Pending, new List<OrderKitchenTicketDTO>()),
+                Preparing = grouped.GetValueOrDefault(TicketStatus.Preparing, new List<OrderKitchenTicketDTO>()),
+                Done = grouped.GetValueOrDefault(TicketStatus.Done, new List<OrderKitchenTicketDTO>())
             };
         }
 

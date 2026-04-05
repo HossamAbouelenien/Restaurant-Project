@@ -68,17 +68,16 @@ namespace RMS.Services.OrderServices
             var paginatedResult = new PaginatedResult<OrderDTO>(queryParams.PageIndex, pageSize, countOfOrders, orderDtos);
             return paginatedResult;
         }
-        //public async Task<PaginatedResult<MenuItemDTO>> GetAllMenuItemsAsync(MenuItemQueryParams queryParams)
-        //{
-        //    var repo = _unitOfWork.GetRepository<MenuItem>();
-        //    var spec = new MenuItemWithCategorySpecifications(queryParams);
-        //    var menuItems = await repo.GetAllAsync(spec);
-        //    var returnedMenuItems = _mapper.Map<IEnumerable<MenuItemDTO>>(menuItems);
-        //    var countOfReturnedMenuItems = returnedMenuItems.Count();
-        //    var countSpec = new MenuItemCountSpecification(queryParams);
-        //    var countOfAllMenuItems = await repo.CountAsync(countSpec);
-        //    var paginatedResult = new PaginatedResult<MenuItemDTO>(queryParams.PageIndex, countOfReturnedMenuItems, countOfAllMenuItems, returnedMenuItems);
-        //    return paginatedResult;
-        //}
+
+        public async Task<OrderDetailsDTO> GetOrderByIdAsync(int id)
+        {
+            var repo = _unitOfWork.GetRepository<Order>();
+            var spec = new OrderWithItemsAndPaymentAndDeliveryAndKitchenTicketsSpecification(id);
+            var order = await repo.GetByIdAsync(spec) ?? throw new Exception("Order not found");
+            if (order == null) throw new Exception("order is not found");
+            var orderDetailsDto = _mapper.Map<OrderDetailsDTO>(order);
+
+            return orderDetailsDto;
+        }
     }
 }

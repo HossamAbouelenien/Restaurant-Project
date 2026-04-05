@@ -50,5 +50,22 @@ namespace RMS.Presentation.Controllers
                 return BadRequest(ex.Message);
             }
         }
-    }
+        [HttpGet("{id}")]
+        public async Task<ActionResult<OrderDetailsDTO>> GetOrderById(int id)
+        {
+            try
+            {
+                var orderDetails = await _orderService.GetOrderByIdAsync(id);
+                if (orderDetails == null)
+                {
+                    return NotFound();
+                }
+                return Ok(orderDetails);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        }
 }

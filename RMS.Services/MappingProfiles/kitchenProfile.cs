@@ -13,7 +13,7 @@ namespace RMS.Services.MappingProfiles
     {
         public kitchenProfile()
         {
-            CreateMap<KitchenTicket, KitchenTicketDTO>();
+            CreateMap<KitchenTicket, OrderKitchenTicketDTO>();
 
             CreateMap<KitchenTicket, KitchenTicketDetailsDto>()
                     .ForMember(dest => dest.Items,opt => opt.MapFrom(src =>src.Order!.OrderItems
