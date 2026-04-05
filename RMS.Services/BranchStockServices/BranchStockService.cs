@@ -48,6 +48,7 @@ namespace RMS.Services.BranchStockServices
             var Spec = new BranchStockWithBranchAndIngredient(id);
             var BranchStock = await Repo.GetByIdAsync(Spec);
             _mapper.Map(UpdateBranchStock, BranchStock);
+            BranchStock!.UpdatedAt = DateTime.UtcNow;
             Repo.Update(BranchStock!);
             await _unitOfWork.SaveChangesAsync();
             var DataToReturn = _mapper.Map<BranchStockDTO>(BranchStock);

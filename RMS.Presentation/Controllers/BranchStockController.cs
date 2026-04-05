@@ -32,7 +32,7 @@ namespace RMS.Presentation.Controllers
             var BranchStock = await _branchStockService.GetBranchStockAsync(id);
             return Ok(BranchStock);
         }
-        [HttpPut("{id}")]
+        [HttpPatch("{id}")]
         public async Task<ActionResult<BranchStockDTO>> UpdateBranchStock(int id, UpdateBranchStockDTO updateBranchStock)
         {
             var BranchStock = await _branchStockService.UpdateBranchStockAsync(id, updateBranchStock);
