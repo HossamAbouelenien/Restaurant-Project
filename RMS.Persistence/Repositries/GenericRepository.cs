@@ -42,11 +42,6 @@ namespace RMS.Persistence.Repositories
 
         }
 
-        //public async Task<TEntity?> GetByIdIgnoreFiltersAsync(int id)
-        //{
-        //    return await _dbContex.Set<TEntity>()
-        //               .IgnoreQueryFilters()
-        //               .FirstOrDefaultAsync(e => EF.Property<int>(e, "Id") == id);
-        //}
+       
     }
 }
