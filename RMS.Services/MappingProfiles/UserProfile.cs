@@ -48,8 +48,8 @@ namespace RMS.Services.MappingProfiles
 
             CreateMap<UpdateCurrentUserDTO, User>()
             .ForMember(dest => dest.Id, opt => opt.Ignore())
-            .ForMember(dest => dest.PasswordHash, opt => opt.Ignore())
-            .ForMember(dest => dest.UserName, opt => opt.Ignore());
+            .ForMember(dest => dest.PasswordHash, opt => opt.Ignore());
+            
         }
 
     }
