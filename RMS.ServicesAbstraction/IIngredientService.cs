@@ -10,5 +10,15 @@ namespace RMS.ServicesAbstraction
     public interface IIngredientService
     {
         Task<IEnumerable<IngredientDTO>> GetAllIngredientsAsync();
+        Task<IngredientDTO> GetIngredientByIdAsync(int id);
+
+        Task<IngredientDTO> CreateIngredientAsync(CreateIngredientDTO createIngredientDTO);
+
+        Task<IngredientDTO> UpdateIngredientAsync(int id, CreateIngredientDTO updateIngredientDTO);
+
+        Task DeleteIngredientAsync(int id);
+
+
+
     }
 }
