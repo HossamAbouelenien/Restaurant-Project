@@ -70,14 +70,30 @@ namespace RMS.Services.OrderServices
         }
 
         public async Task<OrderDetailsDTO> GetOrderByIdAsync(int id)
+
         {
-            var repo = _unitOfWork.GetRepository<Order>();
+        var repo = _unitOfWork.GetRepository<Order>();
             var spec = new OrderWithItemsAndPaymentAndDeliveryAndKitchenTicketsSpecification(id);
-            var order = await repo.GetByIdAsync(spec) ?? throw new Exception("Order not found");
+        var order = await repo.GetByIdAsync(spec) ?? throw new Exception("Order not found");
             if (order == null) throw new Exception("order is not found");
             var orderDetailsDto = _mapper.Map<OrderDetailsDTO>(order);
 
             return orderDetailsDto;
+        }
+
+
+
+        public async Task<PaginatedResult<OrderDTO>> GetCustomerOrdersHistoryAsync(OrderQueryParams queryParams, string customerId)
+        {
+            var repo = _unitOfWork.GetRepository<Order>();
+            var spec = new OrderWithBranchAndCustomerAndOrderItemsSpecification(queryParams, customerId);
+            var orders = await repo.GetAllAsync(spec);
+            var orderDtos = _mapper.Map<IEnumerable<OrderDTO>>(orders);
+            var countSpec = new OrderCountSpecification(queryParams, customerId);
+            var countOfOrders = await repo.CountAsync(countSpec);
+            var pageSize = orderDtos.Count();
+            var paginatedResult = new PaginatedResult<OrderDTO>(queryParams.PageIndex, pageSize, countOfOrders, orderDtos);
+            return paginatedResult;
         }
     }
 }
