@@ -8,8 +8,8 @@ namespace RMS.Shared.DTOs.KitchenDTOs
 {
     public class KitchenBoardDto
     {
-        public List<KitchenTicketDTO> Pending { get; set; } = new();
-        public List<KitchenTicketDTO> Preparing { get; set; } = new();
-        public List<KitchenTicketDTO> Done { get; set; } = new();
+        public List<OrderKitchenTicketDTO> Pending { get; set; } = new();
+        public List<OrderKitchenTicketDTO> Preparing { get; set; } = new();
+        public List<OrderKitchenTicketDTO> Done { get; set; } = new();
     }
 }

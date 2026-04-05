@@ -26,6 +26,23 @@ namespace RMS.Services.MappingProfiles
 
 
             CreateMap<OrderItemDTO, OrderItem>().ReverseMap();
+
+            CreateMap<Order, OrderDetailsDTO>()
+                    .ForMember(dest => dest.OrderItems, opt => opt.MapFrom(src => src.OrderItems))
+                    .ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => src.Customer!.Name))
+                    .ForMember(dest => dest.BranchName, opt => opt.MapFrom(src => src.Branch!.Name))
+                    .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
+                    .ForMember(dest => dest.OrderType, opt => opt.MapFrom(src => src.OrderType.ToString()))
+                    .ForMember(dest => dest.Payment, opt => opt.MapFrom(src => src.Payment))
+                    .ForMember(dest => dest.Delivery, opt => opt.MapFrom(src => src.Delivery))
+                    .ForMember(dest => dest.KitchenTickets, opt => opt.MapFrom(src => src.KitchenTickets))
+                    .ReverseMap();
+
+            CreateMap<Payment, OrderPaymentDTO>().ReverseMap();
+            CreateMap<Delivery, OrderDeliveryDTO>()
+                .ForMember(dest => dest.DriverName, opt => opt.MapFrom(src => src.Driver!.Name))
+                .ReverseMap();
+            CreateMap<KitchenTicket, OrderKitchenTicketsDTO>().ReverseMap();
         }
     }
 }
