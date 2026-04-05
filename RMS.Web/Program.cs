@@ -12,12 +12,14 @@ using RMS.Services.BranchServices;
 using RMS.Services.BranchStockServices;
 using RMS.Services.IdentityService;
 using RMS.Services.IngredientServices;
+using RMS.Services.KitchenServices;
 using RMS.Services.MappingProfiles;
 using RMS.Services.MenuItemsServices;
 using RMS.Services.OrderServices;
 using RMS.Services.UserServices;
 using RMS.ServicesAbstraction;
 using RMS.ServicesAbstraction.IIdentityService;
+using RMS.ServicesAbstraction.IKitchenServices;
 using RMS.ServicesAbstraction.IUserServices;
 using RMS.Web.Extensions;
 using System.Text;
@@ -136,7 +138,7 @@ namespace RMS.Web
             });
 
             builder.Services.AddScoped<IUserService, UserService>();
-
+            builder.Services.AddScoped<IKitchenService, KitchenService>();
 
 
 
