@@ -14,7 +14,7 @@ namespace RMS.Services.Specifications.MenuItemSpec
             AddInclude(m => m.Category!);
             // Include Recipes then ThenInclude Ingredient using dot notation
             AddInclude("Recipes.Ingredient");
-
+            
         }
     }
 }

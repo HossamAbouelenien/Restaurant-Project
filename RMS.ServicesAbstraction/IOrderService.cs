@@ -1,4 +1,6 @@
-﻿using RMS.Shared.DTOs.OrderDTOs;
+﻿using RMS.Shared;
+using RMS.Shared.DTOs.OrderDTOs;
+using RMS.Shared.QueryParams;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,5 +12,6 @@ namespace RMS.ServicesAbstraction
     public interface IOrderService
     {
         Task<OrderDTO> CreateOrderAsync(CreateOrderDTO orderDto);
+        Task<PaginatedResult<OrderDTO>> GetAllOrdersAsync(OrderQueryParams queryParams);
     }
 }

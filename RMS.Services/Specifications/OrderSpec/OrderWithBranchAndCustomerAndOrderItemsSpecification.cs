@@ -1,4 +1,5 @@
 ﻿using RMS.Domain.Entities;
+using RMS.Shared.QueryParams;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,11 +10,23 @@ namespace RMS.Services.Specifications.OrderSpec
 {
     internal class OrderWithBranchAndCustomerAndOrderItemsSpecification : BaseSpecifications<Order>
     {
-        public OrderWithBranchAndCustomerAndOrderItemsSpecification(int orderId) : base(o => o.Id == orderId)
+        public OrderWithBranchAndCustomerAndOrderItemsSpecification(int orderId) 
+            : base(o => o.Id == orderId)
         {
             AddInclude(o => o.Customer!);
             AddInclude(o => o.Branch!);
             AddInclude(o => o.OrderItems);
         }
+
+        public OrderWithBranchAndCustomerAndOrderItemsSpecification(OrderQueryParams queryParams) 
+            : base(OrderSpecificationHelper.GetOrderCriteria(queryParams))
+        {
+            AddInclude(o => o.Customer!);
+            AddInclude(o => o.Branch!);
+            AddInclude(o => o.OrderItems);
+            ApplyPagination(queryParams.PageSize, queryParams.PageIndex);
+        }
+
+
     }
 }
