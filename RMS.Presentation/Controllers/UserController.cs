@@ -13,7 +13,7 @@ namespace RMS.Presentation.Controllers
     {
         private readonly IUserService _userService;
 
-        public UserController( IUserService userService)
+        public UserController(IUserService userService)
         {
             _userService = userService;
         }
@@ -32,13 +32,13 @@ namespace RMS.Presentation.Controllers
             return Ok(User);
         }
 
-      
+
         [HttpPost]
         public async Task<ActionResult<UserDetailsDTO>> AddUserAsync(CreateUserDto createUserDto)
         {
             var user = await _userService.AddUserAsync(createUserDto);
 
-            return CreatedAtAction("GetUserDetails", new { id = user.Id },user);
+            return CreatedAtAction("GetUserDetails", new { id = user.Id }, user);
         }
 
         [HttpPut("{id}")]
@@ -51,5 +51,14 @@ namespace RMS.Presentation.Controllers
             return Ok(user);
         }
 
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteUserAsync(string id)
+        {
+            var result = await _userService.DeleteUserAsync(id);
+            if (!result)
+                return NotFound();
+            return NoContent();
+
+        }
     }
 }

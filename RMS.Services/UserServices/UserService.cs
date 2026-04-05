@@ -46,16 +46,23 @@ namespace RMS.Services.UserServices
 
         public async Task<UserDetailsDTO> AddUserAsync(CreateUserDto createUserDto)
         {
-         
+
+            var repo = _unitOfWork.GetRepository<User>();
             var user = _mapper.Map<User>(createUserDto);
             user.CreatedAt = DateTime.UtcNow;
-            var createdUser = await _userManager.CreateAsync(user, createUserDto.Password);
+            user.UserName = createUserDto.Email;
+            var createdUser = await _userManager.CreateAsync(user, "Rms123@#");
+
+            //SEND EMAIL TO USER WITH PASSWORD
+
             if (!createdUser.Succeeded)
             {
                 throw new Exception(string.Join(", ", createdUser.Errors.Select(e => e.Description)));
             }
-            var userDetails = _mapper.Map<UserDetailsDTO>(user);
-            return userDetails ;
+            var spec = new UserWithBranchSpecifications(user.Id);
+            var addedUser = await repo.GetByIdAsync(spec);
+
+            return _mapper.Map<UserDetailsDTO>(addedUser);
 
         }
 
@@ -71,6 +78,17 @@ namespace RMS.Services.UserServices
             await _unitOfWork.SaveChangesAsync();
             var result = _mapper.Map<UserDetailsDTO>(user);
             return result;
+        }
+
+
+        public async Task<bool> DeleteUserAsync(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+                throw new Exception("User not found");
+            user.IsDeleted = true;
+            await _userManager.UpdateAsync(user); 
+            return true;
         }
     }
 }
