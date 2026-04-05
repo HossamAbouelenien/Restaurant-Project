@@ -203,9 +203,6 @@ namespace RMS.Services.MenuItemsServices
             var menuItem = await _unitOfWork.GetRepository<MenuItem>().GetByIdAsync(id);
             if (menuItem is null) throw new Exception("MenuItem not found");
 
-            if (menuItem.IsDeleted)
-                throw new Exception("MenuItem already deleted");
-
             menuItem.IsDeleted = true;
             menuItem.DeletedAt = DateTime.UtcNow;
 

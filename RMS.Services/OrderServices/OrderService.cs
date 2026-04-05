@@ -1,9 +1,13 @@
 ﻿using AutoMapper;
 using RMS.Domain.Contracts;
 using RMS.Domain.Entities;
+using RMS.Services.Specifications.MenuItemSpec;
 using RMS.Services.Specifications.OrderSpec;
 using RMS.ServicesAbstraction;
+using RMS.Shared;
+using RMS.Shared.DTOs.MenuItemsDTOs;
 using RMS.Shared.DTOs.OrderDTOs;
+using RMS.Shared.QueryParams;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,5 +55,30 @@ namespace RMS.Services.OrderServices
             }
             throw new Exception("Failed to create order");
         }
+
+        public async Task<PaginatedResult<OrderDTO>> GetAllOrdersAsync(OrderQueryParams queryParams)
+        {
+            var repo = _unitOfWork.GetRepository<Order>();
+            var spec = new OrderWithBranchAndCustomerAndOrderItemsSpecification(queryParams);
+            var orders = await repo.GetAllAsync(spec);
+            var orderDtos = _mapper.Map<IEnumerable<OrderDTO>>(orders);
+            var countSpec = new OrderCountSpecification(queryParams);
+            var countOfOrders = await repo.CountAsync(countSpec);
+            var pageSize = orderDtos.Count();
+            var paginatedResult = new PaginatedResult<OrderDTO>(queryParams.PageIndex, pageSize, countOfOrders, orderDtos);
+            return paginatedResult;
+        }
+        //public async Task<PaginatedResult<MenuItemDTO>> GetAllMenuItemsAsync(MenuItemQueryParams queryParams)
+        //{
+        //    var repo = _unitOfWork.GetRepository<MenuItem>();
+        //    var spec = new MenuItemWithCategorySpecifications(queryParams);
+        //    var menuItems = await repo.GetAllAsync(spec);
+        //    var returnedMenuItems = _mapper.Map<IEnumerable<MenuItemDTO>>(menuItems);
+        //    var countOfReturnedMenuItems = returnedMenuItems.Count();
+        //    var countSpec = new MenuItemCountSpecification(queryParams);
+        //    var countOfAllMenuItems = await repo.CountAsync(countSpec);
+        //    var paginatedResult = new PaginatedResult<MenuItemDTO>(queryParams.PageIndex, countOfReturnedMenuItems, countOfAllMenuItems, returnedMenuItems);
+        //    return paginatedResult;
+        //}
     }
 }

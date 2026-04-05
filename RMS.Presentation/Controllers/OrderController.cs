@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RMS.ServicesAbstraction;
+using RMS.Shared;
+using RMS.Shared.DTOs.MenuItemsDTOs;
 using RMS.Shared.DTOs.OrderDTOs;
+using RMS.Shared.QueryParams;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,6 +30,20 @@ namespace RMS.Presentation.Controllers
                 var createdOrder = await _orderService.CreateOrderAsync(orderDto);
                 //return CreatedAtAction(nameof(GetOrderById), new { id = createdOrder.Id }, createdOrder);
                 return Ok(createdOrder);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<PaginatedResult<OrderDTO>>> GetAllOrders([FromQuery] OrderQueryParams queryParams)
+        {
+            try
+            {
+                var result = await _orderService.GetAllOrdersAsync(queryParams);
+                return Ok(result);
             }
             catch (Exception ex)
             {
