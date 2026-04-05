@@ -14,6 +14,7 @@ using RMS.Services.IdentityService;
 using RMS.Services.IngredientServices;
 using RMS.Services.MappingProfiles;
 using RMS.Services.MenuItemsServices;
+using RMS.Services.OrderServices;
 using RMS.Services.UserServices;
 using RMS.ServicesAbstraction;
 using RMS.ServicesAbstraction.IIdentityService;
@@ -73,7 +74,7 @@ namespace RMS.Web
 
 
 
-
+            builder.Services.AddScoped<IOrderService, OrderService>();
             builder.Services.AddScoped<IBranchStockService, BranchStockService>();
             //================= Mustafa (75 : 150) =================
             builder.Services.AddIdentity<User, IdentityRole>()
