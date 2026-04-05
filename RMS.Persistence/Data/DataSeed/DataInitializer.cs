@@ -181,6 +181,19 @@ namespace RMS.Persistence.Data.DataSeed
                             }
                         }
                     }
+                    if (typeof(T) == typeof(Delivery) && fileName == "Deliveries.json")
+                    {
+                        foreach (var item in data)
+                        {
+                            var delivery = item as Delivery;
+                            var user = await _userManager.FindByEmailAsync("areej@gmai.com");
+                            if (user is not null)
+                            {
+                                delivery.DriverId = user.Id;
+                                delivery.Driver = null;
+                            }
+                        }
+                    }
                     await dbSet.AddRangeAsync(data);
                 }
             }
