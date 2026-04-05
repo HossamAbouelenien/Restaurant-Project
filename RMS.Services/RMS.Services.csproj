@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Specifications\BranchSpec\**" />
+    <EmbeddedResource Remove="Specifications\BranchSpec\**" />
+    <None Remove="Specifications\BranchSpec\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\RMS.Domain\RMS.Domain.csproj" />
     <ProjectReference Include="..\RMS.ServicesAbstraction\RMS.ServicesAbstraction.csproj" />
   </ItemGroup>
@@ -15,10 +21,6 @@
     <PackageReference Include="AutoMapper" Version="16.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.25" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Specifications\BranchSpec\" />
   </ItemGroup>
 
 </Project>

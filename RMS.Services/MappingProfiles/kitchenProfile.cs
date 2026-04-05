@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using RMS.Domain.Entities;
+using RMS.Domain.Enums;
 using RMS.Shared.DTOs.KitchenDTOs;
 using System;
 using System.Collections.Generic;
@@ -22,7 +23,14 @@ namespace RMS.Services.MappingProfiles
             CreateMap<KitchenTicket, ActivePendingStationsDTOs>()
                     .ForMember(dest => dest.Station,opt => opt.MapFrom(src => src.Station))
                     .ForMember(dest => dest.PendingCount,opt => opt.Ignore());
-        
+
+            CreateMap<KitchenTicket, KitchenTicketStatusDto>()
+                    .ForMember(dest => dest.IsOrderReady,opt => opt.MapFrom(src =>src.Order != null &&src.Order.Status == OrderStatus.Ready));
+
+
+
+
+
 
 
         }
