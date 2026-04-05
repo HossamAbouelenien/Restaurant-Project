@@ -19,6 +19,6 @@ namespace RMS.Domain.Contracts
         Task<TEntity?> GetByIdAsync(ISpecifications<TEntity> specifications);
         Task<int> CountAsync(ISpecifications<TEntity> specifications);
 
-        //Task<TEntity?> GetByIdIgnoreFiltersAsync(int id);
+        
     }
 }
