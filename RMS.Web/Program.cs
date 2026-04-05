@@ -16,6 +16,7 @@ using RMS.Services.KitchenServices;
 using RMS.Services.MappingProfiles;
 using RMS.Services.MenuItemsServices;
 using RMS.Services.OrderServices;
+using RMS.Services.TableServices;
 using RMS.Services.UserServices;
 using RMS.ServicesAbstraction;
 using RMS.ServicesAbstraction.IIdentityService;
@@ -186,7 +187,7 @@ namespace RMS.Web
             //================= Areej (180 : 200) =================
 
             builder.Services.AddScoped<IBranchService, BranchServices>();
-
+            builder.Services.AddScoped<ITableService, TableService>();
 
 
 
