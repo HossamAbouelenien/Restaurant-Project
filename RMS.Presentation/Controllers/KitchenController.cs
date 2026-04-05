@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RMS.ServicesAbstraction;
 using RMS.ServicesAbstraction.IKitchenServices;
 using RMS.Shared.DTOs.BranchStockDTOs;
@@ -40,6 +41,13 @@ namespace RMS.Presentation.Controllers
         {
             var ActiveStationsWithPendingCount = await _kitchenService.GetListOfActiveStationsWithPendingCountAsync(branchId);
             return Ok(ActiveStationsWithPendingCount);
+        }
+
+        [HttpPut("{ticketId}")]
+        public async Task<IActionResult> UpdateTicketStatus(int ticketId,[FromBody] UpdateTicketStatusRequestDto dto)             
+        {
+            var result = await _kitchenService.UpdateTicketStatusAsync(ticketId, dto);
+            return Ok(result);
         }
 
     }

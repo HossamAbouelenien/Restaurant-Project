@@ -9,6 +9,9 @@ namespace RMS.ServicesAbstraction.IKitchenServices
         Task<KitchenBoardDto> GetAllKitchenTicketsGroupedByStatusForCurrentBranchAsync(KitchenTicketQueryParams queryParams);
         Task<KitchenTicketDetailsDto> GetSingleKitchenTicketWithsOrderItemsAsync(int id);
         Task<List<ActivePendingStationsDTOs>> GetListOfActiveStationsWithPendingCountAsync(int branchId);
+        Task<KitchenTicketStatusDto> UpdateTicketStatusAsync(int ticketId, UpdateTicketStatusRequestDto dto);
+
+
 
     }
 }
