@@ -60,5 +60,11 @@ namespace RMS.Presentation.Controllers
             return NoContent();
 
         }
-    }
+
+        [HttpGet("Roles")]
+        public async Task<ActionResult<List<string>>> GetRolesAsync()
+        {
+            var roles = await _userService.GetRolesAsync();
+            return Ok(roles);
+    }   }    
 }

@@ -23,7 +23,7 @@ namespace RMS.Presentation.Controllers
         {
             _kitchenService = kitchenService;
         }
-        [HttpGet("KitchenTicketsGroupedByStatusForCurrentBranch")]
+        [HttpGet("KitchenTickets")]
         public async Task<ActionResult<KitchenBoardDto>> GetAllKitchenTicketsGroupedByStatusForCurrentBranchAsync([FromQuery] KitchenTicketQueryParams queryParams)
         {
             var KitchenTickets = await _kitchenService.GetAllKitchenTicketsGroupedByStatusForCurrentBranchAsync(queryParams);
@@ -36,7 +36,7 @@ namespace RMS.Presentation.Controllers
             return Ok(KitchenTicket);
         }
 
-        [HttpGet("ActiveStationsWithPendingCount")]
+        [HttpGet("ActiveStations")]
         public async Task<ActionResult<List<ActivePendingStationsDTOs>>> GetListOfActiveStationsWithPendingCountAsync([FromQuery] int branchId)
         {
             var ActiveStationsWithPendingCount = await _kitchenService.GetListOfActiveStationsWithPendingCountAsync(branchId);

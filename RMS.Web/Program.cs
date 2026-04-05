@@ -140,7 +140,7 @@ namespace RMS.Web
 
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IKitchenService, KitchenService>();
-
+            
 
 
 
