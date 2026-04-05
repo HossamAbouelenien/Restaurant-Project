@@ -14,6 +14,8 @@ namespace RMS.Services.MappingProfiles
         public IngredientsProfile()
         {
             CreateMap<Ingredient, IngredientDTO>().ReverseMap();
+            CreateMap<CreateIngredientDTO, Ingredient>().ReverseMap();
+
         }
     }
 }
