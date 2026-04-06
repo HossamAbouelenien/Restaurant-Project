@@ -12,5 +12,6 @@ namespace RMS.ServicesAbstraction
     {
         Task<TableDTO> CreateTableAsync(CreateTableDTO dto);
         Task<IEnumerable<TableDTO>> GetAllTablesAsync(TableQueryParams queryParams);
+        Task<TableDTO> GetTableByIdAsync(int id);
     }
 }
