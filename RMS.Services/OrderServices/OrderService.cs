@@ -20,6 +20,7 @@ using System.Threading.Tasks;
 namespace RMS.Services.OrderServices
 {
     public class OrderService : IOrderService
+
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
@@ -226,8 +227,6 @@ namespace RMS.Services.OrderServices
             return orderDetailsDto;
         }
 
-
-
         public async Task<PaginatedResult<OrderDTO>> GetCustomerOrdersHistoryAsync(OrderQueryParams queryParams, string customerId)
         {
             var repo = _unitOfWork.GetRepository<Order>();
@@ -330,6 +329,152 @@ namespace RMS.Services.OrderServices
             else
             {
                 throw new Exception("Failed to update order status");
+            }
+        }
+
+        public async Task<AddedItemsDTO> AddItemsToOrderAsync(int orderId, List<OrderItemDTO> items)
+        {
+            var orderRepo = _unitOfWork.GetRepository<Order>();
+            var orderSpec = new OrderWithTableOrderAndBranchAndCustomerAndOrderItemsSpecification(orderId);
+            var order = await orderRepo.GetByIdAsync(orderSpec);
+            if (order == null) throw new Exception("Order not found");
+            if (order.Status != OrderStatus.Received)
+                throw new Exception("Can only add items to orders with 'Received' status");
+
+            var ItemRepo = _unitOfWork.GetRepository<MenuItem>();
+
+
+            var OldIngredientConsumption = new Dictionary<int, decimal>();
+            var NewIngredientConsumption = new Dictionary<int, decimal>();
+
+            foreach (var item in order.OrderItems)
+            {
+                var menuItemSpec = new MenuItemWithBranchStockSpecification(item.MenuItemId);
+                var menuItem = await ItemRepo.GetByIdAsync(menuItemSpec) ?? throw new Exception("Menu item not found");
+                foreach (var recipe in menuItem.Recipes)
+                {
+                    var totalRequired = recipe.QuantityRequired * item.Quantity;
+                    // Accumulate total required quantity for each ingredient across all items
+                    if (OldIngredientConsumption.ContainsKey(recipe.IngredientId))
+                        OldIngredientConsumption[recipe.IngredientId] += totalRequired;
+                    else
+                        OldIngredientConsumption[recipe.IngredientId] = totalRequired;
+                }
+            }
+            foreach (var item in items)
+            {
+                var menuItemSpec = new MenuItemWithBranchStockSpecification(item.MenuItemId);
+                var menuItem = await ItemRepo.GetByIdAsync(menuItemSpec) ?? throw new Exception("Menu item not found");
+                foreach (var recipe in menuItem.Recipes)
+                {
+                    var totalRequired = recipe.QuantityRequired * item.Quantity;
+                    // Accumulate total required quantity for each ingredient across all items
+                    if (NewIngredientConsumption.ContainsKey(recipe.IngredientId))
+                        NewIngredientConsumption[recipe.IngredientId] += totalRequired;
+                    else
+                        NewIngredientConsumption[recipe.IngredientId] = totalRequired;
+                }
+            }
+
+
+            foreach (var (ingredientId, totalRequired) in NewIngredientConsumption)
+            {
+                var StockSpec = new BranchStockWithBranchAndIngredient(order.BranchId, ingredientId);
+                var stock = await _unitOfWork.GetRepository<BranchStock>().GetAllAsync(StockSpec);
+                var stockItem = stock.FirstOrDefault();
+                if (stockItem == null)
+                    throw new Exception($"Ingredient ID {ingredientId} not found in branch");
+
+                var remainingStock = stockItem.QuantityAvailable - OldIngredientConsumption.GetValueOrDefault(ingredientId, 0);
+
+                if (remainingStock < totalRequired)
+                {
+                    // Build detailed error message showing how many of each menu item can be ordered based on the limiting ingredient
+                    string ErrorMessage = string.Empty;
+                    // For each ordered menu item, calculate how many can be made with the available stock of the limiting ingredient
+                    foreach (var item in items)
+                    {
+                        var menuItemSpec = new MenuItemWithBranchStockSpecification(item.MenuItemId);
+                        var menuItem = await ItemRepo.GetByIdAsync(menuItemSpec)
+                            ?? throw new Exception("Menu item not found");
+
+                        // For this menu item, find the recipe that uses the limiting ingredient and calculate how many can be made
+                        var limitingIngredient = menuItem.Recipes
+                            .Select(r =>
+                            {
+                                var stock = r.Ingredient!.BranchStocks
+                                    .FirstOrDefault(bs => bs.BranchId == order.BranchId);
+
+                                var available = stock?.QuantityAvailable - OldIngredientConsumption.GetValueOrDefault(ingredientId, 0) ?? 0;
+                                // Calculate how many of this menu item can be made with the available stock of this ingredient
+                                return new
+                                {
+                                    IngredientName = r.Ingredient.Name,
+                                    MaxPossible = (int)Math.Floor(available / r.QuantityRequired)
+                                };
+                            })
+                            .OrderBy(x => x.MaxPossible)
+                            .First(); // The most limiting ingredient determines how many of this menu item can be made
+                        // If this menu item is part of the order, include it in the error message
+                        ErrorMessage += $"You can only order {limitingIngredient.MaxPossible} of {menuItem.Name} " +
+                                        $"because '{limitingIngredient.IngredientName}' is insufficient.\n";
+                    }
+                    throw new Exception($"{ErrorMessage}");
+                }
+            }
+
+            var categories = new HashSet<string>();
+
+            foreach (var item in order.OrderItems)
+            {
+                var menuItemSpec = new MenuItemWithBranchStockSpecification(item.MenuItemId);
+                var menuItem = await ItemRepo.GetByIdAsync(menuItemSpec) ?? throw new Exception("Menu item not found");
+                categories.Add(menuItem.Category!.Name);
+            }
+
+            foreach (var item in items)
+            {
+                order.OrderItems.Add(new OrderItem
+                {
+                    MenuItemId = item.MenuItemId,
+                    Quantity = item.Quantity,
+                    UnitPrice = item.UnitPrice,
+                    Notes = item.Notes
+                });
+                    order.TotalAmount += item.Quantity * item.UnitPrice;
+            }
+
+            var addedItemsDto = new AddedItemsDTO
+            {
+                OrderID = order.Id,
+                AddedItems = items
+            };
+
+            var result = await _unitOfWork.SaveChangesAsync();
+            if (result > 0)
+            {
+                
+                
+                foreach (var item in items)
+                {
+                    var menuItemSpec = new MenuItemWithBranchStockSpecification(item.MenuItemId);
+                    var menuItem = await ItemRepo.GetByIdAsync(menuItemSpec) ?? throw new Exception("Menu item not found");
+                    if (categories.Add(menuItem.Category!.Name))
+                    {
+                        var KichenTicketRepo = _unitOfWork.GetRepository<KitchenTicket>();
+                        await KichenTicketRepo.AddAsync(new KitchenTicket
+                        {
+                            OrderId = order.Id,
+                            Station = menuItem.Category.Name
+                        });
+                    }
+                }
+                await _unitOfWork.SaveChangesAsync();
+                return addedItemsDto;
+            }
+            else
+            {
+                throw new Exception("Failed to add items to order");
             }
         }
     }
