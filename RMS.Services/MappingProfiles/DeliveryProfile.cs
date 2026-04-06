@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using RMS.Domain.Entities;
+using RMS.Domain.Enums;
 using RMS.Shared.DTOs.AddressDTOs;
 using RMS.Shared.DTOs.DeliveryDTOs;
 using System;
@@ -32,9 +33,14 @@ namespace RMS.Services.MappingProfiles
 
             CreateMap<OrderItem, OrderItemDto>()
                 .ForMember(dest => dest.MenuItemName,opt => opt.MapFrom(src => src.MenuItem!.Name));
+
+            CreateMap<AssignDeliveryDto, Delivery>()
+                .ForMember(dest => dest.DeliveryAddress,opt => opt.MapFrom(src => src.DeliveryAddress))
+                .ForMember(dest => dest.DeliveryStatus,opt => opt.MapFrom(src => DeliveryStatus.Assigned));
         
 
-            CreateMap<Address, AddressDto>();
+
+            CreateMap<Address, AddressDto>().ReverseMap();
         }
     }
 }

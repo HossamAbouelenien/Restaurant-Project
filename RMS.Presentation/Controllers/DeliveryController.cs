@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RMS.ServicesAbstraction;
 using RMS.ServicesAbstraction.IDeliveryServices;
 using RMS.Shared;
@@ -48,6 +49,14 @@ namespace RMS.Presentation.Controllers
                 return NotFound($"Delivery with ID {id} not found.");
             }
             return Ok(delivery);
+        }
+
+        [HttpPost("assign")]
+        public async Task<ActionResult<DeliveryDetailsDto>> AssignDelivery([FromBody] AssignDeliveryDto dto)
+        {
+            var result = await _deliveryService.AssignDriverAsync(dto);
+
+            return Ok(result);
         }
     }
 
