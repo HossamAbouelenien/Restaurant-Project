@@ -2,6 +2,7 @@
 using RMS.Domain.Contracts;
 using RMS.Domain.Entities;
 using RMS.Domain.Enums;
+using RMS.Services.Specifications.BranchStockSpec;
 using RMS.Services.Specifications.MenuItemSpec;
 using RMS.Services.Specifications.OrderSpec;
 using RMS.ServicesAbstraction;
@@ -29,20 +30,20 @@ namespace RMS.Services.OrderServices
         }
         public async Task<OrderDTO> CreateOrderAsync(CreateOrderDTO orderDto)
         {
-            // ── 1. Parse OrderType ───────────────────────────────────────────────────── 
+            // Parse OrderType
             if (!Enum.TryParse<OrderType>(orderDto.OrderType, ignoreCase: true, out var orderType))
                 throw new Exception($"Invalid OrderType: {orderDto.OrderType}");
             var Repo = _unitOfWork.GetRepository<Order>();
             var ItemRepo = _unitOfWork.GetRepository<MenuItem>();
             var orderItems = new List<OrderItemDTO>();
-            // ── 2. Validate OrderType-specific fields ─────────────────────────────────
+            // Validate OrderType-specific fields
             if (orderType == OrderType.DineIn && !orderDto.TableId.HasValue)
                 throw new Exception("TableId is required for DineIn orders");
 
             if (orderType == OrderType.Delivery && orderDto.DeliveryAddress is null)
                 throw new Exception("DeliveryAddress is required for Delivery orders");
 
-            // ── 3. Validate Items ─────────────────────────────────────────────────────
+            // Validate Items
             if (orderDto.Items == null || !orderDto.Items.Any())
                 throw new Exception("Order must have at least one item");
 
@@ -56,17 +57,80 @@ namespace RMS.Services.OrderServices
             var customerExists = await _unitOfWork.GetRepository<User>().GetByIdAsync(UserSpec) != null;
             if (!branchExists) throw new Exception("Branch not found");
             if (!customerExists) throw new Exception("Customer not found");
+
+            var ingredientConsumption = new Dictionary<int, decimal>();
+
+
             foreach (var item in orderDto.Items)
             {
-                var menuItem = await ItemRepo.GetByIdAsync(item.MenuItemId) ?? throw new Exception("Menu item not found");
+                var menuItemSpec = new MenuItemWithBranchStockSpecification(item.MenuItemId);
+                var menuItem = await ItemRepo.GetByIdAsync(menuItemSpec) ?? throw new Exception("Menu item not found");
+
+
+                foreach (var recipe in menuItem.Recipes)
+                {
+
+                    var totalRequired = recipe.QuantityRequired * item.Quantity;
+                    // Accumulate total required quantity for each ingredient across all items
+                    if (ingredientConsumption.ContainsKey(recipe.IngredientId))
+                        ingredientConsumption[recipe.IngredientId] += totalRequired;
+                    else
+                        ingredientConsumption[recipe.IngredientId] = totalRequired;
+                }
                 orderItems.Add(new OrderItemDTO { MenuItemId = menuItem.Id, Quantity = item.Quantity, UnitPrice = menuItem.Price, Notes=item.Notes}); 
             }
+            foreach (var (ingredientId, totalRequired) in ingredientConsumption)
+            {
+                var StockSpec = new BranchStockWithBranchAndIngredient(orderDto.BranchId, ingredientId);
+                var stock = await _unitOfWork.GetRepository<BranchStock>().GetAllAsync(StockSpec);
+
+                var stockItem = stock.FirstOrDefault();
+
+                if (stockItem == null)
+                    throw new Exception($"Ingredient ID {ingredientId} not found in branch");
+
+                if (stockItem.QuantityAvailable < totalRequired)
+                {
+                    // Build detailed error message showing how many of each menu item can be ordered based on the limiting ingredient
+                    string ErrorMessage = string.Empty;
+                    // For each ordered menu item, calculate how many can be made with the available stock of the limiting ingredient
+                    foreach (var item in orderDto.Items)
+                    {
+                        var menuItemSpec = new MenuItemWithBranchStockSpecification(item.MenuItemId);
+                        var menuItem = await ItemRepo.GetByIdAsync(menuItemSpec)
+                            ?? throw new Exception("Menu item not found");
+
+                        // For this menu item, find the recipe that uses the limiting ingredient and calculate how many can be made
+                        var limitingIngredient = menuItem.Recipes
+                            .Select(r =>
+                            {
+                                var stock = r.Ingredient.BranchStocks
+                                    .FirstOrDefault(bs => bs.BranchId == orderDto.BranchId);
+
+                                var available = stock?.QuantityAvailable ?? 0;
+                                // Calculate how many of this menu item can be made with the available stock of this ingredient
+                                return new
+                                {
+                                    IngredientName = r.Ingredient.Name,
+                                    MaxPossible = (int)Math.Floor(available / r.QuantityRequired)
+                                };
+                            })
+                            .OrderBy(x => x.MaxPossible)
+                            .First(); // The most limiting ingredient determines how many of this menu item can be made
+                        // If this menu item is part of the order, include it in the error message
+                        ErrorMessage += $"You can only order {limitingIngredient.MaxPossible} of {menuItem.Name} " +
+                                        $"because '{limitingIngredient.IngredientName}' is insufficient.\n";
+                    }
+                    throw new Exception($"{ErrorMessage}");
+                }
+            }
+
             orderDto.Items = orderItems;
             var order = _mapper.Map<Order>(orderDto);                 
             order.TotalAmount = orderItems.Sum(i => i.Quantity * i.UnitPrice);
 
 
-            // ── 8. OrderType-specific records ─────────────────────────────────────────
+            //OrderType-specific records
             if (orderType == OrderType.DineIn)
             {
                 // Validate Table belongs to same Branch
