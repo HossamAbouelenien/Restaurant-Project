@@ -2,10 +2,12 @@
 using Microsoft.AspNetCore.Http;
 using RMS.Domain.Contracts;
 using RMS.Domain.Entities;
+using RMS.Services.Specifications.BranchStockSpec;
 using RMS.Services.Specifications.DeliverySpec;
 using RMS.Services.Specifications.OrderSpec;
 using RMS.ServicesAbstraction.IDeliveryServices;
 using RMS.Shared;
+using RMS.Shared.DTOs.BranchStockDTOs;
 using RMS.Shared.DTOs.DeliveryDTOs;
 using RMS.Shared.DTOs.OrderDTOs;
 using RMS.Shared.QueryParams;
@@ -18,7 +20,7 @@ using System.Threading.Tasks;
 
 namespace RMS.Services.DeliveryServices
 {
-    public class DeliveryService:IDeliveryService
+    public class DeliveryService : IDeliveryService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
@@ -32,17 +34,17 @@ namespace RMS.Services.DeliveryServices
         }
 
 
-        public async Task<PaginatedResult<DeliveryDto>> GetAllDeliveriesAsync(DeliveryQueryParams queryParams)
+        public async Task<PaginatedResult<DeliveryDetailsDto>> GetAllDeliveriesAsync(DeliveryQueryParams queryParams)
         {
             var repo = _unitOfWork.GetRepository<Delivery>();
             var spec = new DeliveriesWithOrderSpecification(queryParams);
             var deliveries = await repo.GetAllAsync(spec);
-            var Data = _mapper.Map<IEnumerable<Delivery>, IEnumerable<DeliveryDto>>(deliveries);
+            var Data = _mapper.Map<IEnumerable<Delivery>, IEnumerable<DeliveryDetailsDto>>(deliveries);
             var ProductCount = Data.Count();
             var CountSpec = new DeliveriesCountSpecifications(queryParams);
             var TotalCount = await repo.CountAsync(CountSpec);
 
-            return new PaginatedResult<DeliveryDto>(
+            return new PaginatedResult<DeliveryDetailsDto>(
                 queryParams.PageIndex,
                 ProductCount,
                 TotalCount,
@@ -51,7 +53,7 @@ namespace RMS.Services.DeliveryServices
 
         }
 
-        public async Task<IEnumerable<DeliveryDto>> GetOwnAssignedDeliveriesAsync()
+        public async Task<IEnumerable<DeliveryDetailsDto>> GetOwnAssignedDeliveriesAsync()
         {
             var driverId = _httpContextAccessor.HttpContext?
                 .User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -61,11 +63,23 @@ namespace RMS.Services.DeliveryServices
             }
             var spec = new DeliveriesWithOrderSpecification(driverId);
             var deliveries = await _unitOfWork.GetRepository<Delivery>().GetAllAsync(spec);
-            var data = _mapper.Map<IEnumerable<DeliveryDto>>(deliveries);
+            var data = _mapper.Map<IEnumerable<DeliveryDetailsDto>>(deliveries);
             return data;
         }
 
+        public async Task<DeliveryDetailsDto> GetDeliveryByIdAsync(int id)
+        {
+            var Repo = _unitOfWork.GetRepository<Delivery>();
+            var spec = new DeliveryByIdSpecification(id);
+            var delivery = await Repo.GetByIdAsync(spec);
+            if (delivery == null)
+            {
+                throw new Exception("Delivery not found");
+            }
+            var data = _mapper.Map<DeliveryDetailsDto>(delivery);
+            return data;
 
+        }
 
     }
 }

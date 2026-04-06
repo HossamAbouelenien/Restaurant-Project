@@ -18,9 +18,12 @@ namespace RMS.Services.Specifications.DeliverySpec
                 && (!queryParams.Date.HasValue || b.CreatedAt.Date == queryParams.Date.Value.Date)
             )
         {
-            AddInclude(b => b.Order!);
-            AddInclude(b => b.Order!.Branch!);
-            AddInclude(b => b.Order!.OrderItems!);
+            AddInclude(d => d.Order!);
+            AddInclude(d => d.Order!.Branch!);
+            AddInclude(d => d.Order!.OrderItems!);
+            AddInclude(d => d.Driver!);
+            AddInclude(d => d.DeliveryAddress);
+            AddInclude("Order.OrderItems.MenuItem");
 
             ApplyPagination(queryParams.PageSize, queryParams.PageIndex);
         }
@@ -31,6 +34,9 @@ namespace RMS.Services.Specifications.DeliverySpec
             AddInclude(d => d.Order!);
             AddInclude(d => d.Order!.Branch!);
             AddInclude(d => d.Order!.OrderItems!);
+            AddInclude(d => d.Driver!);
+            AddInclude(d => d.DeliveryAddress);
+            AddInclude("Order.OrderItems.MenuItem");
         }
     }
 }

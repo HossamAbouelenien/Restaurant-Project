@@ -1,5 +1,4 @@
-﻿using RMS.Domain.Enums;
-using RMS.Shared.DTOs.AddressDTOs;
+﻿using RMS.Shared.DTOs.AddressDTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,24 +7,21 @@ using System.Threading.Tasks;
 
 namespace RMS.Shared.DTOs.DeliveryDTOs
 {
-    public class DeliveryDto
+    public class DeliveryDetailsDto
     {
         public int Id { get; set; }
 
-        public int OrderId { get; set; }
-
-        public string? DriverId { get; set; }
-        public string? DriverName { get; set; }
-
-        public int BranchId { get; set; }
-        public string? BranchName { get; set; }
-
-        public DeliveryStatus DeliveryStatus { get; set; }
+        public string DeliveryStatus { get; set; } = default!;
 
         public DateTime CreatedAt { get; set; }
+
         public DateTime? DeliveredAt { get; set; }
 
         public decimal? CashCollected { get; set; }
+
+        public string? DriverName { get; set; }
+
+        public OrderSummaryDto Order { get; set; } = default!;
 
         public AddressDto DeliveryAddress { get; set; } = default!;
     }
