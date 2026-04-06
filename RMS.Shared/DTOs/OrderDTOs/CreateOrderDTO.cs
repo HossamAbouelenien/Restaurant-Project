@@ -14,5 +14,6 @@ namespace RMS.Shared.DTOs.OrderDTOs
         public List<OrderItemDTO> Items { get; set; } = new List<OrderItemDTO>();
         public int? TableId { get; set; }
         public OrderAddressDTO? DeliveryAddress { get; set; }
+        public string PaymentMethod { get; set; } = default!;
     }
 }
