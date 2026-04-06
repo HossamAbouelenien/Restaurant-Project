@@ -1,0 +1,27 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using RMS.ServicesAbstraction;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace RMS.Presentation.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class ReportsController : ControllerBase
+    {
+        private readonly IReportService _reportService;
+        public ReportsController(IReportService reportService)
+        {
+            _reportService = reportService;
+        }
+        [HttpGet]
+        public async Task <IActionResult> GetReport()
+        {
+            var reportData = await _reportService.GetDashboardAsync();
+            return Ok(reportData);
+        }
+    }
+}

@@ -16,6 +16,7 @@ using RMS.Services.IngredientServices;
 using RMS.Services.KitchenServices;
 using RMS.Services.MappingProfiles;
 using RMS.Services.MenuItemsServices;
+using RMS.Services.ReportServices;
 using RMS.Services.OrderServices;
 using RMS.Services.TableServices;
 using RMS.Services.UserServices;
@@ -173,7 +174,7 @@ namespace RMS.Web
 
             //================= Arwa (165 : 180) =================
             builder.Services.AddScoped<IIngredientService, IngredientService>();
-
+            builder.Services.AddScoped<IReportService, ReportService>();
 
 
 

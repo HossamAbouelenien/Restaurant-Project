@@ -1,0 +1,15 @@
+﻿using RMS.Shared.DTOs.ReportsDTOs;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace RMS.ServicesAbstraction
+{
+    public interface IReportService
+    {
+        Task<DashboardDTO> GetDashboardAsync();
+        
+    }
+}
