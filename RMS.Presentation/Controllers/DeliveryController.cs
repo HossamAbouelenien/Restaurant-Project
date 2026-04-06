@@ -25,18 +25,29 @@ namespace RMS.Presentation.Controllers
         }
 
         [HttpGet("GetAll")]
-        public async Task<ActionResult<PaginatedResult<DeliveryDto>>> GetAllDeliveries([FromQuery] DeliveryQueryParams queryParams)
+        public async Task<ActionResult<PaginatedResult<DeliveryDetailsDto>>> GetAllDeliveries([FromQuery] DeliveryQueryParams queryParams)
         {
             var deliveries = await _deliveryService.GetAllDeliveriesAsync(queryParams);
             return Ok(deliveries);
         }
 
         [HttpGet("OwnAssignedDeliveries")]
-        public async Task<ActionResult<IEnumerable<DeliveryDto>>> GetOwnAssignedDeliveriesAsync()
+        public async Task<ActionResult<IEnumerable<DeliveryDetailsDto>>> GetOwnAssignedDeliveriesAsync()
         {
             var deliveries = await _deliveryService.GetOwnAssignedDeliveriesAsync();
             return Ok(deliveries);
 
+        }
+
+        [HttpGet("DeliveryById")]
+        public async Task<ActionResult<DeliveryDetailsDto>> GetDeliveryByIdAsync([FromQuery] int id)
+        {
+            var delivery = await _deliveryService.GetDeliveryByIdAsync(id);
+            if (delivery == null)
+            {
+                return NotFound($"Delivery with ID {id} not found.");
+            }
+            return Ok(delivery);
         }
     }
 

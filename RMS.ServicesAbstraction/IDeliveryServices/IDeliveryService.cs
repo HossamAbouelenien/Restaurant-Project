@@ -11,8 +11,9 @@ namespace RMS.ServicesAbstraction.IDeliveryServices
 {
     public interface IDeliveryService
     {
-        Task<PaginatedResult<DeliveryDto>> GetAllDeliveriesAsync(DeliveryQueryParams queryParams);
-        Task<IEnumerable<DeliveryDto>> GetOwnAssignedDeliveriesAsync();
+        Task<PaginatedResult<DeliveryDetailsDto>> GetAllDeliveriesAsync(DeliveryQueryParams queryParams);
+        Task<IEnumerable<DeliveryDetailsDto>> GetOwnAssignedDeliveriesAsync();
+        Task<DeliveryDetailsDto> GetDeliveryByIdAsync(int id);
 
     }
 }
