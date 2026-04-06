@@ -14,6 +14,7 @@ namespace RMS.ServicesAbstraction.IDeliveryServices
         Task<PaginatedResult<DeliveryDetailsDto>> GetAllDeliveriesAsync(DeliveryQueryParams queryParams);
         Task<IEnumerable<DeliveryDetailsDto>> GetOwnAssignedDeliveriesAsync();
         Task<DeliveryDetailsDto> GetDeliveryByIdAsync(int id);
+        Task<DeliveryDetailsDto> AssignDriverAsync(AssignDeliveryDto dto);
 
     }
 }
