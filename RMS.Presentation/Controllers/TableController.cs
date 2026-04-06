@@ -40,5 +40,10 @@ namespace RMS.Presentation.Controllers
             if (table == null) return NotFound();
             return Ok(table);
         }
+        [HttpPatch("{id}")]
+        public async Task<ActionResult<TableDTO>>UpdateTable(int id,UpdateTableDTO dto) { 
+            var table= await _tableService.UpdateTableAsync(id, dto);
+            return Ok(table);
+        }
     }
 }

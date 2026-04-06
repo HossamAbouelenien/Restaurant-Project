@@ -45,6 +45,7 @@ namespace RMS.Services.TableServices
         }
         public async Task<IEnumerable<TableDTO>> GetAllTablesAsync(TableQueryParams queryParams)
         {
+           
             var repo = _unitOfWork.GetRepository<Table>();
             var spec =  new TableSpecification(queryParams);
             var tables = await repo.GetAllAsync(spec); 
@@ -55,7 +56,43 @@ namespace RMS.Services.TableServices
             var repo = _unitOfWork.GetRepository<Table>();
             var spec = new TableSpecification(id);
             var table = await repo.GetByIdAsync(spec);
+            if (table == null)
+                throw new Exception("Table not found");
             return _mapper.Map<TableDTO>(table);
+        }
+
+        public async Task<TableDTO> UpdateTableAsync(int id, UpdateTableDTO dto)
+        {
+            var repo = _unitOfWork.GetRepository<Table>();
+            var spec = new TableSpecification(id);
+            var tableFromDb = await repo.GetByIdAsync(spec);
+
+            if (tableFromDb == null)
+                throw new Exception("Table not found");
+
+            dto.TableNumber = dto.TableNumber?.Trim();
+
+            if (string.IsNullOrWhiteSpace(dto.TableNumber))
+                throw new Exception("Table number is required");
+
+            if (dto.Capacity < 1 || dto.Capacity > 20)
+                throw new Exception("Capacity must be between 1 and 20");
+
+            var branchSpec = new TableBranchIdSpecification(tableFromDb.BranchId);
+            var tablesInSameBranch = await repo.GetAllAsync(branchSpec);
+
+            if (tablesInSameBranch.Any(t => t.Id != id &&
+                t.TableNumber.Trim().ToLower() == dto.TableNumber.ToLower()))
+            {
+                throw new Exception("Table number already exists in this branch");
+            }
+
+            _mapper.Map(dto, tableFromDb);
+
+            repo.Update(tableFromDb);
+            await _unitOfWork.SaveChangesAsync();
+
+            return _mapper.Map<TableDTO>(tableFromDb);
         }
     }
 }
