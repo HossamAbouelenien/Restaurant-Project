@@ -15,7 +15,7 @@ namespace RMS.Presentation.Controllers
 {
     [ApiController]
     [Route("api/[Controller]")]
-    public class DeliveryController: ControllerBase
+    public class DeliveryController : ControllerBase
     {
         private readonly IDeliveryService _deliveryService;
 
@@ -30,6 +30,14 @@ namespace RMS.Presentation.Controllers
             var deliveries = await _deliveryService.GetAllDeliveriesAsync(queryParams);
             return Ok(deliveries);
         }
-   
+
+        [HttpGet("OwnAssignedDeliveries")]
+        public async Task<ActionResult<IEnumerable<DeliveryDto>>> GetOwnAssignedDeliveriesAsync()
+        {
+            var deliveries = await _deliveryService.GetOwnAssignedDeliveriesAsync();
+            return Ok(deliveries);
+
+        }
     }
+
 }
