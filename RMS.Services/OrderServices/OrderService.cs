@@ -34,6 +34,9 @@ namespace RMS.Services.OrderServices
             // Parse OrderType
             if (!Enum.TryParse<OrderType>(orderDto.OrderType, ignoreCase: true, out var orderType))
                 throw new Exception($"Invalid OrderType: {orderDto.OrderType}");
+            // Parse PaymentMethod
+            if (!Enum.TryParse<PaymentMethod>(orderDto.PaymentMethod, ignoreCase: true, out var paymentMethod))
+                throw new Exception($"Invalid PaymentMethod: {orderDto.PaymentMethod}");
             var Repo = _unitOfWork.GetRepository<Order>();
             var ItemRepo = _unitOfWork.GetRepository<MenuItem>();
             var orderItems = new List<OrderItemDTO>();
@@ -130,7 +133,11 @@ namespace RMS.Services.OrderServices
             var order = _mapper.Map<Order>(orderDto);                 
             order.TotalAmount = orderItems.Sum(i => i.Quantity * i.UnitPrice);
 
-        
+            order.Payment = new Payment
+            {
+                PaymentMethod = paymentMethod,
+                PaymentStatus = PaymentStatus.Pending
+            };
 
             //OrderType-specific records
             if (orderType == OrderType.DineIn)
