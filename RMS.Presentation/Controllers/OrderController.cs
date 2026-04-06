@@ -92,5 +92,20 @@ namespace RMS.Presentation.Controllers
             }
 
         }
+
+        [HttpPut("{orderId}/status")]
+        public async Task<ActionResult<OrderDTO>> UpdateOrderStatus(int orderId, [FromBody] string newStatus)
+        {
+            try
+            {
+                var updatedOrder = await _orderService.UpdateOrderStatusAsync(orderId, newStatus);
+                return Ok(updatedOrder);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+        }
     }
 }

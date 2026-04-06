@@ -14,5 +14,6 @@ namespace RMS.Services.Specifications.KitchenTicketSpec
         {
             AddInclude(o=>o.Order!);
         }
+        
     }
 }

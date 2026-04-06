@@ -15,5 +15,6 @@ namespace RMS.ServicesAbstraction
         Task<PaginatedResult<OrderDTO>> GetAllOrdersAsync(OrderQueryParams queryParams);
         Task<OrderDetailsDTO> GetOrderByIdAsync(int id);
         Task<PaginatedResult<OrderDTO>> GetCustomerOrdersHistoryAsync(OrderQueryParams queryParams, string customerId);
+        Task<OrderDTO> UpdateOrderStatusAsync(int orderId, string newStatus);
     }
 }
