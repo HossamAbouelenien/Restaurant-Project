@@ -4,6 +4,7 @@ using RMS.Domain.Entities;
 using RMS.Services.Specifications.Tablespec;
 using RMS.ServicesAbstraction;
 using RMS.Shared.DTOs.TableDTOs;
+using RMS.Shared.QueryParams;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,6 +42,13 @@ namespace RMS.Services.TableServices
             var spec = new TableSpecification(table.Id);
             var tableWithIncludes = await repo.GetByIdAsync(spec);
             return _mapper.Map<TableDTO>(tableWithIncludes);
+        }
+        public async Task<IEnumerable<TableDTO>> GetAllTablesAsync(TableQueryParams queryParams)
+        {
+            var repo = _unitOfWork.GetRepository<Table>();
+            var spec =  new TableSpecification(queryParams);
+            var tables = await repo.GetAllAsync(spec); 
+            return _mapper.Map<IEnumerable<TableDTO>>(tables);
         }
     }
 }
