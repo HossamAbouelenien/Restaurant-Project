@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RMS.ServicesAbstraction;
 using RMS.Shared.DTOs.TableDTOs;
+using RMS.Shared.QueryParams;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +26,12 @@ namespace RMS.Presentation.Controllers
         {
             var table = await _tableService.CreateTableAsync(createTable);
             return Ok(table);
+        }
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<TableDTO>>> GetAllTables([FromQuery] TableQueryParams queryParams)
+        {
+            var tables = await _tableService.GetAllTablesAsync(queryParams);
+            return Ok(tables);
         }
     }
 }

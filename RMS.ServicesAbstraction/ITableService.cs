@@ -1,4 +1,5 @@
 ﻿using RMS.Shared.DTOs.TableDTOs;
+using RMS.Shared.QueryParams;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,5 +11,6 @@ namespace RMS.ServicesAbstraction
    public interface ITableService
     {
         Task<TableDTO> CreateTableAsync(CreateTableDTO dto);
+        Task<IEnumerable<TableDTO>> GetAllTablesAsync(TableQueryParams queryParams);
     }
 }
