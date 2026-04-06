@@ -156,7 +156,18 @@ namespace RMS.Services.KitchenServices
                         throw new Exception("Not enough stock");
 
                     stock.QuantityAvailable -= required;
+
+                    if(stock.QuantityAvailable < stock.LowThreshold)
+                    {
+                        
+                        //notifying the system that the menu item is unavailable due to low stock, so it can be hidden from the menu until restocked
+                        Console.WriteLine("Notification : Restock ");
+
+                    }
+
                 }
+
+                
             }
         }
 
