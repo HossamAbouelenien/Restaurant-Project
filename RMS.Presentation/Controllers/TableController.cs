@@ -33,5 +33,12 @@ namespace RMS.Presentation.Controllers
             var tables = await _tableService.GetAllTablesAsync(queryParams);
             return Ok(tables);
         }
+        [HttpGet("{id}")]
+        public async Task<ActionResult<TableDTO>> GetTableById(int id)
+        {
+            var table = await _tableService.GetTableByIdAsync(id);
+            if (table == null) return NotFound();
+            return Ok(table);
+        }
     }
 }

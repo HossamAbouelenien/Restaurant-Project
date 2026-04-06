@@ -50,5 +50,12 @@ namespace RMS.Services.TableServices
             var tables = await repo.GetAllAsync(spec); 
             return _mapper.Map<IEnumerable<TableDTO>>(tables);
         }
+        public async Task<TableDTO> GetTableByIdAsync(int id)
+        {
+            var repo = _unitOfWork.GetRepository<Table>();
+            var spec = new TableSpecification(id);
+            var table = await repo.GetByIdAsync(spec);
+            return _mapper.Map<TableDTO>(table);
+        }
     }
 }
