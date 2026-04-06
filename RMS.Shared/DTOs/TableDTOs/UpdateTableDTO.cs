@@ -9,7 +9,7 @@ namespace RMS.Shared.DTOs.TableDTOs
    public class UpdateTableDTO
     {
      
-        public int TableNumber { get; set; }
+        public string? TableNumber { get; set; }
         public int Capacity { get; set; }
        
 

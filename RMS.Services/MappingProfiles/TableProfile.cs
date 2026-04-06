@@ -10,6 +10,7 @@ namespace RMS.Services.MappingProfiles
         {
             CreateMap<Table, TableDTO>();
             CreateMap<CreateTableDTO, Table>();
+            CreateMap<UpdateTableDTO,Table>();
         }
     }
 }
