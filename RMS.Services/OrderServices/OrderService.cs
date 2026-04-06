@@ -104,7 +104,7 @@ namespace RMS.Services.OrderServices
                         var limitingIngredient = menuItem.Recipes
                             .Select(r =>
                             {
-                                var stock = r.Ingredient.BranchStocks
+                                var stock = r.Ingredient!.BranchStocks
                                     .FirstOrDefault(bs => bs.BranchId == orderDto.BranchId);
 
                                 var available = stock?.QuantityAvailable ?? 0;
@@ -129,6 +129,7 @@ namespace RMS.Services.OrderServices
             var order = _mapper.Map<Order>(orderDto);                 
             order.TotalAmount = orderItems.Sum(i => i.Quantity * i.UnitPrice);
 
+        
 
             //OrderType-specific records
             if (orderType == OrderType.DineIn)
@@ -168,6 +169,23 @@ namespace RMS.Services.OrderServices
             var result = await _unitOfWork.SaveChangesAsync();
             if (result > 0)
             {
+                var categories = new HashSet<string>();
+
+                foreach (var item in order.OrderItems)
+                {
+                    var menuItemSpec = new MenuItemWithBranchStockSpecification(item.MenuItemId);
+                    var menuItem = await ItemRepo.GetByIdAsync(menuItemSpec) ?? throw new Exception("Menu item not found");
+                    if (categories.Add(menuItem.Category!.Name))
+                    {
+                        var KichenTicketRepo = _unitOfWork.GetRepository<KitchenTicket>();
+                        await KichenTicketRepo.AddAsync(new KitchenTicket
+                        {
+                            OrderId = order.Id,
+                            Station = menuItem.Category.Name
+                        });
+                    }
+                }
+                await _unitOfWork.SaveChangesAsync();
                 var Spec = new OrderWithBranchAndCustomerAndOrderItemsSpecification(order.Id);
                 order = await Repo.GetByIdAsync(Spec) ?? throw new Exception("Failed to retrieve created order");
                 return _mapper.Map<OrderDTO>(order);               
