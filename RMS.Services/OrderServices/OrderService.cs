@@ -3,6 +3,7 @@ using RMS.Domain.Contracts;
 using RMS.Domain.Entities;
 using RMS.Domain.Enums;
 using RMS.Services.Specifications.BranchStockSpec;
+using RMS.Services.Specifications.KitchenTicketSpec;
 using RMS.Services.Specifications.MenuItemSpec;
 using RMS.Services.Specifications.OrderSpec;
 using RMS.ServicesAbstraction;
@@ -231,6 +232,98 @@ namespace RMS.Services.OrderServices
             var pageSize = orderDtos.Count();
             var paginatedResult = new PaginatedResult<OrderDTO>(queryParams.PageIndex, pageSize, countOfOrders, orderDtos);
             return paginatedResult;
+        }
+
+        public async Task<OrderDTO> UpdateOrderStatusAsync(int orderId, string newStatus)
+        {
+            var orderRepo = _unitOfWork.GetRepository<Order>();
+            var orderSpec = new OrderWithTableOrderAndBranchAndCustomerAndOrderItemsSpecification(orderId);
+            var orderToUpdate = await orderRepo.GetByIdAsync(orderSpec);
+            if (orderToUpdate == null) throw new Exception("Order not found");
+            if (Enum.TryParse(typeof(OrderStatus), newStatus, true, out var parsedStatus))
+            {
+                switch (orderToUpdate.Status)
+                {
+                    case OrderStatus.Received:
+                        if (parsedStatus is OrderStatus.Preparing or OrderStatus.Cancelled)
+                            orderToUpdate.Status = (OrderStatus)parsedStatus;
+                        else
+                            throw new Exception("Invalid status transition from Received");
+                        break;
+                    case OrderStatus.Preparing:
+                        if (parsedStatus is OrderStatus.Ready)
+                            orderToUpdate.Status = (OrderStatus)parsedStatus;
+                        else
+                            throw new Exception("Invalid status transition from Preparing");
+                        break;
+                    case OrderStatus.Ready:
+                        if (parsedStatus is OrderStatus.Delivered)
+                            orderToUpdate.Status = (OrderStatus)parsedStatus;
+                        else
+                            throw new Exception("Invalid status transition from Ready");
+                        break;
+                    case OrderStatus.Delivered:
+                    case OrderStatus.Cancelled:
+                        throw new Exception("Cannot change status of Delivered or Cancelled orders");
+                    default:
+                        throw new Exception("Unknown current order status");
+                }
+                // If order is being cancelled, release reserved stock and free up table if DineIn
+                if (orderToUpdate.Status == OrderStatus.Cancelled)
+                {
+                    orderToUpdate.TotalAmount = 0;
+                    // Free up table if DineIn
+                    if (orderToUpdate.OrderType == OrderType.DineIn)
+                    {
+                        var table = await _unitOfWork.GetRepository<Table>().GetByIdAsync(orderToUpdate.TableOrder!.TableId);
+                        if (table != null)
+                        {
+                            table.IsOccupied = false;
+                        }
+                    }
+                    var kitchenTicketSpec = new TicketByOrderSpecification(orderToUpdate.Id);
+                    var tickets = await _unitOfWork.GetRepository<KitchenTicket>().GetAllAsync(kitchenTicketSpec);
+                    foreach (var ticket in tickets)
+                    {
+                        ticket.IsDeleted = true;
+                        ticket.DeletedAt = DateTime.Now;
+                    }
+                    // Real Time Kitchen notification to cancel tickets would be implemented here (e.g., via SignalR)
+                    if (orderToUpdate.Delivery is not null)
+                    {
+                        var delivery = await _unitOfWork.GetRepository<Delivery>().GetByIdAsync(orderToUpdate.Delivery.Id);
+                        if (delivery is not null)
+                        {
+                            delivery.IsDeleted = true;
+                            delivery.DeletedAt = DateTime.Now;
+                        }   
+                    }
+                    if(orderToUpdate.Payment is not null)
+                    {
+                        var payment = await _unitOfWork.GetRepository<Payment>().GetByIdAsync(orderToUpdate.Payment.Id);
+                        if (payment is not null && payment.PaymentStatus == PaymentStatus.Paid)
+                        {
+                            payment.PaymentStatus = PaymentStatus.Refunded;
+                            payment.UpdatedAt = DateTime.UtcNow;
+                        }
+                    }
+
+                }
+            }
+            else
+            {
+                throw new Exception("Invalid order status");
+            }
+            orderToUpdate.UpdatedAt = DateTime.UtcNow;
+            var updatedResult = await _unitOfWork.SaveChangesAsync();
+            if (updatedResult > 0)
+            {
+                return _mapper.Map<OrderDTO>(orderToUpdate);
+            }
+            else
+            {
+                throw new Exception("Failed to update order status");
+            }
         }
     }
 }
