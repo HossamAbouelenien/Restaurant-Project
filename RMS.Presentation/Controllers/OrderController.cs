@@ -107,5 +107,18 @@ namespace RMS.Presentation.Controllers
             }
 
         }
+        [HttpPost("{orderId}/items")]
+        public async Task<ActionResult<AddedItemsDTO>> AddItemsToOrder(int orderId, [FromBody] List<OrderItemDTO> items)
+        {
+            try
+            {
+                var addedItems = await _orderService.AddItemsToOrderAsync(orderId, items);
+                return Ok(addedItems);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }
