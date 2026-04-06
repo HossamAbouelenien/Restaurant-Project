@@ -24,5 +24,13 @@ namespace RMS.Services.Specifications.DeliverySpec
 
             ApplyPagination(queryParams.PageSize, queryParams.PageIndex);
         }
+
+        public DeliveriesWithOrderSpecification(string driverId)
+       : base(d => d.DriverId == driverId)
+        {
+            AddInclude(d => d.Order!);
+            AddInclude(d => d.Order!.Branch!);
+            AddInclude(d => d.Order!.OrderItems!);
+        }
     }
 }
