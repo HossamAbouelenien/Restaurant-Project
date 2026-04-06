@@ -20,5 +20,9 @@ namespace RMS.Services.Specifications.BranchStockSpec
             AddInclude(b => b.Branch!);
             AddInclude(b => b.Ingredient!);
         }
+        public BranchStockWithBranchAndIngredient(int branchId,int ingredientId) : base(b => b.BranchId == branchId && b.IngredientId == ingredientId)
+        {
+            
+        }
     }
 }

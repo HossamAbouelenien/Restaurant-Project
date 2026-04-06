@@ -86,8 +86,15 @@ namespace RMS.Presentation.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteMenuItem(int id)
         {
-            await _menuItemService.DeleteMenuItemAsync(id);
-            return Ok(); 
+            try
+            {
+                await _menuItemService.DeleteMenuItemAsync(id);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
     }
 }

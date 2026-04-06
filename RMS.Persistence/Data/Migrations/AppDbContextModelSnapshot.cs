@@ -310,11 +310,6 @@ namespace RMS.Persistence.Data.Migrations
                     b.Property<DateTime?>("DeliveredAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("DeliveryAddress")
-                        .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
-
                     b.Property<string>("DeliveryStatus")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
@@ -323,7 +318,6 @@ namespace RMS.Persistence.Data.Migrations
                         .HasDefaultValue("Assigned");
 
                     b.Property<string>("DriverId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("IsDeleted")
@@ -1014,13 +1008,54 @@ namespace RMS.Persistence.Data.Migrations
                     b.HasOne("RMS.Domain.Entities.User", "Driver")
                         .WithMany("Deliveries")
                         .HasForeignKey("DriverId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("RMS.Domain.Entities.Order", "Order")
                         .WithOne("Delivery")
                         .HasForeignKey("RMS.Domain.Entities.Delivery", "OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.OwnsOne("RMS.Domain.Entities.Address", "DeliveryAddress", b1 =>
+                        {
+                            b1.Property<int>("DeliveryId")
+                                .HasColumnType("int");
+
+                            b1.Property<int>("BuildingNumber")
+                                .HasColumnType("int")
+                                .HasColumnName("BuildingNumber");
+
+                            b1.Property<string>("City")
+                                .IsRequired()
+                                .HasMaxLength(100)
+                                .HasColumnType("nvarchar(100)")
+                                .HasColumnName("City");
+
+                            b1.Property<string>("Note")
+                                .HasMaxLength(300)
+                                .HasColumnType("nvarchar(300)")
+                                .HasColumnName("Note");
+
+                            b1.Property<string>("SpecialMark")
+                                .HasMaxLength(200)
+                                .HasColumnType("nvarchar(200)")
+                                .HasColumnName("SpecialMark");
+
+                            b1.Property<string>("Street")
+                                .IsRequired()
+                                .HasMaxLength(150)
+                                .HasColumnType("nvarchar(150)")
+                                .HasColumnName("Street");
+
+                            b1.HasKey("DeliveryId");
+
+                            b1.ToTable("Deliveries");
+
+                            b1.WithOwner()
+                                .HasForeignKey("DeliveryId");
+                        });
+
+                    b.Navigation("DeliveryAddress")
                         .IsRequired();
 
                     b.Navigation("Driver");

@@ -8,7 +8,7 @@ namespace RMS.Domain.Enums
 {
     public enum OrderType : byte
     {
-        DineIn,
+        DineIn=1,
         Pickup,
         Delivery
     }

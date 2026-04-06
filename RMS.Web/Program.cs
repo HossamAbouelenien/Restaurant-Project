@@ -10,14 +10,20 @@ using RMS.Persistence.Data.DataSeed;
 using RMS.Persistence.Repositories;
 using RMS.Services.BranchServices;
 using RMS.Services.BranchStockServices;
+using RMS.Services.DeliveryServices;
 using RMS.Services.IdentityService;
 using RMS.Services.IngredientServices;
+using RMS.Services.KitchenServices;
 using RMS.Services.MappingProfiles;
 using RMS.Services.MenuItemsServices;
 using RMS.Services.ReportServices;
+using RMS.Services.OrderServices;
+using RMS.Services.TableServices;
 using RMS.Services.UserServices;
 using RMS.ServicesAbstraction;
+using RMS.ServicesAbstraction.IDeliveryServices;
 using RMS.ServicesAbstraction.IIdentityService;
+using RMS.ServicesAbstraction.IKitchenServices;
 using RMS.ServicesAbstraction.IUserServices;
 using RMS.Web.Extensions;
 using System.Text;
@@ -74,7 +80,7 @@ namespace RMS.Web
 
 
 
-
+            builder.Services.AddScoped<IOrderService, OrderService>();
             builder.Services.AddScoped<IBranchStockService, BranchStockService>();
             //================= Mustafa (75 : 150) =================
             builder.Services.AddIdentity<User, IdentityRole>()
@@ -136,8 +142,8 @@ namespace RMS.Web
             });
 
             builder.Services.AddScoped<IUserService, UserService>();
-
-
+            builder.Services.AddScoped<IKitchenService, KitchenService>();
+            builder.Services.AddScoped<IDeliveryService, DeliveryService>();
 
 
 
@@ -184,7 +190,7 @@ namespace RMS.Web
             //================= Areej (180 : 200) =================
 
             builder.Services.AddScoped<IBranchService, BranchServices>();
-
+            builder.Services.AddScoped<ITableService, TableService>();
 
 
 
