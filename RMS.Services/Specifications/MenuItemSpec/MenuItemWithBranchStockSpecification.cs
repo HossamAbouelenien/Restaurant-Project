@@ -12,6 +12,7 @@ namespace RMS.Services.Specifications.MenuItemSpec
         public MenuItemWithBranchStockSpecification(int id) : base(m => m.Id == id)
         {
             AddInclude("Recipes.Ingredient.BranchStocks");
+            AddInclude(m => m.Category!);
         }
     }
 }
