@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RMS.ServicesAbstraction;
 using System;
 using System.Collections.Generic;
@@ -17,11 +18,21 @@ namespace RMS.Presentation.Controllers
         {
             _reportService = reportService;
         }
-        [HttpGet]
+        [HttpGet("dashboard")]
         public async Task <IActionResult> GetReport()
         {
             var reportData = await _reportService.GetDashboardAsync();
             return Ok(reportData);
+        }
+
+        [HttpGet("revenue")]
+        public async Task<IActionResult> GetRevenue(
+            [FromQuery] int? branchId,
+            [FromQuery] DateTime? from,
+            [FromQuery] DateTime? to)
+        {
+            var result = await _reportService.GetRevenueAsync(branchId, from, to);
+            return Ok(result);
         }
     }
 }

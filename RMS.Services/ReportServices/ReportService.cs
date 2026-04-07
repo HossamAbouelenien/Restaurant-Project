@@ -45,5 +45,38 @@ namespace RMS.Services.ReportServices
                     : 0
             };
         }
+
+        public async Task<IEnumerable<RevenueDTO>> GetRevenueAsync(int? branchId, DateTime? from, DateTime? to)
+        {
+            var fromDate = from ?? DateTime.Today;
+            var toDate = to ?? DateTime.Today.AddDays(1);
+
+            var orders = await _unitOfWork.GetRepository<Order>().GetAllAsync();
+
+            var filtered = orders.Where(o =>
+                !o.IsDeleted &&
+                o.Status != OrderStatus.Cancelled &&
+                o.CreatedAt >= fromDate &&
+                o.CreatedAt < toDate
+            );
+
+            if (branchId.HasValue)
+            {
+                filtered = filtered.Where(o => o.BranchId == branchId.Value);
+            }
+
+            var result = filtered
+                .GroupBy(o => new { Date = o.CreatedAt.Date, o.BranchId })
+                .Select(g => new RevenueDTO
+                {
+                    Date = g.Key.Date,
+                    BranchId = g.Key.BranchId,
+                    TotalRevenue = g.Sum(o => o.TotalAmount)
+                })
+                .OrderBy(r => r.Date)
+                .ToList();
+
+            return result;
+        }
     }
 }
