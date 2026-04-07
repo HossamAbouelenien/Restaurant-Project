@@ -13,5 +13,6 @@ namespace RMS.ServicesAbstraction
         
         Task<IEnumerable<RevenueDTO>> GetRevenueAsync(int? branchId, DateTime? from, DateTime? to);
         Task<OrdersByTypeDTO> GetOrdersByTypeAsync();
+        Task<IEnumerable<TopItemsDto>> GetTopItemsAsync(int top);
     }
 }

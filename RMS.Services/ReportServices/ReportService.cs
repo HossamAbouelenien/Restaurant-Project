@@ -1,6 +1,7 @@
 ﻿using RMS.Domain.Contracts;
 using RMS.Domain.Entities;
 using RMS.Domain.Enums;
+using RMS.Services.Specifications.ReportSpec;
 using RMS.ServicesAbstraction;
 using RMS.Shared.DTOs.ReportsDTOs;
 using System;
@@ -19,6 +20,7 @@ namespace RMS.Services.ReportServices
             _unitOfWork = unitOfWork;
 
         }
+
         public async Task<DashboardDTO> GetDashboardAsync()
         {
             var today = DateTime.Today;
@@ -91,6 +93,32 @@ namespace RMS.Services.ReportServices
                     TotalRevenue = g.Sum(o => o.TotalAmount)
                 })
                 .OrderBy(r => r.Date)
+                .ToList();
+
+            return result;
+        }
+        public async Task<IEnumerable<TopItemsDto>> GetTopItemsAsync(int top)
+        {
+            if (top <= 0)
+                throw new Exception("Top must be greater than 0");
+
+            var spec = new OrdersWithItemsSpecification();
+
+            var orders = await _unitOfWork
+                .GetRepository<Order>()
+                .GetAllAsync(spec);
+
+            var result = orders
+                .SelectMany(o => o.OrderItems)
+                .GroupBy(oi => new { oi.MenuItemId, oi.MenuItem.Name })
+                .Select(g => new TopItemsDto
+                {
+                    MenuItemId = g.Key.MenuItemId,
+                    Name = g.Key.Name,
+                    OrderCount = g.Count()
+                })
+                .OrderByDescending(x => x.OrderCount)
+                .Take(top)
                 .ToList();
 
             return result;
