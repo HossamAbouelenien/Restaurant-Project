@@ -53,6 +53,12 @@ namespace RMS.Presentation.Controllers
             await _tableService.DeleteTableAsync(id);
             return Ok();
         }
-     
+        [HttpPatch("{id}/status")]
+        public async Task<ActionResult> UpdateTableStatus(int id)
+        {
+            await _tableService.ToggleTableStatusAsync(id);
+            return Ok();
+        }
+
     }
 }
