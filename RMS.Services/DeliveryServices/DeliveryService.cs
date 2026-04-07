@@ -123,5 +123,74 @@ namespace RMS.Services.DeliveryServices
 
             return _mapper.Map<DeliveryDetailsDto>(createdDelivery);
         }
+
+
+
+        public async Task<DeliveryDetailsDto> UpdateDeliveryStatusAsync(int id, UpdateDeliveryStatusDto dto, string userId, bool isAdmin)
+        {
+            var deliveryRepo = _unitOfWork.GetRepository<Delivery>();
+            var orderRepo = _unitOfWork.GetRepository<Order>();
+
+            
+            var spec = new DeliveryByIdSpecification(id);
+            var delivery = await deliveryRepo.GetByIdAsync(spec);
+
+            if (delivery == null)
+                throw new Exception("Delivery not found");
+
+           
+            if (!isAdmin && delivery.DriverId != userId)
+                throw new Exception("Unauthorized");
+
+            
+            if (!Enum.TryParse<DeliveryStatus>(dto.Status, true, out var parsedStatus))
+                throw new Exception("Invalid status value");
+
+            
+            if (!IsValidTransition(delivery.DeliveryStatus, parsedStatus))
+                throw new Exception("Invalid status transition");
+
+            if (parsedStatus == DeliveryStatus.Delivered)
+            {
+                delivery.DeliveredAt = DateTime.UtcNow;
+
+                if (dto.CashCollected.HasValue)
+                    delivery.CashCollected = dto.CashCollected;
+
+               
+                var order = await orderRepo.GetByIdAsync(delivery.OrderId);
+
+                if (order == null)
+                    throw new Exception("Related order not found");
+
+                order.Status = OrderStatus.Delivered; 
+
+                orderRepo.Update(order);
+
+                
+                delivery.DriverId = null;
+            }
+
+            
+            delivery.DeliveryStatus = parsedStatus;
+
+            deliveryRepo.Update(delivery);
+            await _unitOfWork.SaveChangesAsync();
+
+            return _mapper.Map<DeliveryDetailsDto>(delivery);
+        }
+
+
+
+        private bool IsValidTransition(DeliveryStatus current, DeliveryStatus next)
+        {
+            return (current, next) switch
+            {
+                (DeliveryStatus.Assigned, DeliveryStatus.PickedUp) => true,
+                (DeliveryStatus.PickedUp, DeliveryStatus.OnTheWay) => true,
+                (DeliveryStatus.OnTheWay, DeliveryStatus.Delivered) => true,
+                _ => false
+            };
+        }
     }
 }
