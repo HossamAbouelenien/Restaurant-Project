@@ -31,15 +31,14 @@ namespace RMS.Services.MappingProfiles
                     opt => opt.MapFrom(src => src.Ingredient!.Unit.ToString()));
 
 
-            // ── Write mapping (ignored — handled manually in service) 
             CreateMap<CreateMenuItemDTO, MenuItem>()
-                .ForMember(dest => dest.ImageUrl, opt => opt.Ignore())
-                .ForMember(dest => dest.Recipes, opt => opt.Ignore());
+                .ForMember(dest => dest.ImageUrl, opt => opt.Ignore())  // handled manually
+                .ForMember(dest => dest.Recipes, opt => opt.Ignore());  // handled manually
 
             CreateMap<UpdateMenuItemDTO, MenuItem>()
-                .ForMember(dest => dest.ImageUrl, opt => opt.Ignore())  // handled manually
-                .ForMember(dest => dest.Recipes, opt => opt.Ignore())   // handled manually
-                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => DateTime.UtcNow));
+                .ForMember(dest => dest.ImageUrl, opt => opt.Ignore())  
+                .ForMember(dest => dest.Recipes, opt => opt.Ignore())   
+                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => DateTime.Now));
         }
     }
 }
