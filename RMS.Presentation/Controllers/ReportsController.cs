@@ -47,5 +47,11 @@ namespace RMS.Presentation.Controllers
             var result = await _reportService.GetTopItemsAsync(top);
             return Ok(result);
         }
+        [HttpGet("inventory-usage")]
+        public async Task<IActionResult> GetInventoryUsage()
+        {
+            var result = await _reportService.GetInventoryUsageAsync();
+            return Ok(result);
+        }
     }
 }

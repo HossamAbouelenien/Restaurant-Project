@@ -47,7 +47,6 @@ namespace RMS.Services.ReportServices
                     : 0
             };
         }
-
         public async Task<OrdersByTypeDTO> GetOrdersByTypeAsync()
         {
             var orders = await _unitOfWork.GetRepository<Order>().GetAllAsync();
@@ -64,7 +63,6 @@ namespace RMS.Services.ReportServices
                 DeliveryCount = validOrders.Count(o => o.OrderType == OrderType.Delivery)
             };
         }
-
         public async Task<IEnumerable<RevenueDTO>> GetRevenueAsync(int? branchId, DateTime? from, DateTime? to)
         {
             var fromDate = from ?? DateTime.Today;
@@ -123,5 +121,49 @@ namespace RMS.Services.ReportServices
 
             return result;
         }
+        public async Task<IEnumerable<InventoryUsageDTO>> GetInventoryUsageAsync()
+        {
+            var to = DateTime.Today.AddDays(1);
+            var from = DateTime.Today.AddDays(-7);
+
+            var spec = new OrdersWithFullDataSpecification(from, to);
+
+            var orders = await _unitOfWork
+                .GetRepository<Order>()
+                .GetAllAsync(spec);
+
+            var result = orders
+                .SelectMany(o => o.OrderItems.SelectMany(oi =>
+                    oi.MenuItem.Recipes.Select(r => new
+                    {
+                        o.CreatedAt,
+                        r.IngredientId,
+                        IngredientName = r.Ingredient.Name,
+                        Unit = r.Ingredient.Unit.ToString(), 
+                        QuantityUsed = r.QuantityRequired * oi.Quantity
+                    })
+                ))
+                .GroupBy(x => new
+                {
+                    Date = x.CreatedAt.Date,
+                    x.IngredientId,
+                    x.IngredientName,
+                    x.Unit 
+                })
+                .Select(g => new InventoryUsageDTO
+                {
+                    Date = g.Key.Date,
+                    IngredientId = g.Key.IngredientId,
+                    IngredientName = g.Key.IngredientName,
+                    Unit = g.Key.Unit, 
+                    QuantityUsed = g.Sum(x => x.QuantityUsed)
+                })
+                .OrderBy(x => x.Date)
+                .ToList();
+
+            return result;
+        }
+
+
     }
 }
