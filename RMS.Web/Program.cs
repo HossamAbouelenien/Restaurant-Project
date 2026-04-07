@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using RMS.Domain.Contracts;
 using RMS.Domain.Entities;
+using RMS.Persistence;
 using RMS.Persistence.Data.Contexts;
 using RMS.Persistence.Data.DataSeed;
 using RMS.Persistence.Repositories;
@@ -16,8 +18,8 @@ using RMS.Services.IngredientServices;
 using RMS.Services.KitchenServices;
 using RMS.Services.MappingProfiles;
 using RMS.Services.MenuItemsServices;
-using RMS.Services.ReportServices;
 using RMS.Services.OrderServices;
+using RMS.Services.ReportServices;
 using RMS.Services.TableServices;
 using RMS.Services.UserServices;
 using RMS.ServicesAbstraction;
@@ -27,7 +29,6 @@ using RMS.ServicesAbstraction.IKitchenServices;
 using RMS.ServicesAbstraction.IUserServices;
 using RMS.Web.Extensions;
 using System.Text;
-
 namespace RMS.Web
 {
     public class Program
@@ -35,7 +36,7 @@ namespace RMS.Web
         public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
+            
             // Add services to the container.
 
             builder.Services.AddControllers();
@@ -65,8 +66,7 @@ namespace RMS.Web
 
 
 
-
-
+            builder.Services.AddScoped<IImageService, ImageService>();
             //================= Amr (60 : 75) =====================
 
 

@@ -7,11 +7,13 @@ using RMS.ServicesAbstraction;
 using RMS.Shared;
 using RMS.Shared.DTOs.MenuItemDTOs;
 using RMS.Shared.DTOs.MenuItemsDTOs;
+using RMS.Shared.DTOs.RecipeDTOs;
 using RMS.Shared.QueryParams;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace RMS.Services.MenuItemsServices
@@ -20,11 +22,13 @@ namespace RMS.Services.MenuItemsServices
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IImageService _imageService;
 
-        public MenuItemService(IUnitOfWork unitOfWork, IMapper mapper)
+        public MenuItemService(IUnitOfWork unitOfWork, IMapper mapper, IImageService imageService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _imageService = imageService;
         }
         public async Task<PaginatedResult<MenuItemDTO>> GetAllMenuItemsAsync(MenuItemQueryParams queryParams)
         {
@@ -47,41 +51,30 @@ namespace RMS.Services.MenuItemsServices
             return _mapper.Map<MenuItemDetailsDTO>(menuItem);
         }
 
-        public async Task<MenuItemDetailsDTO> CreateMenuItemAsync(CreateMenuItemDTO dto)
+        public async Task<MenuItemDetailsDTO> CreateMenuItemAsync(CreateMenuItemDTO menuItemDto)
         {
             var repo = _unitOfWork.GetRepository<MenuItem>();
             // Validation
-            if (dto.Recipes == null || !dto.Recipes.Any())
+            if (menuItemDto.Recipes == null || !menuItemDto.Recipes.Any())
                 throw new Exception("MenuItem must have at least one ingredient");
             // Check for duplicate ingredients
-            var duplicates = dto.Recipes.GroupBy(r => r.IngredientId).Where(g => g.Count() > 1);
+            var duplicates = menuItemDto.Recipes.GroupBy(r => r.IngredientId).Where(g => g.Count() > 1);
             if (duplicates.Any())
                 throw new Exception("Duplicate ingredients not allowed");
 
-            var ingredientIds = dto.Recipes.Select(r => r.IngredientId).Distinct().ToList();
+            var ingredientIds = menuItemDto.Recipes.Select(r => r.IngredientId).Distinct().ToHashSet();
             var spec = new IngredientByIdsSpecification(ingredientIds);
-            var existingIngredients = await _unitOfWork .GetRepository<Ingredient>().GetAllAsync(spec);
-            var existingIds = existingIngredients.Select(i => i.Id).ToList();
+            var existingIngredients = await _unitOfWork.GetRepository<Ingredient>().GetAllAsync(spec);
+            var existingIds = existingIngredients.Select(i => i.Id).ToHashSet();
             var invalidIds = ingredientIds.Except(existingIds);
             if (invalidIds.Any())
                 throw new Exception($"Invalid IngredientIds: {string.Join(",", invalidIds)}");
 
-            // Handle image upload
-            string? imagePath = null;
-            if (dto.Image != null)
-            {
-                var fileName = Guid.NewGuid() + Path.GetExtension(dto.Image.FileName);
-
-                var filePath = Path.Combine("wwwroot/Images", fileName);
-
-                using var stream = new FileStream(filePath, FileMode.Create);
-                await dto.Image.CopyToAsync(stream);
-
-                imagePath = $"Images/{fileName}";
-            }
-            var menuItem = _mapper.Map<MenuItem>(dto);
+            // Image upload using IImageService
+            var imagePath = await _imageService.UploadImageAsync(menuItemDto.Image);
+            var menuItem = _mapper.Map<MenuItem>(menuItemDto);
             menuItem.ImageUrl = imagePath;
-            menuItem.Recipes = dto.Recipes.Select(r => new Recipe
+            menuItem.Recipes = menuItemDto.Recipes.Select(r => new Recipe
             {
                 IngredientId = r.IngredientId,
                 QuantityRequired = r.QuantityRequired
@@ -95,7 +88,8 @@ namespace RMS.Services.MenuItemsServices
             return _mapper.Map<MenuItemDetailsDTO>(created!);
         }
 
-        public async Task<MenuItemDetailsDTO> UpdateMenuItemAsync(int id, UpdateMenuItemDTO dto)
+       
+        public async Task<MenuItemDetailsDTO> UpdateMenuItemAsync(int id, UpdateMenuItemDTO menuItemDto)
         {
             var repo = _unitOfWork.GetRepository<MenuItem>();
             //  Check exists
@@ -103,51 +97,33 @@ namespace RMS.Services.MenuItemsServices
             var menuItem = await repo.GetByIdAsync(spec);
             if (menuItem is null) throw new Exception("MenuItem not found");
             //  Validation
-            if (dto.Recipes == null || !dto.Recipes.Any())
+            if (menuItemDto.Recipes == null || !menuItemDto.Recipes.Any())
                 throw new Exception("MenuItem must have at least one ingredient");
             // Check for duplicate ingredients
-            var duplicates = dto.Recipes.GroupBy(r => r.IngredientId).Where(g => g.Count() > 1);
+            var duplicates = menuItemDto.Recipes.GroupBy(r => r.IngredientId).Where(g => g.Count() > 1);
             if (duplicates.Any())
                 throw new Exception("Duplicate ingredients not allowed");
             //  Validate Ingredients
-            var ingredientIds = dto.Recipes.Select(r => r.IngredientId).Distinct().ToList();
+            var ingredientIds = menuItemDto.Recipes.Select(r => r.IngredientId).Distinct().ToHashSet();
 
             var ingredientSpec = new IngredientByIdsSpecification(ingredientIds);
 
-            var existingIngredients = await _unitOfWork
-                .GetRepository<Ingredient>()
-                .GetAllAsync(ingredientSpec);
-            var existingIds = existingIngredients.Select(i => i.Id).ToList();
-
+            var existingIngredients = await _unitOfWork.GetRepository<Ingredient>().GetAllAsync(ingredientSpec);
+            var existingIds = existingIngredients.Select(i => i.Id).ToHashSet();
             var invalidIds = ingredientIds.Except(existingIds);
-
             if (invalidIds.Any())
                 throw new Exception($"Invalid IngredientIds: {string.Join(",", invalidIds)}");
 
-            
-            if (dto.Image != null)
+            if (menuItemDto.Image != null)
             {
-                // delete old image
-                if (!string.IsNullOrEmpty(menuItem.ImageUrl))
-                {
-                    var oldPath = Path.Combine("wwwroot", menuItem.ImageUrl);
-                    if (File.Exists(oldPath))
-                        File.Delete(oldPath);
-                }
-
-                var fileName = Guid.NewGuid() + Path.GetExtension(dto.Image.FileName);
-                var filePath = Path.Combine("wwwroot/Images", fileName);
-
-                using var stream = new FileStream(filePath, FileMode.Create);
-                await dto.Image.CopyToAsync(stream);
-
-                menuItem.ImageUrl = $"Images/{fileName}";
+                // Replace Old Image
+                menuItem.ImageUrl = await _imageService.ReplaceImageAsync(menuItemDto.Image, menuItem.ImageUrl);
             }
             //  Map updated fields ignoreing Recipes and ImageUrl as they are handled separately
-            _mapper.Map(dto, menuItem);
+            _mapper.Map(menuItemDto, menuItem);
 
             var existingRecipes = menuItem.Recipes.ToList();
-            var incomingRecipes = dto.Recipes;
+            var incomingRecipes = menuItemDto.Recipes;
 
             // Update
             foreach (var existingRecipe in existingRecipes)
@@ -200,12 +176,19 @@ namespace RMS.Services.MenuItemsServices
 
         public async Task DeleteMenuItemAsync(int id)
         {
-            var menuItem = await _unitOfWork.GetRepository<MenuItem>().GetByIdAsync(id);
+            var menuItemWithRecipesSpec = new MenuItemWithRecipesSpecification(id);
+            var menuItem = await _unitOfWork.GetRepository<MenuItem>().GetByIdAsync(menuItemWithRecipesSpec);
             if (menuItem is null) throw new Exception("MenuItem not found");
-
+            
             menuItem.IsDeleted = true;
-            menuItem.DeletedAt = DateTime.UtcNow;
+            menuItem.DeletedAt = DateTime.Now;
 
+            foreach(var  recipe in menuItem.Recipes)
+            {
+                recipe.IsDeleted = true;
+                menuItem.DeletedAt = DateTime.Now;
+
+            }
             await _unitOfWork.SaveChangesAsync();
         }
     }

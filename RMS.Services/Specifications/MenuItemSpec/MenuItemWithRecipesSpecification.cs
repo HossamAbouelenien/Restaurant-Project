@@ -7,10 +7,11 @@ using System.Threading.Tasks;
 
 namespace RMS.Services.Specifications.MenuItemSpec
 {
-    public class IngredientByIdsSpecification : BaseSpecifications<Ingredient>
+    internal class MenuItemWithRecipesSpecification : BaseSpecifications<MenuItem>
     {
-        public IngredientByIdsSpecification(HashSet<int> ingredientIds): base(i => ingredientIds.Contains(i.Id))
+        public MenuItemWithRecipesSpecification(int menuItemId) : base(m => m.Id  == menuItemId )
         {
+            AddInclude(m => m.Recipes);
         }
     }
 }

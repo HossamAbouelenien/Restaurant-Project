@@ -44,7 +44,7 @@ namespace RMS.Presentation.Controllers
 
 
         [HttpPost]
-
+        [Consumes("multipart/form-data")]
         public async Task<ActionResult<MenuItemDetailsDTO>> CreateMenuItem([FromForm] CreateMenuItemDTO dto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
