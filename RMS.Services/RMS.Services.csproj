@@ -25,7 +25,6 @@
 
   <ItemGroup>
     <Folder Include="Specifications\BranchSpec\" />
-    <Folder Include="Specifications\ReportSpec\" />
   </ItemGroup>
 
 </Project>

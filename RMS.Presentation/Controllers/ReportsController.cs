@@ -41,5 +41,11 @@ namespace RMS.Presentation.Controllers
             var result = await _reportService.GetOrdersByTypeAsync();
             return Ok(result);
         }
+        [HttpGet("top-items")]
+        public async Task<IActionResult> GetTopItems([FromQuery] int top = 5)
+        {
+            var result = await _reportService.GetTopItemsAsync(top);
+            return Ok(result);
+        }
     }
 }
