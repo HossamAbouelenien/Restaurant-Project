@@ -34,5 +34,12 @@ namespace RMS.Presentation.Controllers
             var result = await _reportService.GetRevenueAsync(branchId, from, to);
             return Ok(result);
         }
+
+        [HttpGet("orders-by-type")]
+        public async Task<IActionResult> GetOrdersByType()
+        {
+            var result = await _reportService.GetOrdersByTypeAsync();
+            return Ok(result);
+        }
     }
 }
