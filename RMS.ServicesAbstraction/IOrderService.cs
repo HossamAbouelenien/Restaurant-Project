@@ -18,6 +18,7 @@ namespace RMS.ServicesAbstraction
         Task<OrderDTO> UpdateOrderStatusAsync(int orderId, string newStatus);
         Task<AddedItemsDTO> AddItemsToOrderAsync(int orderId, List<CreateOrderItemDTO> items);
         Task<OrderDTO> RemoveItemsFromOrderAsync(int orderId, int itemId);
+        Task CancelOrderAsync(int orderId);
 
     }
 }
