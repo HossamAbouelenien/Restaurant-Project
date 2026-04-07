@@ -113,24 +113,23 @@ namespace RMS.Services.TableServices
 
             return _mapper.Map<TableDTO>(tableFromDb);
         }
-        public async Task<TableDTO> UpdateTableStatusAsync(int id, UpdateTableStatusDTO dto)
+        
+        public async Task<IEnumerable<TableOrderDTO>> GetAllTableOrdersAsync(TableOrderQueryParams queryParams)
         {
-            var repo = _unitOfWork.GetRepository<Table>();
-            var spec = new TableWithOrdersSpecification(id);
-            var table = await repo.GetByIdAsync(spec);
+            var repo = _unitOfWork.GetRepository<TableOrder>();
+            var spec = new TableOrderSpecification(queryParams);
+            var tableOrders = await repo.GetAllAsync(spec);
 
-            if (table is null)
-                throw new Exception("Table not found");
+            if (queryParams.TableId.HasValue)
+            {
+                var tableRepo = _unitOfWork.GetRepository<Table>();
+                var tableSpec = new TableSpecification(queryParams.TableId.Value);
+                var table = await tableRepo.GetByIdAsync(tableSpec);
+                if (table is null)
+                    throw new Exception("Table not found");
+            }
 
-            if (dto.IsOccupied == false && table.TableOrders.Any(to => to.CompletedAt == null))
-                throw new Exception("Cannot free table with active orders");
-
-            table.IsOccupied = dto.IsOccupied;
-            table.UpdatedAt = DateTime.UtcNow;
-            repo.Update(table);
-            await _unitOfWork.SaveChangesAsync();
-
-            return _mapper.Map<TableDTO>(table);
+            return _mapper.Map<IEnumerable<TableOrderDTO>>(tableOrders);
         }
     }
 }
