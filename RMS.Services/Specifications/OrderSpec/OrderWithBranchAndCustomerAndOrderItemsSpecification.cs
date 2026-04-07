@@ -16,6 +16,8 @@ namespace RMS.Services.Specifications.OrderSpec
             AddInclude(o => o.Customer!);
             AddInclude(o => o.Branch!);
             AddInclude(o => o.OrderItems);
+            AddInclude("OrderItems.MenuItem");
+
         }
 
         public OrderWithBranchAndCustomerAndOrderItemsSpecification(OrderQueryParams queryParams) 
@@ -25,6 +27,8 @@ namespace RMS.Services.Specifications.OrderSpec
             AddInclude(o => o.Branch!);
             AddInclude(o => o.OrderItems);
             ApplyPagination(queryParams.PageSize, queryParams.PageIndex);
+            AddInclude("OrderItems.MenuItem");
+
         }
 
         public OrderWithBranchAndCustomerAndOrderItemsSpecification(OrderQueryParams queryParams, string customerId)
@@ -34,6 +38,8 @@ namespace RMS.Services.Specifications.OrderSpec
             AddInclude(o => o.Branch!);
             AddInclude(o => o.OrderItems);
             ApplyPagination(queryParams.PageSize, queryParams.PageIndex);
+            AddInclude("OrderItems.MenuItem");
+
         }
 
     }

@@ -16,7 +16,8 @@ namespace RMS.ServicesAbstraction
         Task<OrderDetailsDTO> GetOrderByIdAsync(int id);
         Task<PaginatedResult<OrderDTO>> GetCustomerOrdersHistoryAsync(OrderQueryParams queryParams, string customerId);
         Task<OrderDTO> UpdateOrderStatusAsync(int orderId, string newStatus);
-        Task<AddedItemsDTO> AddItemsToOrderAsync(int orderId, List<OrderItemDTO> items);
+        Task<AddedItemsDTO> AddItemsToOrderAsync(int orderId, List<CreateOrderItemDTO> items);
+        Task<OrderDTO> RemoveItemsFromOrderAsync(int orderId, int itemId);
 
     }
 }
