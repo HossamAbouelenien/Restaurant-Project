@@ -135,5 +135,18 @@ namespace RMS.Presentation.Controllers
                 return BadRequest(ex.Message);
             }
         }
+        [HttpPatch("{Id}/cancel")]
+        public async Task<IActionResult> CancelOrder(int Id)
+        {
+            try
+            {
+                await _orderService.CancelOrderAsync(Id);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

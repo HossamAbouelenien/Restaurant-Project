@@ -327,7 +327,7 @@ namespace RMS.Services.OrderServices
                         if (payment is not null && payment.PaymentStatus == PaymentStatus.Paid)
                         {
                             payment.PaymentStatus = PaymentStatus.Refunded;
-                            payment.UpdatedAt = DateTime.UtcNow;
+                            payment.UpdatedAt = DateTime.Now;
                         }
                     }
 
@@ -337,7 +337,7 @@ namespace RMS.Services.OrderServices
             {
                 throw new Exception("Invalid order status");
             }
-            orderToUpdate.UpdatedAt = DateTime.UtcNow;
+            orderToUpdate.UpdatedAt = DateTime.Now;
             var updatedResult = await _unitOfWork.SaveChangesAsync();
             if (updatedResult > 0)
             {
@@ -547,6 +547,63 @@ namespace RMS.Services.OrderServices
                 return _mapper.Map<OrderDTO>(order);
             else
                 throw new Exception("Failed to remove items from order");
+        }
+
+        public async Task CancelOrderAsync(int orderId)
+        {
+            
+            // Get order to cancel
+            var orderRepo = _unitOfWork.GetRepository<Order>();
+            var orderSpec = new OrderWithTableOrderAndBranchAndCustomerAndOrderItemsSpecification(orderId);
+            var orderToCancel = await orderRepo.GetByIdAsync(orderSpec);
+            if (orderToCancel == null) throw new Exception("Order not found");
+            if (orderToCancel.Status != OrderStatus.Received) throw new Exception("Order is not in a state that allows cancellation");
+            // when cancelling an order, we need to:
+            // 1. Set order status to Cancelled
+            orderToCancel.Status = OrderStatus.Cancelled;
+            // 2. If DineIn, free up the table
+            if (orderToCancel.OrderType == OrderType.DineIn)
+            {
+                var table = await _unitOfWork.GetRepository<Table>().GetByIdAsync(orderToCancel.TableOrder!.TableId);
+                if (table != null)
+                {
+                    table.IsOccupied = false;
+                }
+            }
+            // 3. Mark related kitchen tickets as cancelled (or deleted)
+            var kitchenTicketSpec = new TicketByOrderSpecification(orderToCancel.Id);
+            var tickets = await _unitOfWork.GetRepository<KitchenTicket>().GetAllAsync(kitchenTicketSpec);
+            foreach (var ticket in tickets)
+            {
+                ticket.IsDeleted = true;
+                ticket.DeletedAt = DateTime.Now;
+            }
+            // 4. If Delivery, mark delivery as cancelled (or deleted)
+            if (orderToCancel.Delivery is not null)
+            {
+                var delivery = await _unitOfWork.GetRepository<Delivery>().GetByIdAsync(orderToCancel.Delivery.Id);
+                if (delivery is not null)
+                {
+                    delivery.IsDeleted = true;
+                    delivery.DeletedAt = DateTime.Now;
+                }
+            }
+            // 5. If payment was already made, mark payment as refunded
+            if (orderToCancel.Payment is not null)
+            {
+                var payment = await _unitOfWork.GetRepository<Payment>().GetByIdAsync(orderToCancel.Payment.Id);
+                if (payment is not null && payment.PaymentStatus == PaymentStatus.Paid)
+                {
+                    payment.PaymentStatus = PaymentStatus.Refunded;
+                    payment.UpdatedAt = DateTime.Now;
+                }
+            }
+
+            orderToCancel.UpdatedAt = DateTime.Now;
+            var updatedResult = await _unitOfWork.SaveChangesAsync();
+            if (!(updatedResult > 0))
+                throw new Exception("Failed to update order status");
+            
         }
     }
 }
