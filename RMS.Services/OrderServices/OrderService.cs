@@ -434,14 +434,26 @@ namespace RMS.Services.OrderServices
 
             foreach (var item in items)
             {
+                var menuItemSpec = new MenuItemWithBranchStockSpecification(item.MenuItemId);
+                var menuItem = await ItemRepo.GetByIdAsync(menuItemSpec) ?? throw new Exception("Menu item not found");
+                // check if item already exists in order, if so, update quantity and unit price
+                var existingItem = order.OrderItems.FirstOrDefault(oi => oi.MenuItemId == item.MenuItemId);
+                item.UnitPrice = menuItem.Price;
+
+                if (existingItem != null)
+                {
+                    existingItem.Quantity += item.Quantity;
+                    order.TotalAmount += item.Quantity * menuItem.Price;
+                    continue; // Skip adding a new item
+                }
                 order.OrderItems.Add(new OrderItem
                 {
                     MenuItemId = item.MenuItemId,
                     Quantity = item.Quantity,
-                    UnitPrice = item.UnitPrice,
+                    UnitPrice = menuItem.Price,
                     Notes = item.Notes
                 });
-                    order.TotalAmount += item.Quantity * item.UnitPrice;
+                    order.TotalAmount += item.Quantity * menuItem.Price ;
             }
 
             var addedItemsDto = new AddedItemsDTO
