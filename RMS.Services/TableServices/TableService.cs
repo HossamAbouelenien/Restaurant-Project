@@ -131,5 +131,23 @@ namespace RMS.Services.TableServices
 
             return _mapper.Map<IEnumerable<TableOrderDTO>>(tableOrders);
         }
+        public async Task ToggleTableStatusAsync(int id)
+        {
+            var repo = _unitOfWork.GetRepository<Table>();
+            var spec = new TableWithOrdersSpecification(id);
+            var table = await repo.GetByIdAsync(spec);
+
+            if (table is null)
+                throw new Exception("Table not found");
+
+            if (table.IsOccupied == true && table.TableOrders.Any(to => to.CompletedAt == null))
+                throw new Exception("Cannot free table with active orders");
+
+            table.IsOccupied = !table.IsOccupied;
+            table.UpdatedAt = DateTime.UtcNow;
+            repo.Update(table);
+            await _unitOfWork.SaveChangesAsync();
+        }
+
     }
 }
