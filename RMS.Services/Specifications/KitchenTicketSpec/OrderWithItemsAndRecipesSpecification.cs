@@ -15,6 +15,7 @@ namespace RMS.Services.Specifications.KitchenTicketSpec
             AddInclude("OrderItems");
             AddInclude("OrderItems.MenuItem");
             AddInclude("OrderItems.MenuItem.Recipes");
+            AddInclude("OrderItems.MenuItem.Recipes.Ingredient");
         }
     }
 }
