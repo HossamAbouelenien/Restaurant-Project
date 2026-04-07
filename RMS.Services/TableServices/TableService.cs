@@ -148,6 +148,25 @@ namespace RMS.Services.TableServices
             repo.Update(table);
             await _unitOfWork.SaveChangesAsync();
         }
+        public async Task<TableOrderDTO> CompleteTableOrderAsync(int id)
+        {
+            var repo = _unitOfWork.GetRepository<TableOrder>();
+
+            var tableOrder = await repo.GetByIdAsync(id);
+
+            if (tableOrder is null)
+                throw new Exception("Table order not found");
+
+            if (tableOrder.CompletedAt != null)
+                throw new Exception("Table order is already completed");
+
+            tableOrder.CompletedAt = DateTime.UtcNow;
+
+            repo.Update(tableOrder);
+            await _unitOfWork.SaveChangesAsync();
+
+            return _mapper.Map<TableOrderDTO>(tableOrder);
+        }
 
     }
 }
