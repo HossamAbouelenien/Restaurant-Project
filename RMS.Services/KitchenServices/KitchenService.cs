@@ -69,8 +69,7 @@ namespace RMS.Services.KitchenServices
         }
 
 
-
-        public async Task<KitchenTicketStatusDto> UpdateTicketStatusAsync(int ticketId,UpdateTicketStatusRequestDto dto)
+        public async Task<KitchenTicketStatusDto> UpdateTicketStatusAsync(int ticketId, UpdateTicketStatusRequestDto dto)
         {
             var repo = _unitOfWork.GetRepository<KitchenTicket>();
 
@@ -80,7 +79,7 @@ namespace RMS.Services.KitchenServices
             if (ticket == null)
                 throw new Exception("Ticket not found");
 
-            // Validate transitions
+           
             if (dto.Status == TicketStatus.Preparing)
             {
                 if (ticket.Status != TicketStatus.Pending)
@@ -98,24 +97,24 @@ namespace RMS.Services.KitchenServices
                 ticket.CompletedAt = DateTime.UtcNow;
 
                 await DecrementStock(ticket);
-                await CheckOrderCompletion(ticket.OrderId);
             }
             else
             {
                 throw new Exception("Invalid status");
             }
 
+           
+            await UpdateOrderStatus(ticket.OrderId);
+
             await _unitOfWork.SaveChangesAsync();
 
-            // reload
+            
             var updatedTicket = await repo.GetByIdAsync(spec);
 
             var dtoResult = _mapper.Map<KitchenTicketStatusDto>(updatedTicket);
 
-            // calculate IsOrderReady
             var ticketRepo = _unitOfWork.GetRepository<KitchenTicket>();
-            var ticketsSpec = new TicketByOrderSpecification(ticket.OrderId);
-            var tickets = await ticketRepo.GetAllAsync(ticketsSpec);
+            var tickets = await ticketRepo.GetAllAsync(new TicketByOrderSpecification(ticket.OrderId));
 
             dtoResult.IsOrderReady = tickets.All(t => t.Status == TicketStatus.Done);
 
@@ -123,23 +122,53 @@ namespace RMS.Services.KitchenServices
         }
 
 
+
+        private async Task UpdateOrderStatus(int orderId)
+        {
+            var ticketRepo = _unitOfWork.GetRepository<KitchenTicket>();
+            var orderRepo = _unitOfWork.GetRepository<Order>();
+
+            var tickets = await ticketRepo.GetAllAsync(new TicketByOrderSpecification(orderId));
+
+            var order = await orderRepo.GetByIdAsync(orderId);
+
+            if (order == null)
+                throw new Exception("Order not found");
+
+            if (tickets.All(t => t.Status == TicketStatus.Done))
+            {
+                order.Status = OrderStatus.Ready;
+            }
+            else if (tickets.Any(t => t.Status == TicketStatus.Preparing))
+            {
+                order.Status = OrderStatus.Preparing;
+            }
+            else
+            {
+                order.Status = OrderStatus.Received;
+            }
+        }
+
+
         private async Task DecrementStock(KitchenTicket ticket)
         {
             var orderRepo = _unitOfWork.GetRepository<Order>();
             var stockRepo = _unitOfWork.GetRepository<BranchStock>();
-            var spec = new OrderWithItemsAndRecipesSpecification(ticket.OrderId);
 
+            var spec = new OrderWithItemsAndRecipesSpecification(ticket.OrderId);
             var order = await orderRepo.GetByIdAsync(spec);
 
-            var ingredientIds = order!.OrderItems
+            var branchId = order!.BranchId;
+
+            var ingredientIds = order.OrderItems
                 .SelectMany(i => i.MenuItem!.Recipes)
                 .Select(r => r.IngredientId)
                 .Distinct()
                 .ToList();
 
-            var specStock = new StockByBranchAndIngredientsSpecification(order.BranchId, ingredientIds);
-
-            var stocks = await stockRepo.GetAllAsync(specStock);
+            var stocks = await stockRepo.GetAllAsync(
+                new StockByBranchAndIngredientsSpecification(branchId, ingredientIds)
+            );
 
             var stockDict = stocks.ToDictionary(s => s.IngredientId);
 
@@ -147,45 +176,42 @@ namespace RMS.Services.KitchenServices
             {
                 foreach (var recipe in item.MenuItem!.Recipes)
                 {
-                    if (!stockDict.TryGetValue(recipe.IngredientId, out var stock))
-                        throw new Exception($"Ingredient {recipe.IngredientId} not found");
+                    var ingredientId = recipe.IngredientId;
+                    var ingredientName = recipe.Ingredient?.Name ?? "Unknown";
+
+                   
+                    if (!stockDict.TryGetValue(ingredientId, out var stock))
+                    {
+                        throw new Exception(
+                            $"❌ Ingredient not found → Branch: {branchId} | Id: {ingredientId} | Name: {ingredientName}"
+                        );
+                    }
 
                     var required = recipe.QuantityRequired * item.Quantity;
 
+                   
                     if (stock.QuantityAvailable < required)
-                        throw new Exception("Not enough stock");
-
-                    stock.QuantityAvailable -= required;
-
-                    if(stock.QuantityAvailable < stock.LowThreshold)
                     {
-                        
-                        //notifying the system that the menu item is unavailable due to low stock, so it can be hidden from the menu until restocked
-                        Console.WriteLine("Notification : Restock ");
-
+                        throw new Exception(
+                            $"❌ Not enough stock → Branch: {branchId} | Ingredient: {ingredientName} (Id: {ingredientId}) | Required: {required} | Available: {stock.QuantityAvailable}"
+                        );
                     }
 
+                    
+                    stock.QuantityAvailable -= required;
+
+                  
+                    if (stock.QuantityAvailable < stock.LowThreshold)
+                    {
+                        //Notification
+                        Console.WriteLine(
+                            $"⚠️ Low stock → Branch: {branchId} | Ingredient: {ingredientName} (Id: {ingredientId}) | Remaining: {stock.QuantityAvailable}"
+                        );
+                    }
                 }
-
-                
             }
         }
 
-
-        private async Task CheckOrderCompletion(int orderId)
-        {
-            var ticketRepo = _unitOfWork.GetRepository<KitchenTicket>();
-            var orderRepo = _unitOfWork.GetRepository<Order>();
-
-            var spec = new TicketByOrderSpecification(orderId);
-            var tickets = await ticketRepo.GetAllAsync(spec);
-
-            if (tickets.All(t => t.Status == TicketStatus.Done))
-            {
-                var order = await orderRepo.GetByIdAsync(orderId);
-                order.Status = OrderStatus.Ready;
-            }
-        }
     }
 }
 
