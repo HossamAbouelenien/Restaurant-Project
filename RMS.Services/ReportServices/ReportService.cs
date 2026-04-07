@@ -46,6 +46,23 @@ namespace RMS.Services.ReportServices
             };
         }
 
+        public async Task<OrdersByTypeDTO> GetOrdersByTypeAsync()
+        {
+            var orders = await _unitOfWork.GetRepository<Order>().GetAllAsync();
+
+            var validOrders = orders.Where(o =>
+                !o.IsDeleted &&
+                o.Status != OrderStatus.Cancelled
+            );
+
+            return new OrdersByTypeDTO
+            {
+                DineInCount = validOrders.Count(o => o.OrderType == OrderType.DineIn),
+                PickupCount = validOrders.Count(o => o.OrderType == OrderType.Pickup),
+                DeliveryCount = validOrders.Count(o => o.OrderType == OrderType.Delivery)
+            };
+        }
+
         public async Task<IEnumerable<RevenueDTO>> GetRevenueAsync(int? branchId, DateTime? from, DateTime? to)
         {
             var fromDate = from ?? DateTime.Today;
