@@ -43,6 +43,25 @@ namespace RMS.Services.TableServices
             var tableWithIncludes = await repo.GetByIdAsync(spec);
             return _mapper.Map<TableDTO>(tableWithIncludes);
         }
+
+        public async Task DeleteTableAsync(int id)
+        {
+            var repo = _unitOfWork.GetRepository<Table>();
+            var spec = new TableSpecification(id);
+            var table = await repo.GetByIdAsync(spec);
+
+            if (table is null)
+                throw new Exception("Table not found");
+
+            if (table.IsOccupied)
+                throw new Exception("Cannot delete an occupied table");
+
+            table.IsDeleted = true;
+            table.DeletedAt = DateTime.UtcNow;
+            repo.Update(table);
+            await _unitOfWork.SaveChangesAsync();
+        }
+
         public async Task<IEnumerable<TableDTO>> GetAllTablesAsync(TableQueryParams queryParams)
         {
            

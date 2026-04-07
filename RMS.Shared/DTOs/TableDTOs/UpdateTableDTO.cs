@@ -10,7 +10,7 @@ namespace RMS.Shared.DTOs.TableDTOs
     {
      
         public string? TableNumber { get; set; }
-        public int Capacity { get; set; }
+        public int ?Capacity { get; set; }
        
 
     }
