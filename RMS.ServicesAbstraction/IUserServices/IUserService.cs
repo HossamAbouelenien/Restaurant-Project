@@ -17,6 +17,8 @@ namespace RMS.ServicesAbstraction.IUserServices
         Task<UserDetailsDTO> AddUserAsync(CreateUserDto createUserDto);
 
         Task<UserDetailsDTO> UpdateUserAsync(string id, UpdateUserDto updateUserDto );
+        Task<bool> DeleteUserAsync(string id);
+        Task<List<string>> GetRolesAsync();
 
     }
 }

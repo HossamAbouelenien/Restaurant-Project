@@ -41,13 +41,15 @@ namespace RMS.Services.MappingProfiles
                 .ForMember(dest => dest.BranchId, opt => opt.MapFrom(src => src.Branch!.Id));
 
             CreateMap<CreateUserDto, User>()
-            .ForMember(dest => dest.PasswordHash, opt => opt.Ignore());
+            .ForMember(dest => dest.PasswordHash, opt => opt.Ignore())
+            .ForMember(dest => dest.UserName, opt => opt.Ignore());
 
             CreateMap<UpdateUserDto, User>();
 
             CreateMap<UpdateCurrentUserDTO, User>()
             .ForMember(dest => dest.Id, opt => opt.Ignore())
             .ForMember(dest => dest.PasswordHash, opt => opt.Ignore());
+            
         }
 
     }

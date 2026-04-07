@@ -34,9 +34,6 @@ public class DeliveryConfigurations : IEntityTypeConfiguration<Delivery>
                .HasColumnType("decimal(10,2)")
                .IsRequired(false);
 
-        builder.Property(d => d.DeliveryAddress)
-               .IsRequired()
-               .HasMaxLength(300);
 
         // ── FK → Order (1-to-1) ───────────────────────────────────────────────
         builder.HasOne(d => d.Order)
@@ -52,5 +49,30 @@ public class DeliveryConfigurations : IEntityTypeConfiguration<Delivery>
                .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasQueryFilter(d => !d.IsDeleted);
+
+        builder.OwnsOne(b => b.DeliveryAddress, address =>
+        {
+            address.Property(a => a.BuildingNumber)
+                   .HasColumnName("BuildingNumber")
+                   .IsRequired();
+
+            address.Property(a => a.Street)
+                   .HasColumnName("Street")
+                   .IsRequired()
+                   .HasMaxLength(150);
+
+            address.Property(a => a.City)
+                   .HasColumnName("City")
+                   .IsRequired()
+                   .HasMaxLength(100);
+
+            address.Property(a => a.Note)
+                   .HasColumnName("Note")
+                   .HasMaxLength(300);
+
+            address.Property(a => a.SpecialMark)
+                   .HasColumnName("SpecialMark")
+                   .HasMaxLength(200);
+        });
     }
 }

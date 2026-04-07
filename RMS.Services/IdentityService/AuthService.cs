@@ -40,7 +40,7 @@ namespace RMS.Services.IdentityService
             {
                 var user = await _userManager.FindByEmailAsync(loginRequestDTO.Email);
 
-                if (user == null)
+                if (user == null || user.IsDeleted)
                 {
                     return null;
                 }

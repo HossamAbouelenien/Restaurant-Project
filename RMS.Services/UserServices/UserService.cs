@@ -16,15 +16,17 @@ namespace RMS.Services.UserServices
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly UserManager<User> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public UserService(IUnitOfWork unitOfWork, IMapper mapper, UserManager<User> userManager)
+        public UserService(IUnitOfWork unitOfWork, IMapper mapper, UserManager<User> userManager,RoleManager<IdentityRole> roleManager)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _userManager = userManager;
+            _roleManager = roleManager;
         }
 
-       
+
 
         public async Task<IEnumerable<GetUserDTO>> GetAllUserWithBranchAsync(UserQueryParams queryParams)
         {
@@ -46,16 +48,23 @@ namespace RMS.Services.UserServices
 
         public async Task<UserDetailsDTO> AddUserAsync(CreateUserDto createUserDto)
         {
-         
+
+            var repo = _unitOfWork.GetRepository<User>();
             var user = _mapper.Map<User>(createUserDto);
             user.CreatedAt = DateTime.UtcNow;
-            var createdUser = await _userManager.CreateAsync(user, createUserDto.Password);
+            user.UserName = createUserDto.Email;
+            var createdUser = await _userManager.CreateAsync(user, "Rms123@#");
+
+            //SEND EMAIL TO USER WITH PASSWORD
+
             if (!createdUser.Succeeded)
             {
                 throw new Exception(string.Join(", ", createdUser.Errors.Select(e => e.Description)));
             }
-            var userDetails = _mapper.Map<UserDetailsDTO>(user);
-            return userDetails ;
+            var spec = new UserWithBranchSpecifications(user.Id);
+            var addedUser = await repo.GetByIdAsync(spec);
+
+            return _mapper.Map<UserDetailsDTO>(addedUser);
 
         }
 
@@ -67,10 +76,34 @@ namespace RMS.Services.UserServices
             if (user == null)
                 throw new Exception("User not found");
             _mapper.Map(updateUserDto, user);
+            user.UserName = updateUserDto.Email;
             repo.Update(user);
             await _unitOfWork.SaveChangesAsync();
             var result = _mapper.Map<UserDetailsDTO>(user);
             return result;
         }
+
+
+        public async Task<bool> DeleteUserAsync(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+                throw new Exception("User not found");
+            user.IsDeleted = true;
+            await _userManager.UpdateAsync(user);
+            return true;
+        }
+
+        public async Task<List<string>> GetRolesAsync()
+        {
+            return await Task.FromResult(_roleManager.Roles
+                              .Where(r => r.Name != null)
+                              .Select(r => r.Name!)
+                              .Distinct()
+                              .OrderBy(r => r)
+                              .ToList()  
+            );
+        }
     }
+
 }

@@ -27,17 +27,24 @@ namespace RMS.Presentation.Controllers
             return Ok(BranchStocks);
         }
         [HttpGet("{id}")]
-        public async Task<ActionResult<BranchDTO>> GetBranchStock(int id)
+        public async Task<ActionResult<BranchDTO>> GetBranch(int id)
         {
-            var BranchStock = await _branchService.GetBranchByIdAsync(id);
-            return Ok(BranchStock);
+            var Branch = await _branchService.GetBranchByIdAsync(id);
+            return Ok(Branch);
         }
         [HttpPut("{id}")]
-        public async Task<ActionResult<BranchDTO>> UpdateBranchStock(int id, BranchDTO updateBranch)
+        public async Task<ActionResult<UpdateBranchDTO>> UpdateBranch(int id, UpdateBranchDTO updateBranch)
         {
-            var BranchStock = await _branchService.UpdateBranchAsync(id, updateBranch);
-            return Ok(BranchStock);
+            var Branch = await _branchService.UpdateBranchAsync(id, updateBranch);
+            return Ok(Branch);
         }
+        [HttpPost]
+        public async Task<ActionResult<CreateBranchDTO>> CreateBranch(CreateBranchDTO BranchDTO)
+        {
+            var Branch = await _branchService.CreateBranchAsync(BranchDTO);
+             return Ok(Branch);
+        }
+
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteBranch(int id)
         {
