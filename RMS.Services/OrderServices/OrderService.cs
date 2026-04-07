@@ -40,7 +40,7 @@ namespace RMS.Services.OrderServices
                 throw new Exception($"Invalid PaymentMethod: {orderDto.PaymentMethod}");
             var Repo = _unitOfWork.GetRepository<Order>();
             var ItemRepo = _unitOfWork.GetRepository<MenuItem>();
-            var orderItems = new List<OrderItemDTO>();
+            var orderItems = new List<CreateOrderItemDTO>();
             // Validate OrderType-specific fields
             if (orderType == OrderType.DineIn && !orderDto.TableId.HasValue)
                 throw new Exception("TableId is required for DineIn orders");
@@ -82,7 +82,7 @@ namespace RMS.Services.OrderServices
                     else
                         ingredientConsumption[recipe.IngredientId] = totalRequired;
                 }
-                orderItems.Add(new OrderItemDTO { MenuItemId = menuItem.Id, Quantity = item.Quantity, UnitPrice = menuItem.Price, Notes=item.Notes}); 
+                orderItems.Add(new CreateOrderItemDTO { MenuItemId = menuItem.Id, Quantity = item.Quantity, UnitPrice = menuItem.Price, Notes=item.Notes}); 
             }
             foreach (var (ingredientId, totalRequired) in ingredientConsumption)
             {
@@ -349,7 +349,7 @@ namespace RMS.Services.OrderServices
             }
         }
 
-        public async Task<AddedItemsDTO> AddItemsToOrderAsync(int orderId, List<OrderItemDTO> items)
+        public async Task<AddedItemsDTO> AddItemsToOrderAsync(int orderId, List<CreateOrderItemDTO> items)
         {
             var orderRepo = _unitOfWork.GetRepository<Order>();
             var orderSpec = new OrderWithTableOrderAndBranchAndCustomerAndOrderItemsSpecification(orderId);
@@ -490,8 +490,8 @@ namespace RMS.Services.OrderServices
                     var menuItem = await ItemRepo.GetByIdAsync(menuItemSpec) ?? throw new Exception("Menu item not found");
                     if (categories.Add(menuItem.Category!.Name))
                     {
-                        var KichenTicketRepo = _unitOfWork.GetRepository<KitchenTicket>();
-                        await KichenTicketRepo.AddAsync(new KitchenTicket
+                        var kitchenTicketRepo = _unitOfWork.GetRepository<KitchenTicket>();
+                        await kitchenTicketRepo.AddAsync(new KitchenTicket
                         {
                             OrderId = order.Id,
                             Station = menuItem.Category.Name
@@ -505,6 +505,48 @@ namespace RMS.Services.OrderServices
             {
                 throw new Exception("Failed to add items to order");
             }
+        }
+
+        public async Task<OrderDTO> RemoveItemsFromOrderAsync(int orderId, int itemId)
+        {
+            var repo = _unitOfWork.GetRepository<Order>();
+            var spec = new OrderWithTableOrderAndBranchAndCustomerAndOrderItemsSpecification(orderId);
+            var order = await repo.GetByIdAsync(spec);
+            var menuItemRepo = _unitOfWork.GetRepository<MenuItem>();
+            if (order is null) throw new Exception("Order not found");
+            if (order.Status != OrderStatus.Received) throw new Exception("Order is not in a state that allows item removal");
+            var orderItemSpec = new OrderItemWithCategorySpecification(itemId);
+            var orderItemRepo = _unitOfWork.GetRepository<OrderItem>();
+            var orderItem = await orderItemRepo.GetByIdAsync(orderItemSpec);           
+            if(orderItem is null || orderItem.OrderId != orderId) throw new Exception("Order item not found in order");
+            order.OrderItems.Remove(orderItem);
+            if(!order.OrderItems.Any()) throw new Exception("Cannot remove all items from order. Consider cancelling the order instead.");
+            var newCategories = new HashSet<string>();
+            foreach (var item in order.OrderItems)
+            {
+                var menuItemSpec = new MenuItemWithBranchStockSpecification(item.MenuItemId);
+                var menuItem = await menuItemRepo.GetByIdAsync(menuItemSpec) ?? throw new Exception("Menu item not found");
+                newCategories.Add(menuItem.Category!.Name);
+            }
+            if (!newCategories.Contains(orderItem.MenuItem!.Category!.Name))
+            {
+                var kitchenTicketRepo = _unitOfWork.GetRepository<KitchenTicket>();
+                var ticketSpec = new TicketByOrderSpecification(order.Id);
+                var tickets = await kitchenTicketRepo.GetAllAsync(ticketSpec);
+                var ticketToRemove = tickets.FirstOrDefault(t => t.Station == orderItem.MenuItem.Category!.Name);
+                if (ticketToRemove != null)
+                {
+                     kitchenTicketRepo.Remove(ticketToRemove);
+                }
+            }
+
+            order.TotalAmount -= orderItem.Quantity * orderItem.UnitPrice;
+            order.UpdatedAt = DateTime.Now;
+            var result = await _unitOfWork.SaveChangesAsync();
+            if (result > 0)
+                return _mapper.Map<OrderDTO>(order);
+            else
+                throw new Exception("Failed to remove items from order");
         }
     }
 }

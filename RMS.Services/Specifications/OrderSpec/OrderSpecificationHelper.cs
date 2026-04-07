@@ -14,7 +14,7 @@ namespace RMS.Services.Specifications.OrderSpec
     {
         public static Expression<Func<Order, bool>> GetOrderCriteria(OrderQueryParams queryParams)
         {
-            // Parse قبل الـ expression
+            
             var status = Enum.TryParse<OrderStatus>(queryParams.Status, true, out var s) ? s : (OrderStatus?)null;
             var orderType = Enum.TryParse<OrderType>(queryParams.OrderType, true, out var o) ? o : (OrderType?)null;
 

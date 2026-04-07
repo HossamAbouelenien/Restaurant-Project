@@ -108,12 +108,27 @@ namespace RMS.Presentation.Controllers
 
         }
         [HttpPost("{orderId}/items")]
-        public async Task<ActionResult<AddedItemsDTO>> AddItemsToOrder(int orderId, [FromBody] List<OrderItemDTO> items)
+        public async Task<ActionResult<AddedItemsDTO>> AddItemsToOrder(int orderId, [FromBody] List<CreateOrderItemDTO> items)
         {
             try
             {
                 var addedItems = await _orderService.AddItemsToOrderAsync(orderId, items);
                 return Ok(addedItems);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpDelete("{orderId}/items/{itemId}")]
+
+        public async Task<ActionResult<OrderDTO>> RemoveItemsFromOrder(int orderId, int itemId)
+        {
+            try
+            {
+                var updatedOrder = await _orderService.RemoveItemsFromOrderAsync(orderId, itemId);
+                return Ok(updatedOrder);
             }
             catch (Exception ex)
             {

@@ -18,6 +18,7 @@ namespace RMS.Services.Specifications.OrderSpec
             AddInclude(o => o.KitchenTickets);
             AddInclude("Delivery.Driver");
             AddInclude("TableOrder.Table");
+            AddInclude("OrderItems.MenuItem");
         }
     }
 }

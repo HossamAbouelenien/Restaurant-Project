@@ -18,8 +18,9 @@ namespace RMS.Services.Specifications.OrderSpec
             AddInclude(o => o.TableOrder!);
             AddInclude(o => o.Delivery!);
             AddInclude(o => o.Payment!);
+            AddInclude("OrderItems.MenuItem");
 
         }
-    
+
     }
 }
