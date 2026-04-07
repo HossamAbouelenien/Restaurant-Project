@@ -274,6 +274,23 @@ namespace RMS.Services.OrderServices
                     default:
                         throw new Exception("Unknown current order status");
                 }
+                // If order is being marked as Delivered, set DeliveryStatus to Delivered if it's a Delivery order
+                if (orderToUpdate.Status == OrderStatus.Delivered && orderToUpdate.OrderType == OrderType.Delivery)
+                {
+                    if (orderToUpdate.Delivery != null)
+                    {
+                        orderToUpdate.Delivery.DeliveryStatus = DeliveryStatus.Delivered;
+                        orderToUpdate.Delivery.UpdatedAt = DateTime.Now;
+                    }
+                    if (orderToUpdate.OrderType == OrderType.DineIn)
+                    {
+                        var table = await _unitOfWork.GetRepository<Table>().GetByIdAsync(orderToUpdate.TableOrder!.TableId);
+                        if (table != null)
+                        {
+                            table.IsOccupied = false;
+                        }
+                    }
+                }
                 // If order is being cancelled, release reserved stock and free up table if DineIn
                 if (orderToUpdate.Status == OrderStatus.Cancelled)
                 {
