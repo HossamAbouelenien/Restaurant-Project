@@ -15,6 +15,6 @@ namespace RMS.ServicesAbstraction
         Task<TableDTO> GetTableByIdAsync(int id);
         Task<TableDTO>UpdateTableAsync(int id,UpdateTableDTO dto);
         Task DeleteTableAsync(int id);
-        Task<TableDTO> UpdateTableStatusAsync(int id, UpdateTableStatusDTO dto);
+        Task<IEnumerable<TableOrderDTO>> GetAllTableOrdersAsync(TableOrderQueryParams queryParams);
     }
 }
