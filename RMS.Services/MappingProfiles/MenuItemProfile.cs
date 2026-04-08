@@ -24,7 +24,7 @@ namespace RMS.Services.MappingProfiles
                     opt => opt.MapFrom(src => src.Category!.Name))
                 .ForMember(dest => dest.ImageUrl,opt => opt.MapFrom<MenuItemImagesUrlResolver<MenuItemDetailsDTO>>()); 
 
-            CreateMap<Recipe, RecipeDTO>()
+            CreateMap<Recipe, RecipesListDTO>()
                 .ForMember(dest => dest.IngredientName,
                     opt => opt.MapFrom(src => src.Ingredient!.Name))
                 .ForMember(dest => dest.Unit,

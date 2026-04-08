@@ -19,6 +19,7 @@ using RMS.Services.KitchenServices;
 using RMS.Services.MappingProfiles;
 using RMS.Services.MenuItemsServices;
 using RMS.Services.OrderServices;
+using RMS.Services.RecipeServices;
 using RMS.Services.ReportServices;
 using RMS.Services.TableServices;
 using RMS.Services.UserServices;
@@ -65,7 +66,7 @@ namespace RMS.Web
 
 
 
-
+            builder.Services.AddScoped<IRecipeService, RecipeService>();
             builder.Services.AddScoped<IImageService, ImageService>();
             //================= Amr (60 : 75) =====================
 

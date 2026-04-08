@@ -19,6 +19,6 @@ namespace RMS.Shared.DTOs.MenuItemDTOs
 
         public string ImageUrl { get; set; } = default!;
 
-        public List<RecipeDTO> Recipes { get; set; } = new();
+        public List<RecipesListDTO> Recipes { get; set; } = new();
     }
 }
