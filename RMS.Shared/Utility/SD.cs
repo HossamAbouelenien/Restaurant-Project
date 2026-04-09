@@ -17,5 +17,7 @@ namespace RMS.Shared.DTOs.Utility
 
 
         public const string DefaultPassword = "Rms123@#";
+
+        public const string RestaurantName = "RMS Restaurant";
     }
 }

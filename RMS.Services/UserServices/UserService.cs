@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Identity;
 using RMS.Domain.Contracts;
 using RMS.Domain.Entities;
+using RMS.Services.EmailServices;
 using RMS.Services.Specifications.BranchStockSpec;
 using RMS.Services.Specifications.UserSpec;
+using RMS.ServicesAbstraction.IEmailServices;
 using RMS.ServicesAbstraction.IUserServices;
 using RMS.Shared.DTOs.BranchStockDTOs;
 using RMS.Shared.DTOs.UserDTOs;
@@ -18,13 +20,16 @@ namespace RMS.Services.UserServices
         private readonly IMapper _mapper;
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IEmailService _emailService;
 
-        public UserService(IUnitOfWork unitOfWork, IMapper mapper, UserManager<User> userManager,RoleManager<IdentityRole> roleManager)
+        public UserService(IUnitOfWork unitOfWork, IMapper mapper, UserManager<User> userManager,
+            RoleManager<IdentityRole> roleManager, IEmailService emailService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _userManager = userManager;
             _roleManager = roleManager;
+            _emailService = emailService;
         }
 
 
@@ -66,7 +71,10 @@ namespace RMS.Services.UserServices
            
             var createdUser = await _userManager.CreateAsync(user, SD.DefaultPassword);
 
-            //SEND EMAIL TO USER WITH PASSWORD
+            if (!createdUser.Succeeded)
+            {
+                throw new Exception(string.Join(", ", createdUser.Errors.Select(e => e.Description)));
+            }
 
             var role = string.IsNullOrEmpty(createUserDto.RoleId)
                 ? SD.Role_Customer
@@ -74,12 +82,55 @@ namespace RMS.Services.UserServices
 
             var roleResult = await _userManager.AddToRoleAsync(user, role);
 
-            if (!createdUser.Succeeded)
-            {
-                throw new Exception(string.Join(", ", createdUser.Errors.Select(e => e.Description)));
-            }
             var spec = new UserWithBranchSpecifications(user.Id);
             var addedUser = await repo.GetByIdAsync(spec);
+
+            var subject = $"Welcome to {SD.RestaurantName}";
+
+            var body =
+                $@"<div style='font-family: Arial, sans-serif; line-height:1.8; max-width:600px; margin:auto;'>
+
+                <h2 style='color:#2c3e50;'>Welcome to {SD.RestaurantName}</h2>
+
+                <p>Hello {createUserDto.Name},</p>
+
+                <p>
+                    Your account has been created successfully. Below are your login details:
+                </p>
+
+                <p>
+                    <b>Email:</b> {createUserDto.Email}<br>
+                    <b>Temporary Password:</b> {SD.DefaultPassword}<br>
+                    <b>Role:</b> {role}
+                </p>
+
+                <p style='color:#d35400; font-weight:bold;'>
+                    ⚠️ For your security, this is a temporary password.<br>
+                    You must change your password immediately after logging in.
+                </p>
+
+                <hr>
+
+                <h3 style='color:#2c3e50;'>مرحبًا {createUserDto.Name}</h3>
+
+                <p>
+                    تم إنشاء حسابك بنجاح. بيانات تسجيل الدخول الخاصة بك:
+                </p>
+
+                <p>
+                    <b>البريد الإلكتروني:</b> {createUserDto.Email}<br>
+                    <b>كلمة المرور المؤقتة:</b> {SD.DefaultPassword}<br>
+                    <b>الدور:</b> {role}
+                </p>
+
+                <p style='color:#d35400; font-weight:bold;'>
+                    ⚠️ هذه كلمة مرور مؤقتة لأسباب أمنية.<br>
+                    يجب عليك تغيير كلمة المرور فور تسجيل الدخول.
+                </p>
+
+                </div>";
+
+            await _emailService.SendEmailAsync(user.Email, subject, body);
 
             return _mapper.Map<UserDetailsDTO>(addedUser);
 
