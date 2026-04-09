@@ -7,6 +7,7 @@ using RMS.Services.Specifications.UserSpec;
 using RMS.ServicesAbstraction.IUserServices;
 using RMS.Shared.DTOs.BranchStockDTOs;
 using RMS.Shared.DTOs.UserDTOs;
+using RMS.Shared.DTOs.Utility;
 using RMS.Shared.QueryParams;
 
 namespace RMS.Services.UserServices
@@ -50,12 +51,28 @@ namespace RMS.Services.UserServices
         {
 
             var repo = _unitOfWork.GetRepository<User>();
-            var user = _mapper.Map<User>(createUserDto);
-            user.CreatedAt = DateTime.UtcNow;
-            user.UserName = createUserDto.Email;
-            var createdUser = await _userManager.CreateAsync(user, "Rms123@#");
+
+            User user = new()
+            {
+                Email = createUserDto.Email,
+                Name = createUserDto.Name,
+                UserName = createUserDto.Email,
+                NormalizedEmail = createUserDto.Email.ToUpper(),
+                EmailConfirmed = true,
+                RoleId = string.IsNullOrEmpty(createUserDto.RoleId) ? SD.Role_Customer : createUserDto.RoleId,
+                CreatedAt = DateTime.UtcNow
+            };
+
+           
+            var createdUser = await _userManager.CreateAsync(user, SD.DefaultPassword);
 
             //SEND EMAIL TO USER WITH PASSWORD
+
+            var role = string.IsNullOrEmpty(createUserDto.RoleId)
+                ? SD.Role_Customer
+                : createUserDto.RoleId;
+
+            var roleResult = await _userManager.AddToRoleAsync(user, role);
 
             if (!createdUser.Succeeded)
             {

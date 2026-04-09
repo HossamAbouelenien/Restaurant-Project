@@ -13,5 +13,9 @@ namespace RMS.Shared.DTOs.Utility
         public const string Role_Admin = "Admin";
         public const string Role_Chef = "Chef";
         public const string Role_Waiter = "Waiter";
+
+
+
+        public const string DefaultPassword = "Rms123@#";
     }
 }
