@@ -160,7 +160,16 @@ namespace RMS.Web
 
             //================= Hossam (150 : 165) =================
 
-
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll",
+                    policy =>
+                    {
+                        policy.AllowAnyOrigin()
+                              .AllowAnyMethod()
+                              .AllowAnyHeader();
+                    });
+            });
 
 
 
@@ -234,6 +243,7 @@ namespace RMS.Web
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+            app.UseCors("AllowAll");
             app.UseAuthentication();
             app.UseAuthorization();
 
