@@ -13,6 +13,7 @@ using RMS.Persistence.Repositories;
 using RMS.Services.BranchServices;
 using RMS.Services.BranchStockServices;
 using RMS.Services.DeliveryServices;
+using RMS.Services.EmailServices;
 using RMS.Services.IdentityService;
 using RMS.Services.IngredientServices;
 using RMS.Services.KitchenServices;
@@ -25,6 +26,7 @@ using RMS.Services.TableServices;
 using RMS.Services.UserServices;
 using RMS.ServicesAbstraction;
 using RMS.ServicesAbstraction.IDeliveryServices;
+using RMS.ServicesAbstraction.IEmailServices;
 using RMS.ServicesAbstraction.IIdentityService;
 using RMS.ServicesAbstraction.IKitchenServices;
 using RMS.ServicesAbstraction.IUserServices;
@@ -145,7 +147,7 @@ namespace RMS.Web
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IKitchenService, KitchenService>();
             builder.Services.AddScoped<IDeliveryService, DeliveryService>();
-
+            builder.Services.AddScoped<IEmailService, EmailService>();
 
 
 
