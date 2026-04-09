@@ -15,7 +15,7 @@ namespace RMS.Services.Specifications.RecipeSpec
         {
             AddInclude(r => r.Ingredient!);
             AddInclude(r => r.MenuItem!);
-            
+            ApplyPagination(queryParams.PageSize * (queryParams.PageIndex - 1), queryParams.PageSize);
         }
         public RecipeWithIngredientAndMenuItemSpecification(int recipeId)
             :base(r => r.Id == recipeId)
