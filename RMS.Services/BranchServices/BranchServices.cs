@@ -38,9 +38,8 @@ namespace RMS.Services.BranchServices
         {
             var repo = _unitOfWork.GetRepository<Branch>();
             var branch = await repo.GetByIdAsync(Id);
-
             if (branch is null)
-                return null;
+                throw new KeyNotFoundException($"Branch  not found.");
 
             _mapper.Map(BranchDTO, branch);
 
