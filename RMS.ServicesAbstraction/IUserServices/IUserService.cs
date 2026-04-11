@@ -1,4 +1,5 @@
 ﻿using RMS.Domain.Entities;
+using RMS.Shared;
 using RMS.Shared.DTOs.BranchStockDTOs;
 using RMS.Shared.DTOs.UserDTOs;
 using RMS.Shared.QueryParams;
@@ -12,7 +13,7 @@ namespace RMS.ServicesAbstraction.IUserServices
 {
     public interface IUserService
     {
-        Task<IEnumerable<GetUserDTO>> GetAllUserWithBranchAsync(UserQueryParams queryParams);
+        Task<PaginatedResult<GetUserDTO>> GetAllUserWithBranchAsync(UserQueryParams queryParams);
         Task<UserDetailsDTO> GetUserDetailsAsync(string id);
         Task<UserDetailsDTO> AddUserAsync(CreateUserDto createUserDto);
 

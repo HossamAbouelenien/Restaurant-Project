@@ -7,6 +7,7 @@ using RMS.Services.Specifications.BranchStockSpec;
 using RMS.Services.Specifications.UserSpec;
 using RMS.ServicesAbstraction.IEmailServices;
 using RMS.ServicesAbstraction.IUserServices;
+using RMS.Shared;
 using RMS.Shared.DTOs.BranchStockDTOs;
 using RMS.Shared.DTOs.UserDTOs;
 using RMS.Shared.DTOs.Utility;
@@ -34,13 +35,23 @@ namespace RMS.Services.UserServices
 
 
 
-        public async Task<IEnumerable<GetUserDTO>> GetAllUserWithBranchAsync(UserQueryParams queryParams)
+        public async Task<PaginatedResult<GetUserDTO>> GetAllUserWithBranchAsync(UserQueryParams queryParams)
         {
-            var Repo = _unitOfWork.GetRepository<User>();
-            var Spec = new UserWithBranchSpecifications(queryParams);
-            var Users = await Repo.GetAllAsync(Spec);
-            var DataToReturn = _mapper.Map<IEnumerable<GetUserDTO>>(Users);
-            return DataToReturn;
+            var repo = _unitOfWork.GetRepository<User>();
+            var spec = new UserWithBranchSpecifications(queryParams);
+            var users = await repo.GetAllAsync(spec);
+            var dataToReturn = _mapper.Map<IEnumerable<GetUserDTO>>(users);
+            var countOfReturnedUsers = dataToReturn.Count();
+            var countSpec = new UsersCountSpecification(queryParams);
+            var countOfAllUsers = await repo.CountAsync(countSpec);
+            var paginatedResult = new PaginatedResult<GetUserDTO>(
+                queryParams.PageIndex,
+                countOfReturnedUsers,
+                countOfAllUsers,
+                dataToReturn
+            );
+
+            return paginatedResult;
         }
 
         public async Task<UserDetailsDTO> GetUserDetailsAsync(string id)

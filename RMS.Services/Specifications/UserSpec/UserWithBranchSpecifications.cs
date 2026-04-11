@@ -19,7 +19,7 @@ namespace RMS.Services.Specifications.UserSpec
             )
         {
             AddInclude(b => b.Branch!);
-            
+            ApplyPagination(queryParams.PageSize, queryParams.PageIndex);
         }
     }
 }
