@@ -16,6 +16,7 @@ namespace RMS.ServicesAbstraction.IDeliveryServices
         Task<DeliveryDetailsDto> GetDeliveryByIdAsync(int id);
         Task<DeliveryDetailsDto> AssignDriverAsync(AssignDeliveryDto dto);
         Task<DeliveryDetailsDto> UpdateDeliveryStatusAsync(int id, UpdateDeliveryStatusDto dto, string userId, bool isAdmin);
+        Task<List<UnAssignDeliveryDto>> GetUnAssignedDeliveriesAsync();
 
     }
 }

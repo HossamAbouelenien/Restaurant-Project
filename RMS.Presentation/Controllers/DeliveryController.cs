@@ -77,7 +77,15 @@ namespace RMS.Presentation.Controllers
              var result = await _deliveryService.UpdateDeliveryStatusAsync(id, dto,userId,isAdmin );    
              return Ok(result);
          }
-        
+
+        [HttpGet("unassigned")]
+        public async Task<IActionResult> GetUnAssignedDeliveries()
+        {
+            var result = await _deliveryService.GetUnAssignedDeliveriesAsync();
+
+            return Ok(result);
+        }
+
     }
 
 }

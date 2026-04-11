@@ -37,7 +37,16 @@ namespace RMS.Services.MappingProfiles
             CreateMap<AssignDeliveryDto, Delivery>()
                 .ForMember(dest => dest.DeliveryAddress,opt => opt.MapFrom(src => src.DeliveryAddress))
                 .ForMember(dest => dest.DeliveryStatus,opt => opt.MapFrom(src => DeliveryStatus.Assigned));
-        
+
+
+            CreateMap<Delivery, UnAssignDeliveryDto>()
+                .ForMember(dest => dest.DeliveryId, opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.OrderNumber, opt => opt.MapFrom(src => src.Order!.Id))
+                .ForMember(dest => dest.BranchName, opt => opt.MapFrom(src => src.Order!.Branch!.Name))
+                .ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => src.Order!.Customer.Name))
+                .ForMember(dest => dest.ItemsCount, opt => opt.MapFrom(src => src.Order!.OrderItems.Count))
+                .ForMember(dest => dest.DeliveryAddress, opt => opt.MapFrom(src => src.DeliveryAddress));
+
 
 
             CreateMap<Address, AddressDto>().ReverseMap();
