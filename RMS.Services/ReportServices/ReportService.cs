@@ -49,11 +49,16 @@ namespace RMS.Services.ReportServices
         }
         public async Task<OrdersByTypeDTO> GetOrdersByTypeAsync()
         {
+            var today = DateTime.Today;
+            var tomorrow = today.AddDays(1);
+
             var orders = await _unitOfWork.GetRepository<Order>().GetAllAsync();
 
             var validOrders = orders.Where(o =>
                 !o.IsDeleted &&
-                o.Status != OrderStatus.Cancelled
+                o.Status != OrderStatus.Cancelled &&
+                o.CreatedAt >= today &&
+                o.CreatedAt < tomorrow
             );
 
             return new OrdersByTypeDTO
@@ -65,16 +70,16 @@ namespace RMS.Services.ReportServices
         }
         public async Task<IEnumerable<RevenueDTO>> GetRevenueAsync(int? branchId, DateTime? from, DateTime? to)
         {
-            var fromDate = from ?? DateTime.Today;
-            var toDate = to ?? DateTime.Today.AddDays(1);
+            var today = DateTime.Today;
+            var tomorrow = today.AddDays(1);
 
             var orders = await _unitOfWork.GetRepository<Order>().GetAllAsync();
 
             var filtered = orders.Where(o =>
                 !o.IsDeleted &&
                 o.Status != OrderStatus.Cancelled &&
-                o.CreatedAt >= fromDate &&
-                o.CreatedAt < toDate
+                o.CreatedAt >= today &&
+                o.CreatedAt < tomorrow
             );
 
             if (branchId.HasValue)
@@ -82,7 +87,7 @@ namespace RMS.Services.ReportServices
                 filtered = filtered.Where(o => o.BranchId == branchId.Value);
             }
 
-            var result = filtered
+            return filtered
                 .GroupBy(o => new { Date = o.CreatedAt.Date, o.BranchId })
                 .Select(g => new RevenueDTO
                 {
@@ -92,13 +97,14 @@ namespace RMS.Services.ReportServices
                 })
                 .OrderBy(r => r.Date)
                 .ToList();
-
-            return result;
         }
         public async Task<IEnumerable<TopItemsDto>> GetTopItemsAsync(int top)
         {
             if (top <= 0)
                 throw new Exception("Top must be greater than 0");
+
+            var today = DateTime.Today;
+            var tomorrow = today.AddDays(1);
 
             var spec = new OrdersWithItemsSpecification();
 
@@ -107,6 +113,7 @@ namespace RMS.Services.ReportServices
                 .GetAllAsync(spec);
 
             var result = orders
+                .Where(o => o.CreatedAt >= today && o.CreatedAt < tomorrow)
                 .SelectMany(o => o.OrderItems)
                 .GroupBy(oi => new { oi.MenuItemId, oi.MenuItem.Name })
                 .Select(g => new TopItemsDto

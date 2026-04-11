@@ -4,6 +4,7 @@ using RMS.ServicesAbstraction;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -53,5 +54,7 @@ namespace RMS.Presentation.Controllers
             var result = await _reportService.GetInventoryUsageAsync();
             return Ok(result);
         }
+
+
     }
 }
