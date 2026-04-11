@@ -179,16 +179,14 @@ namespace RMS.Services.MenuItemsServices
             var menuItemWithRecipesSpec = new MenuItemWithRecipesSpecification(id);
             var menuItem = await _unitOfWork.GetRepository<MenuItem>().GetByIdAsync(menuItemWithRecipesSpec);
             if (menuItem is null) throw new Exception("MenuItem not found");
-            
+
+            foreach (var recipe in menuItem.Recipes)
+            {
+                _unitOfWork.GetRepository<Recipe>().Remove(recipe);
+            }
             menuItem.IsDeleted = true;
             menuItem.DeletedAt = DateTime.Now;
 
-            foreach(var  recipe in menuItem.Recipes)
-            {
-                recipe.IsDeleted = true;
-                menuItem.DeletedAt = DateTime.Now;
-
-            }
             await _unitOfWork.SaveChangesAsync();
         }
     }
