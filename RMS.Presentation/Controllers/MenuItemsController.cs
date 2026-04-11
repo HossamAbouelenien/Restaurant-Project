@@ -16,11 +16,11 @@ namespace RMS.Presentation.Controllers
 {
     [ApiController]
     [Route("api/[Controller]")]
-    public class MenuItemController : ControllerBase
+    public class MenuItemsController : ControllerBase
     {
         private readonly IMenuItemService _menuItemService;
 
-        public MenuItemController(IMenuItemService menuItemService)
+        public MenuItemsController(IMenuItemService menuItemService)
         {
             _menuItemService = menuItemService;
         }
