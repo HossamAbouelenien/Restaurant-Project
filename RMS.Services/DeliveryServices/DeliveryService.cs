@@ -192,5 +192,25 @@ namespace RMS.Services.DeliveryServices
                 _ => false
             };
         }
+
+
+
+        
+            public async Task<List<UnAssignDeliveryDto>> GetUnAssignedDeliveriesAsync()
+            {
+                var repo = _unitOfWork.GetRepository<Delivery>();
+                var spec = new UnAssignedDeliveriesSpecification();
+
+                var deliveries = await repo.GetAllAsync(spec);
+
+                 if (deliveries == null || !deliveries.Any())
+                     return new List<UnAssignDeliveryDto>();
+
+               var data = _mapper.Map<List<UnAssignDeliveryDto>>(deliveries);
+                return data;
+            }
+
+
+    
     }
 }
