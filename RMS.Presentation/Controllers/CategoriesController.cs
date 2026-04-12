@@ -47,7 +47,7 @@ namespace RMS.Presentation.Controllers
         {
             var result = await _categoryService.UpdateCategoryAsync(id, DTO);
 
-            if(result == null)
+            if (result == null)
             {
                 return NotFound(new { message = "Category not found" });
             }
@@ -55,7 +55,25 @@ namespace RMS.Presentation.Controllers
             return Ok(result);
         }
 
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> DeleteCategory(int id)
+        {
+            try
+            {
+                await _categoryService.DeleteCategoryAsync(id);
 
+                return NoContent();
+
+            }
+            catch
+            {
+                return NotFound(new { message = "Category not found" });
+
+            }
+
+
+
+        }
 
     }
 }

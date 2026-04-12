@@ -14,5 +14,6 @@ namespace RMS.ServicesAbstraction.ICategoriesService
         Task<CategoryDTO> AddCategoryAsync(CreateCategoryDTO DTO);
         Task<CategoryDTO> UpdateCategoryAsync(int id, UpdateCategoryDTO DTO);
 
+        Task DeleteCategoryAsync(int id);
     }
 }
