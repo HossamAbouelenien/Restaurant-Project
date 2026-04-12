@@ -211,6 +211,28 @@ namespace RMS.Services.DeliveryServices
             }
 
 
-    
+        public async Task<PaginatedResult<AvailableDriverDto>> GetAvailableDriversAsync(AvailableDriversQueryParams query)
+        {
+            var repo = _unitOfWork.GetRepository<User>();
+
+            var spec = new AvailableDriversSpecification(query);
+
+            var drivers = await repo.GetAllAsync(spec);
+
+            var countSpec = new AvailableDriversSpecification(query);
+            var count = await repo.CountAsync(countSpec);
+
+            var data = _mapper.Map<List<AvailableDriverDto>>(drivers);
+
+            return new PaginatedResult<AvailableDriverDto>(
+                query.PageIndex,
+                query.PageSize,
+                count,
+                data
+            );
+        }
+
+
+
     }
 }

@@ -47,7 +47,15 @@ namespace RMS.Services.MappingProfiles
                 .ForMember(dest => dest.ItemsCount, opt => opt.MapFrom(src => src.Order!.OrderItems.Count))
                 .ForMember(dest => dest.DeliveryAddress, opt => opt.MapFrom(src => src.DeliveryAddress));
 
-
+            CreateMap<User, AvailableDriverDto>()
+                .ForMember(dest => dest.DriverId,opt => opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.Name,opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.PhoneNumber,opt => opt.MapFrom(src => src.PhoneNumber))
+                .ForMember(dest => dest.BranchId,opt => opt.MapFrom(src => src.BranchId))
+                .ForMember(dest => dest.BranchName,opt => opt.MapFrom(src => src.Branch != null? src.Branch.Name: null));
+                   
+                   
+               
 
             CreateMap<Address, AddressDto>().ReverseMap();
         }

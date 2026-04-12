@@ -5,6 +5,7 @@ using RMS.ServicesAbstraction.IDeliveryServices;
 using RMS.Shared;
 using RMS.Shared.DTOs.BranchStockDTOs;
 using RMS.Shared.DTOs.DeliveryDTOs;
+using RMS.Shared.DTOs.OrderDTOs;
 using RMS.Shared.DTOs.Utility;
 using RMS.Shared.QueryParams;
 using System;
@@ -86,6 +87,12 @@ namespace RMS.Presentation.Controllers
             return Ok(result);
         }
 
+        [HttpGet("available-drivers")]
+        public async Task<ActionResult<PaginatedResult<AvailableDriverDto>>> GetAvailableDrivers([FromQuery] AvailableDriversQueryParams query)
+        {
+            var result = await _deliveryService.GetAvailableDriversAsync(query);
+            return Ok(result);
+        }
     }
 
 }
