@@ -10,7 +10,7 @@ namespace RMS.ServicesAbstraction.ICategoriesService
     public interface ICategoryService
     {
         Task<IEnumerable<CategoryDTO>> GetAllCategoriesAsync();
-
+        Task<CategoryDTO?> GetCategoryByIdAsync(int id);
 
     }
 }

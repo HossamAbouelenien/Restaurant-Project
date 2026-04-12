@@ -7,13 +7,11 @@ using RMS.Domain.Entities;
 
 namespace RMS.Services.Specifications.CategorySpec
 {
-    internal class CategoryWithIncludingMenuItemOrderedByName : BaseSpecifications<Category>
+    public class GetCategoryByIDWithIncludingMenutItems : BaseSpecifications<Category>
     {
-        public CategoryWithIncludingMenuItemOrderedByName() : base(c => !c.IsDeleted)
+        public GetCategoryByIDWithIncludingMenutItems(int id):base(c => c.Id == id && !c.IsDeleted)
         {
-         
             AddInclude(c => c.MenuItems);
-            AddOrderBy(c => c.Name);
 
         }
     }

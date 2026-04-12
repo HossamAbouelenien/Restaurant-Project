@@ -26,9 +26,22 @@ namespace RMS.Services.CategoryServices
 
         public async Task<IEnumerable<CategoryDTO>> GetAllCategoriesAsync()
         {
+
             var Spec = new CategoryWithIncludingMenuItemOrderedByName();
             var Categories = await _unitOfWork.GetRepository<Category>().GetAllAsync(Spec);
             var result = _mapper.Map<IEnumerable<CategoryDTO>>(Categories);
+
+            return result;
+
+        }
+
+        public async Task<CategoryDTO?> GetCategoryByIdAsync(int id)
+        {
+
+            var Spec = new GetCategoryByIDWithIncludingMenutItems(id);
+            var Category = await _unitOfWork.GetRepository<Category>().GetByIdAsync(Spec);
+            var result = _mapper.Map<CategoryDTO>(Category);
+
             return result;
 
         }
