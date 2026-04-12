@@ -43,7 +43,7 @@ namespace RMS.Services.IdentityService
                     new Claim(ClaimTypes.Role,roles.FirstOrDefault()),
                     new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
                 }),
-                Expires = DateTime.Now.AddMinutes(4),
+                Expires = DateTime.Now.AddHours(2),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
 

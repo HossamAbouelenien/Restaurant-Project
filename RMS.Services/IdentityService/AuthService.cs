@@ -59,7 +59,7 @@ namespace RMS.Services.IdentityService
                 var jwtTokenId = jwtToken.Claims.FirstOrDefault(u => u.Type == JwtRegisteredClaimNames.Jti)?.Value;
 
                 var newRefreshToken = await _tokenService.GenerateRefreshTokenAsync();
-                var refreshTokenExpiry = DateTime.Now.AddMinutes(5);
+                var refreshTokenExpiry = DateTime.Now.AddDays(7);
 
                 await _tokenService.SaveRefreshTokenAsync(user.Id, jwtTokenId, newRefreshToken, refreshTokenExpiry);
 
