@@ -2,6 +2,7 @@
 using RMS.Domain.Entities;
 using RMS.ServicesAbstraction;
 using RMS.ServicesAbstraction.IUserServices;
+using RMS.Shared;
 using RMS.Shared.DTOs.UserDTOs;
 using RMS.Shared.QueryParams;
 
@@ -51,14 +52,11 @@ namespace RMS.Presentation.Controllers
             return Ok(user);
         }
 
-        [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteUserAsync(string id)
+        [HttpPatch("{id}/toggle-status")]
+        public async Task<ActionResult> ToggleUserStatus(string id)
         {
-            var result = await _userService.DeleteUserAsync(id);
-            if (!result)
-                return NotFound();
-            return NoContent();
-
+            var result = await _userService.ToggleUserStatusAsync(id);
+            return Ok(result);
         }
 
         [HttpGet("Roles")]
@@ -66,5 +64,14 @@ namespace RMS.Presentation.Controllers
         {
             var roles = await _userService.GetRolesAsync();
             return Ok(roles);
-    }   }    
+   
+        }
+
+        [HttpGet("inactive")]
+        public async Task<ActionResult<PaginatedResult<GetUserDTO>>> GetInactiveUsers([FromQuery] UserQueryParams queryParams)
+        {
+            var users = await _userService.GetInactiveUsersAsync(queryParams);
+            return Ok(users);
+        }
+    }    
 }
