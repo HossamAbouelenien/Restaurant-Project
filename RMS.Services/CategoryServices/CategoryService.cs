@@ -46,7 +46,7 @@ namespace RMS.Services.CategoryServices
         }
 
 
-        public async Task<int> AddCategoryAsync(CreateCategoryDTO DTO)
+        public async Task<CategoryDTO> AddCategoryAsync(CreateCategoryDTO DTO)
         {
 
             if(string.IsNullOrEmpty(DTO.Name))
@@ -71,7 +71,7 @@ namespace RMS.Services.CategoryServices
 
             await _unitOfWork.SaveChangesAsync();
 
-            return Category.Id;
+            return _mapper.Map<CategoryDTO>(Category);
 
 
         }
