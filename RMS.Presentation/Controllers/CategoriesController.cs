@@ -63,12 +63,13 @@ namespace RMS.Presentation.Controllers
                 await _categoryService.DeleteCategoryAsync(id);
 
                 return NoContent();
-
             }
-            catch
+            catch (Exception ex)
             {
-                return NotFound(new { message = "Category not found" });
+                if (ex.Message == "Category not found")
+                    return NotFound(new { message = ex.Message });
 
+                return BadRequest(new { message = ex.Message });
             }
 
 
