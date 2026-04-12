@@ -12,7 +12,7 @@ using RMS.Shared.DTOs.CategoryDTOs;
 
 namespace RMS.Services.CategoryServices
 {
-    public class CategoryService : ICategoriesService
+    public class CategoryService : ICategoryService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;

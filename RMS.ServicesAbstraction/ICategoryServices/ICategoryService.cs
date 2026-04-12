@@ -7,7 +7,7 @@ using RMS.Shared.DTOs.CategoryDTOs;
 
 namespace RMS.ServicesAbstraction.ICategoriesService
 {
-    public interface ICategoriesService
+    public interface ICategoryService
     {
         Task<IEnumerable<CategoryDTO>> GetAllCategoriesAsync();
 
