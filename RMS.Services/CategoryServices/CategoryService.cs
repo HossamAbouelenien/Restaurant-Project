@@ -76,8 +76,27 @@ namespace RMS.Services.CategoryServices
 
         }
 
+        public async Task<CategoryDTO> UpdateCategoryAsync(int id, UpdateCategoryDTO DTO)
+        {
+            var repository = _unitOfWork.GetRepository<Category>();
 
+            var Category = await repository.GetByIdAsync(id);
 
+            if(Category == null || Category.IsDeleted)
+            {
+                throw new Exception("Category not found");
+            }
 
+            _mapper.Map(DTO,Category);
+
+            Category.UpdatedAt = DateTime.UtcNow;
+
+            repository.Update(Category);
+
+            await _unitOfWork.SaveChangesAsync();
+
+            return _mapper.Map<CategoryDTO>(Category);
+
+        }
     }
 }

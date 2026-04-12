@@ -19,6 +19,11 @@ namespace RMS.Services.MappingProfiles
 
             CreateMap<CreateCategoryDTO, Category>();
 
+            CreateMap<UpdateCategoryDTO, Category>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.DeletedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.IsDeleted, opt => opt.Ignore());
 
         }
 
