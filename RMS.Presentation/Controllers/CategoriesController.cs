@@ -35,8 +35,12 @@ namespace RMS.Presentation.Controllers
             return Ok(Category);
         }
 
-
-
+        [HttpPost]
+        public async Task<ActionResult<CategoryDTO>> AddCategory(CreateCategoryDTO DTO)
+        {
+            var Category = await _categoryService.AddCategoryAsync(DTO);
+            return Ok(Category);
+        }
 
 
 
