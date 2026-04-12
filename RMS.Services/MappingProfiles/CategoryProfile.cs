@@ -17,6 +17,9 @@ namespace RMS.Services.MappingProfiles
                 .ForMember(dest => dest.MenuItemsCount,opt => opt.MapFrom(src => src.MenuItems.Count));
 
 
+            CreateMap<CreateCategoryDTO, Category>();
+
+
         }
 
 

@@ -11,6 +11,7 @@ namespace RMS.ServicesAbstraction.ICategoriesService
     {
         Task<IEnumerable<CategoryDTO>> GetAllCategoriesAsync();
         Task<CategoryDTO?> GetCategoryByIdAsync(int id);
+        Task<CategoryDTO> AddCategoryAsync(CreateCategoryDTO DTO);
 
     }
 }
