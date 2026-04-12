@@ -98,5 +98,13 @@ namespace RMS.Services.CategoryServices
             return _mapper.Map<CategoryDTO>(Category);
 
         }
+
+        public Task DeleteCategoryAsync(int id)
+        {
+            
+
+
+
+        }
     }
 }
