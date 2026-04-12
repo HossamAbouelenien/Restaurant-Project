@@ -42,8 +42,18 @@ namespace RMS.Presentation.Controllers
             return Ok(Category);
         }
 
+        [HttpPut("{id}")]
+        public async Task<ActionResult<CategoryDTO>> UpdateCategory(int id, UpdateCategoryDTO DTO)
+        {
+            var result = await _categoryService.UpdateCategoryAsync(id, DTO);
 
+            if(result == null)
+            {
+                return NotFound(new { message = "Category not found" });
+            }
 
+            return Ok(result);
+        }
 
 
 
