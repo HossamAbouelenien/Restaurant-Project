@@ -102,7 +102,7 @@ namespace RMS.Services.DeliveryServices
             if (order.OrderType != OrderType.Delivery)
                 throw new Exception("Order is not a delivery type");
 
-            if (order.Delivery != null)
+            if (order.Delivery != null && order.Delivery.DriverId != null)
                 throw new Exception("Order already assigned");
 
             var driver = await _userManager.FindByIdAsync(dto.DriverId);
@@ -113,9 +113,18 @@ namespace RMS.Services.DeliveryServices
             if (!await _userManager.IsInRoleAsync(driver, SD.Role_Driver))
                 throw new Exception("User is not a driver");
 
-            var delivery = _mapper.Map<Delivery>(dto);
+            
+            var deliverySpec = new DeliveryByOrderIdSpecification(dto.OrderId);
+            var delivery = await deliveryRepo.GetByIdAsync(deliverySpec);
 
-            await deliveryRepo.AddAsync(delivery);
+            if (delivery == null)
+                throw new Exception("Delivery not found");
+
+            delivery.DriverId = dto.DriverId;
+            //delivery.AssignedAt = DateTime.UtcNow;
+            delivery.CreatedAt = DateTime.UtcNow;
+
+            deliveryRepo.Update(delivery);
             await _unitOfWork.SaveChangesAsync();
 
             var spec = new DeliveryByIdSpecification(delivery.Id);
