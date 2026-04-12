@@ -22,8 +22,7 @@ namespace RMS.Services.CategoryServices
             this._unitOfWork = unitOfWork;
             this._mapper = mapper;
         }
-
-
+    
         public async Task<IEnumerable<CategoryDTO>> GetAllCategoriesAsync()
         {
 
@@ -45,5 +44,40 @@ namespace RMS.Services.CategoryServices
             return result;
 
         }
+
+
+        public async Task<int> AddCategoryAsync(CreateCategoryDTO DTO)
+        {
+
+            if(string.IsNullOrEmpty(DTO.Name))
+            {
+                throw new Exception("Category name is required");
+            }
+
+            var repository = _unitOfWork.GetRepository<Category>();
+
+            var ExitingCategories = await repository.GetAllAsync();
+
+            if (ExitingCategories.Any(C => C.Name.ToLower() == DTO.Name.ToLower()))
+            {
+                throw new Exception("Category already exists");
+            }
+
+            var Category = _mapper.Map<Category>(DTO);
+
+            Category.CreatedAt = DateTime.UtcNow;
+
+            await repository.AddAsync(Category);
+
+            await _unitOfWork.SaveChangesAsync();
+
+            return Category.Id;
+
+
+        }
+
+
+
+
     }
 }
