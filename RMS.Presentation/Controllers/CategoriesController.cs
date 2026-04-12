@@ -28,8 +28,12 @@ namespace RMS.Presentation.Controllers
             return Ok(Categories);
         }
 
-
-
+        [HttpGet("{id}")]
+        public async Task<ActionResult<CategoryDTO>> GetCategoryById(int id)
+        {
+            var Category = await _categoryService.GetCategoryByIdAsync(id);
+            return Ok(Category);
+        }
 
 
 
