@@ -99,9 +99,31 @@ namespace RMS.Services.CategoryServices
 
         }
 
-        public Task DeleteCategoryAsync(int id)
+        public async Task DeleteCategoryAsync(int id)
         {
             
+            var repository = _unitOfWork.GetRepository<Category>();
+
+            var Spec = new CategoryWithIncludingMenuItemsByIDForDelete(id);
+
+            var Category = await repository.GetByIdAsync(Spec);
+
+            if(Category == null || Category.IsDeleted)
+            {
+                throw new Exception("Category not found");
+            }
+
+            if (Category.MenuItems.Any())
+            {
+                throw new Exception("Category cannot be deleted because it has menu items");
+            }
+
+            Category.IsDeleted = true;
+            Category.DeletedAt = DateTime.UtcNow;
+
+            repository.Update(Category);
+
+            await _unitOfWork.SaveChangesAsync();
 
 
 
