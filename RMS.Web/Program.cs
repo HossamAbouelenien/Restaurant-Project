@@ -12,6 +12,7 @@ using RMS.Persistence.Data.DataSeed;
 using RMS.Persistence.Repositories;
 using RMS.Services.BranchServices;
 using RMS.Services.BranchStockServices;
+using RMS.Services.CategoryServices;
 using RMS.Services.DeliveryServices;
 using RMS.Services.EmailServices;
 using RMS.Services.IdentityService;
@@ -25,6 +26,7 @@ using RMS.Services.ReportServices;
 using RMS.Services.TableServices;
 using RMS.Services.UserServices;
 using RMS.ServicesAbstraction;
+using RMS.ServicesAbstraction.ICategoriesService;
 using RMS.ServicesAbstraction.IDeliveryServices;
 using RMS.ServicesAbstraction.IEmailServices;
 using RMS.ServicesAbstraction.IIdentityService;
@@ -176,7 +178,7 @@ namespace RMS.Web
 
 
 
-
+            builder.Services.AddScoped<ICategoryService,CategoryService>();
 
 
 
