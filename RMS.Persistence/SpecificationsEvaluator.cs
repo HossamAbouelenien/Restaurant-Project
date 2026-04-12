@@ -13,21 +13,22 @@ namespace RMS.Persistence
             var Query = entryPoint; // _dbContext.Products
             if (specifications is not null)
             {
+                if (specifications.IgnoreQueryFilters)
+                {
+                    Query = Query.IgnoreQueryFilters();
+                }
+
                 if (specifications.Criteria is not null)
                 {
-                    Query = Query.Where(specifications.Criteria); // _dbContext.Products.Where(Criteria)
+                    Query = Query.Where(specifications.Criteria); 
                 }
 
                 if (specifications.IncludeExpressions is not null && specifications.IncludeExpressions.Any())
                 {
-                    //foreach (var includeExp in specifications.IncludeExpressions)
-                    //{
-                    //    Query = Query.Include(includeExp);
-                    //}
-
                     Query = specifications.IncludeExpressions.Aggregate(Query,
                         (CurrentQuery, IncludeExp) => CurrentQuery.Include(IncludeExp));
                 }
+
                 if (specifications.IncludeStrings is not null && specifications.IncludeStrings.Any())
                 {
                     Query = specifications.IncludeStrings
@@ -48,6 +49,7 @@ namespace RMS.Persistence
                 {
                     Query = Query.Skip(specifications.Skip).Take(specifications.Take);
                 }
+               
             }
             return Query;
         }

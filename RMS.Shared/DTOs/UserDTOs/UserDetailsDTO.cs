@@ -27,6 +27,7 @@ namespace RMS.Shared.DTOs.UserDTOs
             public List<object>? Orders { get; set; }
 
             public List<object>? Deliveries { get; set; }
-        
+            public bool IsDeleted { get; set; }
+
     }
 }

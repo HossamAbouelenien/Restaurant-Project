@@ -23,6 +23,7 @@ namespace RMS.Shared.DTOs.UserDTOs
         public int? BranchId { get; set; }
 
         public string? BranchName { get; set; }
+        public bool IsDeleted { get; set; }
 
         //public DateTime CreatedAt { get; set; }
     }

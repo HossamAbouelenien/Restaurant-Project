@@ -12,6 +12,7 @@ using RMS.Shared.DTOs.BranchStockDTOs;
 using RMS.Shared.DTOs.UserDTOs;
 using RMS.Shared.DTOs.Utility;
 using RMS.Shared.QueryParams;
+using Microsoft.EntityFrameworkCore;
 
 namespace RMS.Services.UserServices
 {
@@ -163,14 +164,56 @@ namespace RMS.Services.UserServices
         }
 
 
-        public async Task<bool> DeleteUserAsync(string id)
+        public async Task<bool> ToggleUserStatusAsync(string id)
         {
-            var user = await _userManager.FindByIdAsync(id);
+            var repo = _unitOfWork.GetRepository<User>();
+
+            var spec = new UserByIdIgnoreFilterSpecification(id);
+
+            var user = await repo.GetByIdAsync(spec);
+
             if (user == null)
                 throw new Exception("User not found");
-            user.IsDeleted = true;
-            await _userManager.UpdateAsync(user);
+
+            if (!user.IsDeleted)
+            {
+                user.IsDeleted = true;
+                user.DeletedAt = DateTime.UtcNow;
+            }
+            else
+            {
+                user.IsDeleted = false;
+                user.DeletedAt = null;
+            }
+
+            user.UpdatedAt = DateTime.UtcNow;
+
+            repo.Update(user);
+            await _unitOfWork.SaveChangesAsync();
+
             return true;
+        }
+
+        public async Task<PaginatedResult<GetUserDTO>> GetInactiveUsersAsync(UserQueryParams queryParams)
+        {
+            var repo = _unitOfWork.GetRepository<User>();
+
+            var spec = new InactiveUsersWithBranchSpecification(queryParams);
+
+            var users = await repo.GetAllAsync(spec);
+
+            var dataToReturn = _mapper.Map<IEnumerable<GetUserDTO>>(users);
+
+            var countSpec = new InactiveUsersCountSpecification(queryParams);
+
+            var countOfAllUsers = await repo.CountAsync(countSpec);
+
+            return new PaginatedResult<GetUserDTO>(
+                queryParams.PageIndex,
+                dataToReturn.Count(),
+                countOfAllUsers,
+                dataToReturn
+            );
         }
 
         public async Task<List<string>> GetRolesAsync()

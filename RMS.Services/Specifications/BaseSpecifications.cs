@@ -70,5 +70,9 @@ namespace RMS.Services.Specifications
         }
 
         #endregion Pagination
+
+        #region Ignore Query Filter
+        public bool IgnoreQueryFilters { get; protected set; } = false;
+        #endregion
     }
 }

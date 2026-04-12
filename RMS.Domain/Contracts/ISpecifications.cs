@@ -18,5 +18,6 @@ namespace RMS.Domain.Contracts
         public int Take { get; }
         public int Skip { get; }
         public bool IsPaginated { get; }
+        bool IgnoreQueryFilters { get; }
     }
 }
