@@ -20,10 +20,12 @@ namespace RMS.Presentation.Controllers
             _ingredientService = ingredientService;
         }
         [HttpGet]
-        public async Task<IActionResult> GetAllIngredients()
+        public async Task<IActionResult> GetAllIngredients(
+          [FromQuery] int pageIndex = 1,
+          [FromQuery] int pageSize = 10)
         {
-            var ingredients = await _ingredientService.GetAllIngredientsAsync();
-            return Ok(ingredients);
+            var result = await _ingredientService.GetAllIngredientsAsync(pageIndex, pageSize);
+            return Ok(result);
         }
 
         [HttpGet("{id}")]
