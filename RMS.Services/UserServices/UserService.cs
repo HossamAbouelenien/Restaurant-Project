@@ -226,6 +226,84 @@ namespace RMS.Services.UserServices
                               .ToList()  
             );
         }
+
+
+        public async Task<GetCustomerDTO> AddCustomerAsync(CreateCustomerDTO createCustomerDTO)
+        {
+
+            var repo = _unitOfWork.GetRepository<User>();
+
+            User user = new()
+            {
+              
+                Name = createCustomerDTO.Name,
+                UserName = $"{createCustomerDTO.Name}.{ createCustomerDTO.PhoneNumber}",
+                PhoneNumber = createCustomerDTO.PhoneNumber,
+                RoleId = SD.Role_Customer,
+                CreatedAt = DateTime.Now
+            };
+
+
+            var createdUser = await _userManager.CreateAsync(user, SD.DefaultPassword);
+
+            if (!createdUser.Succeeded)
+            {
+                throw new Exception(string.Join(", ", createdUser.Errors.Select(e => e.Description)));
+            }
+
+            var role = SD.Role_Customer;
+
+            var roleResult = await _userManager.AddToRoleAsync(user, role);
+
+            var spec = new UserWithBranchSpecifications(user.Id);
+            var addedUser = await repo.GetByIdAsync(spec);
+
+            return _mapper.Map<GetCustomerDTO>(addedUser);
+
+        }
+
+        public async Task<PaginatedResult<GetCustomerDTO>> GetAllCustomerUserAysnc(CustomerQueryParams queryParams)
+        {
+            var repo = _unitOfWork.GetRepository<User>();
+            var spec = new CustomerByPhoneSpecification(queryParams);
+            var users = await repo.GetAllAsync(spec);
+            var dataToReturn = _mapper.Map<IEnumerable<GetCustomerDTO>>(users);
+            var countOfReturnedUsers = dataToReturn.Count();
+            var countSpec = new CustomersByPhoneCountSpecification(queryParams);
+            var countOfAllUsers = await repo.CountAsync(countSpec);
+            var paginatedResult = new PaginatedResult<GetCustomerDTO>(
+                queryParams.PageIndex,
+                countOfReturnedUsers,
+                countOfAllUsers,
+                dataToReturn
+            );
+
+            return paginatedResult;
+        }
+
+
+        public async Task<GetCustomerDTO> UpdateCustomerAddress(string id, UpdateCustomerAddressDTO updateCustomerAddressDTO)
+        {
+            var repo = _unitOfWork.GetRepository<User>();
+            var spec = new UserWithBranchSpecifications(id);
+            var user = await repo.GetByIdAsync(spec);
+
+            if (user == null)
+                throw new Exception("User not found");
+
+            // ✅ Map الـ DTO الأول لـ Address Entity
+            var newAddress = _mapper.Map<Address>(updateCustomerAddressDTO.addressDTO);
+
+            // ✅ تأكد إن الـ collection مش null
+            user.Addresses ??= new List<Address>();
+
+            user.Addresses.Add(newAddress);
+
+            repo.Update(user);
+            await _unitOfWork.SaveChangesAsync();
+
+            return _mapper.Map<GetCustomerDTO>(user);
+        }
     }
 
 }

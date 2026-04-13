@@ -49,7 +49,12 @@ namespace RMS.Services.MappingProfiles
             CreateMap<UpdateCurrentUserDTO, User>()
             .ForMember(dest => dest.Id, opt => opt.Ignore())
             .ForMember(dest => dest.PasswordHash, opt => opt.Ignore());
-            
+
+            CreateMap<User, GetCustomerDTO>()
+                 .ForMember(dest => dest.phoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
+                .ForMember(dest => dest.Addresses,opt => opt.MapFrom(src => src.Addresses));
+                      
+
         }
 
     }

@@ -29,4 +29,7 @@ public class User : IdentityUser
     public ICollection<Order> Orders { get; set; } = new List<Order>();
 
     public ICollection<Delivery> Deliveries { get; set; } = new List<Delivery>();
+    public ICollection<Address> Addresses{ get; set; } = new List<Address>();
+
+
 }

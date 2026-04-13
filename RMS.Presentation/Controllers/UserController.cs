@@ -73,5 +73,30 @@ namespace RMS.Presentation.Controllers
             var users = await _userService.GetInactiveUsersAsync(queryParams);
             return Ok(users);
         }
+
+
+        [HttpPost("AddCustomerAsync")]
+        public async Task<ActionResult<CreateCustomerDTO>> AddCustomerAsync(CreateCustomerDTO createCustomerDTO)
+        {
+            var user = await _userService.AddCustomerAsync(createCustomerDTO);
+
+            return Ok(user);
+        }
+
+        [HttpGet("GetAllCustomerUserAysnc")]
+        public async Task<ActionResult<PaginatedResult<GetCustomerDTO>>> GetAllCustomerUserAysnc([FromQuery]CustomerQueryParams queryParams)
+        {
+            var Users = await _userService.GetAllCustomerUserAysnc(queryParams);
+            return Ok(Users);
+        }
+
+        [HttpPut("{id}/address")]
+        public async Task<ActionResult<GetCustomerDTO>> UpdateCustomerAddress(string id, UpdateCustomerAddressDTO updateCustomerAddressDTO)
+        {
+            var result = await _userService.UpdateCustomerAddress(id, updateCustomerAddressDTO);
+            return Ok(result);
+        }
+
+
     }    
 }
