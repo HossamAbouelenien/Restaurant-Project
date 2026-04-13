@@ -240,7 +240,8 @@ namespace RMS.Services.UserServices
                 UserName = $"{createCustomerDTO.Name}.{ createCustomerDTO.PhoneNumber}",
                 PhoneNumber = createCustomerDTO.PhoneNumber,
                 RoleId = SD.Role_Customer,
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.Now,
+                BranchId = createCustomerDTO.BranchId
             };
 
 

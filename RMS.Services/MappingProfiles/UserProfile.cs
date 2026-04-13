@@ -42,7 +42,8 @@ namespace RMS.Services.MappingProfiles
 
             CreateMap<CreateUserDto, User>()
             .ForMember(dest => dest.PasswordHash, opt => opt.Ignore())
-            .ForMember(dest => dest.UserName, opt => opt.Ignore());
+            .ForMember(dest => dest.UserName, opt => opt.Ignore())
+            .ForMember(dest => dest.BranchId, opt => opt.MapFrom(src => src.BranchId));
 
             CreateMap<UpdateUserDto, User>();
 
