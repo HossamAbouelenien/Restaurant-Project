@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
 using RMS.Domain.Contracts;
 using RMS.Domain.Entities;
+using RMS.Services.Specifications;
+using RMS.Services.Specifications.IngredientSpec;
 using RMS.ServicesAbstraction;
+using RMS.Shared;
 using RMS.Shared.DTOs.BranchStockDTOs;
 using RMS.Shared.DTOs.IngredientDTOs;
 using System;
@@ -23,11 +26,24 @@ namespace RMS.Services.IngredientServices
         }
 
         // Get all Ingredients
-        public async Task<IEnumerable<IngredientDTO>> GetAllIngredientsAsync()
+        public async Task<PaginatedResult<IngredientDTO>> GetAllIngredientsAsync(int pageIndex, int pageSize)
         {
-            var ingredients = await _unitOfWork.GetRepository<Ingredient>().GetAllAsync();
-            var result = _mapper.Map<IEnumerable<IngredientDTO>>(ingredients);
-            return result;
+            var repo = _unitOfWork.GetRepository<Ingredient>();
+
+            var spec = new IngredientSpecification(pageIndex, pageSize);
+            var countSpec = new IngredientCountSpecification();
+
+            var ingredients = await repo.GetAllAsync(spec);
+            var totalCount = await repo.CountAsync(countSpec);
+
+            var data = _mapper.Map<IEnumerable<IngredientDTO>>(ingredients);
+
+            return new PaginatedResult<IngredientDTO>(
+                pageIndex,
+                pageSize,
+                totalCount,
+                data
+            );
         }
 
         public async Task<IngredientDTO> GetIngredientByIdAsync(int id)

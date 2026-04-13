@@ -1,4 +1,5 @@
-﻿using RMS.Shared.DTOs.IngredientDTOs;
+﻿using RMS.Shared;
+using RMS.Shared.DTOs.IngredientDTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace RMS.ServicesAbstraction
 {
     public interface IIngredientService
     {
-        Task<IEnumerable<IngredientDTO>> GetAllIngredientsAsync();
+        Task<PaginatedResult<IngredientDTO>> GetAllIngredientsAsync(int pageIndex, int pageSize);
         Task<IngredientDTO> GetIngredientByIdAsync(int id);
 
         Task<IngredientDTO> CreateIngredientAsync(CreateIngredientDTO createIngredientDTO);
