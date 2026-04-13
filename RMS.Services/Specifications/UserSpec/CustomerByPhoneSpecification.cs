@@ -9,14 +9,14 @@ public class CustomerByPhoneSpecification : BaseSpecifications<User>
 {
     public CustomerByPhoneSpecification(CustomerQueryParams QueryParams)
   : base(u =>
-            u.RoleId == SD.Role_Customer && // ✅ فلتر الـ Role
-            (string.IsNullOrEmpty(QueryParams.phoneNumber) ||
-            u.PhoneNumber!.Contains(QueryParams.phoneNumber))
-)
+        u.RoleId == SD.Role_Customer &&
+        (string.IsNullOrEmpty(QueryParams.phoneNumber) ||
+         (u.PhoneNumber != null && u.PhoneNumber.Contains(QueryParams.phoneNumber.Trim())))
+    )
     {
 
         AddInclude(u => u.Addresses);
-        ApplyPagination(QueryParams.PageIndex, QueryParams.PageSize);
+        ApplyPagination(QueryParams.PageSize, QueryParams.PageIndex);
 
     }
 }
