@@ -122,9 +122,12 @@ namespace RMS.Services.DeliveryServices
 
             delivery.DriverId = dto.DriverId;
             //delivery.AssignedAt = DateTime.UtcNow;
-            delivery.CreatedAt = DateTime.UtcNow;
+            delivery.CreatedAt = DateTime.Now;
+
+            delivery.DeliveryStatus = DeliveryStatus.Assigned;
 
             deliveryRepo.Update(delivery);
+            
             await _unitOfWork.SaveChangesAsync();
 
             var spec = new DeliveryByIdSpecification(delivery.Id);
@@ -211,6 +214,7 @@ namespace RMS.Services.DeliveryServices
                 var spec = new UnAssignedDeliveriesSpecification();
 
                 var deliveries = await repo.GetAllAsync(spec);
+                deliveries = deliveries.Where(e => e.Order!.Status != OrderStatus.Delivered);
 
                  if (deliveries == null || !deliveries.Any())
                      return new List<UnAssignDeliveryDto>();
