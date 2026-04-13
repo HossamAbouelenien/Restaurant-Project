@@ -21,6 +21,9 @@ namespace RMS.ServicesAbstraction.IUserServices
         Task<bool> ToggleUserStatusAsync(string id);
         Task<PaginatedResult<GetUserDTO>> GetInactiveUsersAsync(UserQueryParams queryParams);
         Task<List<string>> GetRolesAsync();
+        Task<GetCustomerDTO> AddCustomerAsync(CreateCustomerDTO createCustomerDTO);
+        Task<PaginatedResult<GetCustomerDTO>> GetAllCustomerUserAysnc(CustomerQueryParams queryParams);
+        Task<GetCustomerDTO> UpdateCustomerAddress(string id, UpdateCustomerAddressDTO updateCustomerAddressDTO);
 
     }
 }
