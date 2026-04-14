@@ -11,7 +11,8 @@ namespace RMS.Services.Specifications.MenuItemSpec
 {
     public class MenuItemWithCategorySpecifications : BaseSpecifications<MenuItem>
     {
-        public MenuItemWithCategorySpecifications(MenuItemQueryParams queryParams) : base(MenuItemSpecificationsHelper.GetMenuItemCriteria(queryParams))
+        public MenuItemWithCategorySpecifications(MenuItemQueryParams queryParams) 
+            : base(MenuItemSpecificationsHelper.GetMenuItemCriteria(queryParams))
         {
             //Include the category information when retrieving menu items
             AddInclude(m => m.Category!);
