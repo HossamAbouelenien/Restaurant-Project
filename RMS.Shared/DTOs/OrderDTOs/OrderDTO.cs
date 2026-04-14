@@ -18,6 +18,7 @@ namespace RMS.Shared.DTOs.OrderDTOs
         public string Status { get; set; } = default!;
         public List<OrderItemDTO> OrderItems { get; set; } = new List<OrderItemDTO>();
         public decimal TotalAmount { get; set; }
+        public string? TableNumber { get; set; }
 
     }
 }
