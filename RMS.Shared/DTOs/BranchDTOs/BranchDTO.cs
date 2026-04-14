@@ -1,4 +1,7 @@
-﻿using System;
+﻿using RMS.Shared.DTOs.BranchStockDTOs;
+using RMS.Shared.DTOs.IdentityDTOs;
+using RMS.Shared.DTOs.TableDTOs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,6 +23,10 @@ namespace RMS.Shared.DTOs.BranchDTOs
             public string City { get; set; } = default!;
             public string? Note { get; set; }
             public string? SpecialMark { get; set; }
-        }
+
+         
+
+
     }
+}
 
