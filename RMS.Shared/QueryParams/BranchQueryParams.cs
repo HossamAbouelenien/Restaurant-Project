@@ -9,6 +9,7 @@ namespace RMS.Shared.QueryParams
     public class BranchQueryParams 
     {
         public string? Role { get; set; }
+        public string? Search { get; set; }
 
         #region Pagination
         private int _pageIndex = 1;

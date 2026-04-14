@@ -11,8 +11,11 @@ namespace RMS.Services.Specifications.BranchSpec
     public class BranchWithDetailsSpecification : BaseSpecifications<Branch>
     {
         public BranchWithDetailsSpecification(BranchQueryParams param)
-          : base(b => string.IsNullOrEmpty(param.Role)
-              || b.Users.Any(u => u.RoleId == param.Role))
+          : base(b =>
+      (string.IsNullOrEmpty(param.Role) || b.Users.Any(u => u.RoleId == param.Role))
+      &&
+      (string.IsNullOrEmpty(param.Search) || b.Name.ToLower().Contains(param.Search.ToLower())))
+  
         {
             
             AddInclude(b => b.Users);
