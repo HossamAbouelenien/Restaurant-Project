@@ -7,12 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Specifications\BranchSpec\**" />
-    <EmbeddedResource Remove="Specifications\BranchSpec\**" />
-    <None Remove="Specifications\BranchSpec\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\RMS.Domain\RMS.Domain.csproj" />
     <ProjectReference Include="..\RMS.ServicesAbstraction\RMS.ServicesAbstraction.csproj" />
   </ItemGroup>
