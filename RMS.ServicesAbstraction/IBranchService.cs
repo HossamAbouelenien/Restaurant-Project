@@ -14,7 +14,8 @@ namespace RMS.ServicesAbstraction
         Task<BranchDTO> CreateBranchAsync(CreateBranchDTO BranchDTO);
          Task<BranchDTO> UpdateBranchAsync(int Id, UpdateBranchDTO BranchDTO);
          Task DeleteBranchAsync(int Id);
-        
+        Task ToggleBranchStatusAsync(int id);
+
 
 
 

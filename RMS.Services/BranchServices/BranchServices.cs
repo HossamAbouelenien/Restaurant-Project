@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using RMS.Domain.Contracts;
 using RMS.Domain.Entities;
+using RMS.Domain.Enums;
 using RMS.ServicesAbstraction;
 using RMS.Shared.DTOs.BranchDTOs;
 using RMS.Shared.DTOs.MenuItemsDTOs;
@@ -58,23 +59,38 @@ namespace RMS.Services.BranchServices
         }
         public async Task DeleteBranchAsync(int id)
         {
-            //var repo = _unitOfWork.GetRepository<Branch>();
-            //var Branch = await repo.GetByIdAsync(id);
-            //if (Branch is null)
-            //    throw new Exception("Branch with id not found");
-            //Branch!.IsDeleted = true; 
-            //repo.Update(Branch);
-            //await _unitOfWork.SaveChangesAsync();
             var repo = _unitOfWork.GetRepository<Branch>();
             var Branch = await repo.GetByIdAsync(id);
 
             if (Branch is null) return;
 
+            if (!Branch.IsActive)
+                throw new Exception("Cannot delete an inactive branch");
+
+            var orders = await _unitOfWork.GetRepository<Order>().GetAllAsync();
+            var hasActiveOrders = orders.Any(o => o.BranchId == id &&
+                                  o.Status != OrderStatus.Delivered &&
+                                  o.Status != OrderStatus.Cancelled);
+
+            if (hasActiveOrders)
+                throw new Exception("Cannot delete branch with active orders");
+
             Branch.IsDeleted = true;
             repo.Update(Branch);
             await _unitOfWork.SaveChangesAsync();
         }
+        public async Task ToggleBranchStatusAsync(int id)
+        {
+            var repo = _unitOfWork.GetRepository<Branch>();
+            var Branch = await repo.GetByIdAsync(id);
 
+            if (Branch is null)
+                throw new KeyNotFoundException("Branch not found");
+
+            Branch.IsActive = !Branch.IsActive;
+            repo.Update(Branch);
+            await _unitOfWork.SaveChangesAsync();
+        }
 
     }
 }
