@@ -54,7 +54,11 @@ namespace RMS.Services.MappingProfiles
             CreateMap<User, GetCustomerDTO>()
                  .ForMember(dest => dest.phoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
                 .ForMember(dest => dest.Addresses,opt => opt.MapFrom(src => src.Addresses));
-                      
+
+            CreateMap<User, UserDTO>()
+            .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.RoleId))
+            .ForMember(dest => dest.BranchName, opt => opt.MapFrom(src => src.Branch!.Name));
+
 
         }
 
