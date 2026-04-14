@@ -22,6 +22,7 @@ namespace RMS.Services.MappingProfiles
                 .ForMember(dest => dest.BranchName, opt => opt.MapFrom(src => src.Branch!.Name))
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
                 .ForMember(dest => dest.OrderType, opt => opt.MapFrom(src => src.OrderType.ToString()))
+                .ForMember(dest => dest.TableNumber, opt => opt.MapFrom(src => src.TableOrder!.Table!.TableNumber != null ? $"Table {src.TableOrder!.Table!.TableNumber}" : null))
                 .ReverseMap();
 
             CreateMap<CreateOrderItemDTO, OrderItem>().ReverseMap();

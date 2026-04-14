@@ -28,6 +28,7 @@ namespace RMS.Services.Specifications.OrderSpec
             AddInclude(o => o.OrderItems);
             ApplyPagination(queryParams.PageSize, queryParams.PageIndex);
             AddInclude("OrderItems.MenuItem");
+            AddInclude("TableOrder.Table");
 
         }
 
