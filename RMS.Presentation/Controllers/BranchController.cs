@@ -51,5 +51,11 @@ namespace RMS.Presentation.Controllers
             await _branchService.DeleteBranchAsync(id);
             return Ok();
         }
+        [HttpPatch("{id}/toggle-status")]
+        public async Task<ActionResult> ToggleBranchStatus(int id)
+        {
+            await _branchService.ToggleBranchStatusAsync(id);
+            return Ok();
+        }
     }
 }
