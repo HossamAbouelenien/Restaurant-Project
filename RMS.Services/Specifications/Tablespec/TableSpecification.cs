@@ -23,10 +23,10 @@ namespace RMS.Services.Specifications.Tablespec
             : base(t =>
                 (!queryParams.BranchId.HasValue || t.BranchId == queryParams.BranchId.Value) &&
                 (!queryParams.IsOccupied.HasValue || t.IsOccupied == queryParams.IsOccupied.Value) &&
-                !t.IsDeleted
-            )
+                !t.IsDeleted && (string.IsNullOrEmpty(queryParams.Search) || t.TableNumber.ToLower().Contains(queryParams.Search.ToLower().Trim())))
         {
             AddInclude(t => t.Branch!);
+            ApplyPagination(queryParams.PageSize, queryParams.PageIndex);
         }
        
     }

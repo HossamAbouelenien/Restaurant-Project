@@ -15,7 +15,7 @@ namespace RMS.Services.Specifications.MenuItemSpec
         {
             return m => (!queryParams.CategoryId.HasValue || m.CategoryId == queryParams.CategoryId)
             && (!queryParams.IsAvailable.HasValue || m.IsAvailable == queryParams.IsAvailable)
-            && (string.IsNullOrEmpty(queryParams.Search) || m.Name.ToLower().Contains(queryParams.Search.ToLower()));
+            && (string.IsNullOrEmpty(queryParams.Search) || m.Name.ToLower().Contains(queryParams.Search.ToLower().Trim()));
         }
 
     }

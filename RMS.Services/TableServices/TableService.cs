@@ -3,6 +3,7 @@ using RMS.Domain.Contracts;
 using RMS.Domain.Entities;
 using RMS.Services.Specifications.Tablespec;
 using RMS.ServicesAbstraction;
+using RMS.Shared;
 using RMS.Shared.DTOs.TableDTOs;
 using RMS.Shared.QueryParams;
 using System;
@@ -62,18 +63,27 @@ namespace RMS.Services.TableServices
             await _unitOfWork.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<TableDTO>> GetAllTablesAsync(TableQueryParams queryParams)
+        public async Task<PaginatedResult<TableDTO>> GetAllTablesAsync(TableQueryParams queryParams)
         {
-           
             var repo = _unitOfWork.GetRepository<Table>();
-            var spec =  new TableSpecification(queryParams);
-            var tables = await repo.GetAllAsync(spec); 
-            return _mapper.Map<IEnumerable<TableDTO>>(tables);
+            var spec = new TableSpecification(queryParams);
+            var tables = await repo.GetAllAsync(spec);
+            var tableDtos = _mapper.Map<IEnumerable<TableDTO>>(tables);
+            var countSpec = new TableCountSpecification(queryParams);
+            var countOfTables = await repo.CountAsync(countSpec);
+            var pageSize = tableDtos.Count();
+            var paginatedResult = new PaginatedResult<TableDTO>(
+                queryParams.PageIndex,
+                pageSize,
+                countOfTables,
+                tableDtos
+            );
+            return paginatedResult;
         }
         public async Task<TableDTO> GetTableByIdAsync(int id)
         {
             var repo = _unitOfWork.GetRepository<Table>();
-            var spec = new TableSpecification(id);
+            var spec = new TableWithTableOrderAndOrderAndBranchSpecification(id);
             var table = await repo.GetByIdAsync(spec);
             if (table == null)
                 throw new Exception("Table not found");
