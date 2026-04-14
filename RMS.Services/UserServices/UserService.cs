@@ -77,6 +77,7 @@ namespace RMS.Services.UserServices
                 NormalizedEmail = createUserDto.Email.ToUpper(),
                 EmailConfirmed = true,
                 RoleId = string.IsNullOrEmpty(createUserDto.RoleId) ? SD.Role_Customer : createUserDto.RoleId,
+                BranchId = createUserDto.BranchId,
                 CreatedAt = DateTime.UtcNow
             };
 
