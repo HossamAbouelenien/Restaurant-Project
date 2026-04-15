@@ -20,5 +20,9 @@ namespace RMS.Shared.DTOs.OrderDTOs
         public decimal TotalAmount { get; set; }
         public string? TableNumber { get; set; }
 
+        public string? PaymentMethod { get; set; }
+        public string? PaymentStatus { get; set; }
+
+
     }
 }

@@ -23,6 +23,8 @@ namespace RMS.Services.MappingProfiles
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
                 .ForMember(dest => dest.OrderType, opt => opt.MapFrom(src => src.OrderType.ToString()))
                 .ForMember(dest => dest.TableNumber, opt => opt.MapFrom(src => src.TableOrder!.Table!.TableNumber != null ? $"Table {src.TableOrder!.Table!.TableNumber}" : null))
+                .ForMember(dest => dest.PaymentMethod, opt => opt.MapFrom(src => src.Payment != null ? src.Payment.PaymentMethod.ToString() : null))
+                .ForMember(dest => dest.PaymentStatus, opt => opt.MapFrom(src => src.Payment != null ? src.Payment.PaymentStatus.ToString() : null))
                 .ReverseMap();
 
             CreateMap<CreateOrderItemDTO, OrderItem>().ReverseMap();
