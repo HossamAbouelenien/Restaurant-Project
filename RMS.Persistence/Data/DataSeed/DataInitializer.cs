@@ -176,8 +176,8 @@ namespace RMS.Persistence.Data.DataSeed
                             var user = await _userManager.FindByEmailAsync("areej@gmai.com");
                             if (user is not null)
                             {
-                                order.CustomerId = user.Id;
-                                order.Customer = null;
+                                order.UserId = user.Id;
+                                order.User = null;
                             }
                         }
                     }
