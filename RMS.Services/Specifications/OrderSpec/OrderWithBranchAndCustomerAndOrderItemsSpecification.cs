@@ -29,6 +29,7 @@ namespace RMS.Services.Specifications.OrderSpec
             ApplyPagination(queryParams.PageSize, queryParams.PageIndex);
             AddInclude("OrderItems.MenuItem");
             AddInclude("TableOrder.Table");
+            AddInclude(o => o.Payment!);
 
         }
 
