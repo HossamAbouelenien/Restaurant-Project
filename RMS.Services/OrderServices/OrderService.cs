@@ -58,10 +58,10 @@ namespace RMS.Services.OrderServices
 
             // Validate branch and customer existence
             var branchExists = await _unitOfWork.GetRepository<Branch>().GetByIdAsync(orderDto.BranchId) != null;
-            var UserSpec = new UserSpecification(orderDto.CustomerId!);
+            var UserSpec = new UserSpecification(orderDto.UserId!);
             var customerExists = await _unitOfWork.GetRepository<User>().GetByIdAsync(UserSpec) != null;
             if (!branchExists) throw new Exception("Branch not found");
-            if (!customerExists) throw new Exception("Customer not found");
+            if (!customerExists) throw new Exception("User not found");
 
             var ingredientConsumption = new Dictionary<int, decimal>();
 
