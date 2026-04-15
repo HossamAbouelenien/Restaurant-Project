@@ -73,7 +73,7 @@ namespace RMS.Presentation.Controllers
 
 
         [HttpGet("my")]
-        [Authorize(Roles = SD.Role_Customer)]
+        //[Authorize(Roles = SD.Role_Customer)]
         public async Task<ActionResult<PaginatedResult<OrderDTO>>> GetCustomerOrdersHistory([FromQuery] OrderQueryParams queryParams)
         {
             try
