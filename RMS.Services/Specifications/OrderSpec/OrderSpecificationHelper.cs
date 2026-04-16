@@ -41,7 +41,7 @@ namespace RMS.Services.Specifications.OrderSpec
                     (o.CreatedAt.Year == queryParams.Date.Value.Year &&
                      o.CreatedAt.Month == queryParams.Date.Value.Month &&
                      o.CreatedAt.Day == queryParams.Date.Value.Day))&& 
-                (o.CustomerId == customerId);
+                (o.UserId == customerId);
         }
     }
 }

@@ -2,9 +2,13 @@
 using RMS.Domain.Contracts;
 using RMS.Domain.Entities;
 using RMS.Domain.Enums;
+using RMS.Services.Specifications;
+using RMS.Services.Specifications.BranchSpec;
 using RMS.ServicesAbstraction;
+using RMS.Shared;
 using RMS.Shared.DTOs.BranchDTOs;
 using RMS.Shared.DTOs.MenuItemsDTOs;
+using RMS.Shared.QueryParams;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,17 +26,45 @@ namespace RMS.Services.BranchServices
             _unitOfWork= unitOfWork;
             _mapper = mapper;
         }
+
         public async Task<IEnumerable<BranchDTO>> GetAllBranchesAsync()
         {
-            var Branches =  await _unitOfWork.GetRepository<Branch>().GetAllAsync();
+            var Branches = await _unitOfWork.GetRepository<Branch>().GetAllAsync();
             return _mapper.Map<IEnumerable<BranchDTO>>(Branches);
         }
 
-        public async Task<BranchDTO> GetBranchByIdAsync(int Id)
-        {
 
-            var Branch = await _unitOfWork.GetRepository<Branch>().GetByIdAsync(Id);
-                        return _mapper.Map<BranchDTO>(Branch);
+        public async Task<PaginatedResult<GetBranchDTO>> GetAllBranchesWithOrdersAndTablesAsync(BranchQueryParams param)
+        {
+            var spec = new BranchWithDetailsSpecification(param);
+
+            var branches = await _unitOfWork
+                .GetRepository<Branch>()
+                .GetAllAsync(spec);
+
+            var countSpec = new BranchCountSpecification(param);
+
+            var count = await _unitOfWork
+                .GetRepository<Branch>()
+                .CountAsync(countSpec);
+
+            var data = _mapper.Map<IEnumerable<GetBranchDTO>>(branches);
+
+            return new PaginatedResult<GetBranchDTO>(param.PageIndex, param.PageSize, count, data);
+        }
+
+        
+
+        public async Task<GetBranchDTO> GetBranchByIdAsync(int id)
+        {
+            var spec = new BranchWithDetailsSpecification(id);
+
+            var branch = await _unitOfWork
+                .GetRepository<Branch>()
+                .GetByIdAsync(spec)
+                ?? throw new KeyNotFoundException($"Branch with id {id} not found");
+
+            return _mapper.Map<GetBranchDTO>(branch);
         }
 
         public async Task<BranchDTO> UpdateBranchAsync(int Id, UpdateBranchDTO BranchDTO)

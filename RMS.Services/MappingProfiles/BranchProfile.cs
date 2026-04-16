@@ -15,11 +15,11 @@ namespace RMS.Services.MappingProfiles
         public BranchProfile()
         {
             CreateMap<Branch, BranchDTO>()
-                 .ForMember(dest => dest.BuildingNumber, opt => opt.MapFrom(src => src.Address.BuildingNumber))
-                .ForMember(dest => dest.Street, opt => opt.MapFrom(src => src.Address.Street))
-                .ForMember(dest => dest.City, opt => opt.MapFrom(src => src.Address.City))
-                .ForMember(dest => dest.Note, opt => opt.MapFrom(src => src.Address.Note))
-                .ForMember(dest => dest.SpecialMark, opt => opt.MapFrom(src => src.Address.SpecialMark)) .ReverseMap();
+                .ForMember(dest => dest.BuildingNumber, opt => opt.MapFrom(src => src.Address != null ? src.Address.BuildingNumber : 0))
+                .ForMember(dest => dest.Street, opt => opt.MapFrom(src => src.Address != null ? src.Address.Street : null))
+                .ForMember(dest => dest.City, opt => opt.MapFrom(src => src.Address != null ? src.Address.City : null))
+                .ForMember(dest => dest.Note, opt => opt.MapFrom(src => src.Address != null ? src.Address.Note : null))
+                .ForMember(dest => dest.SpecialMark, opt => opt.MapFrom(src => src.Address != null ? src.Address.SpecialMark : null));
             // Reverse mapping for updating Branch from BranchDTO
 
             CreateMap<UpdateBranchDTO, Branch>()
@@ -41,6 +41,17 @@ namespace RMS.Services.MappingProfiles
                    Note = src.Note,
                    SpecialMark = src.SpecialMark
                }));
+
+            CreateMap<Branch, GetBranchDTO>()
+             .ForMember(dest => dest.UsersCount, opt => opt.MapFrom(src => src.Users.Count))
+             .ForMember(dest => dest.TablesCount, opt => opt.MapFrom(src => src.Tables.Count))
+             .ForMember(dest => dest.BuildingNumber, opt => opt.MapFrom(src => src.Address.BuildingNumber))
+             .ForMember(dest => dest.Street, opt => opt.MapFrom(src => src.Address.Street))
+             .ForMember(dest => dest.City, opt => opt.MapFrom(src => src.Address.City))
+             .ForMember(dest => dest.Note, opt => opt.MapFrom(src => src.Address.Note))
+             .ForMember(dest => dest.SpecialMark, opt => opt.MapFrom(src => src.Address.SpecialMark));
+
+            
         }
 
     }

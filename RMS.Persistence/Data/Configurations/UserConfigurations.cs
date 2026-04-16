@@ -56,8 +56,8 @@ public class UserConfigurations : IEntityTypeConfiguration<User>
 
         // ── Orders placed by this user (as customer) ──────────────────────────
         builder.HasMany(u => u.Orders)
-               .WithOne(o => o.Customer)
-               .HasForeignKey(o => o.CustomerId)
+               .WithOne(o => o.User)
+               .HasForeignKey(o => o.UserId)
                .OnDelete(DeleteBehavior.Restrict);
 
         // ── Deliveries assigned to this user (as driver) ──────────────────────

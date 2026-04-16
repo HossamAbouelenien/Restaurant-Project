@@ -13,32 +13,39 @@ namespace RMS.Services.Specifications.OrderSpec
         public OrderWithBranchAndCustomerAndOrderItemsSpecification(int orderId) 
             : base(o => o.Id == orderId)
         {
-            AddInclude(o => o.Customer!);
+            AddInclude(o => o.User!);
             AddInclude(o => o.Branch!);
             AddInclude(o => o.OrderItems);
             AddInclude("OrderItems.MenuItem");
+            //AddInclude("User.Role");
 
         }
 
         public OrderWithBranchAndCustomerAndOrderItemsSpecification(OrderQueryParams queryParams) 
             : base(OrderSpecificationHelper.GetOrderCriteria(queryParams))
         {
-            AddInclude(o => o.Customer!);
+            AddInclude(o => o.User!);
             AddInclude(o => o.Branch!);
             AddInclude(o => o.OrderItems);
             ApplyPagination(queryParams.PageSize, queryParams.PageIndex);
             AddInclude("OrderItems.MenuItem");
+            AddInclude("TableOrder.Table");
+            AddInclude(o => o.Payment!);
+            //AddInclude("Customer.Role");
 
         }
 
         public OrderWithBranchAndCustomerAndOrderItemsSpecification(OrderQueryParams queryParams, string customerId)
             : base(OrderSpecificationHelper.GetOrderCriteria(queryParams, customerId))
         {
-            AddInclude(o => o.Customer!);
+            AddInclude(o => o.User!);
             AddInclude(o => o.Branch!);
             AddInclude(o => o.OrderItems);
             ApplyPagination(queryParams.PageSize, queryParams.PageIndex);
             AddInclude("OrderItems.MenuItem");
+            AddInclude("TableOrder.Table");
+            //AddInclude("Customer.Role");
+
 
         }
 

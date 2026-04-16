@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using RMS.Domain.Contracts;
 using RMS.Domain.Entities;
@@ -13,6 +14,7 @@ namespace RMS.Services.IdentityService
     {
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IConfiguration _configuration;
         private readonly IMapper _mapper;
         private readonly ITokenService _tokenService;
@@ -21,6 +23,7 @@ namespace RMS.Services.IdentityService
              UserManager<User> userManager, RoleManager<IdentityRole> roleManager,
              ITokenService tokenService)
         {
+            _unitOfWork = unitOfWork;
             _configuration = configuration;
             _mapper = mapper;
             _userManager = userManager;
@@ -179,8 +182,13 @@ namespace RMS.Services.IdentityService
 
         public async Task<UserDTO?> GetCurrentUserAsync(string email)
         {
-            var User = await _userManager.FindByEmailAsync(email) ?? throw new KeyNotFoundException($"User with email {email} not found");
-            return new UserDTO() { Name = User.Name, Email = User.Email!, Role = User.RoleId };
+            var spec = new UserByEmailSpecification(email);
+
+            var user = await _unitOfWork.GetRepository<User>()
+                .GetByIdAsync(spec)
+                ?? throw new KeyNotFoundException($"User with email {email} not found");
+
+            return _mapper.Map<UserDTO>(user);
         }
 
 

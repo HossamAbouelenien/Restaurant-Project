@@ -17,10 +17,10 @@ public class Order : BaseEntity
 
     // ── FK → User (customer) ─────────────────────────────────────────────────
     [Required]
-    public string CustomerId { get; set; }
+    public string UserId { get; set; }
 
-    [ForeignKey(nameof(CustomerId))]
-    public User? Customer { get; set; }
+    [ForeignKey(nameof(UserId))]
+    public User? User { get; set; }
 
     // ── Order type & status ───────────────────────────────────────────────────
     [Required]

@@ -38,9 +38,9 @@ public class OrderConfigurations : IEntityTypeConfiguration<Order>
                .OnDelete(DeleteBehavior.Restrict);
 
         // ── FK → User (customer) ──────────────────────────────────────────────
-        builder.HasOne(o => o.Customer)
+        builder.HasOne(o => o.User)
                .WithMany(u => u.Orders)
-               .HasForeignKey(o => o.CustomerId)
+               .HasForeignKey(o => o.UserId)
                .OnDelete(DeleteBehavior.Restrict);
 
         // ── One Order → Many OrderItems ───────────────────────────────────────

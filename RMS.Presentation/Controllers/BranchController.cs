@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RMS.ServicesAbstraction;
+using RMS.Shared;
 using RMS.Shared.DTOs.BranchDTOs;
 using RMS.Shared.DTOs.BranchStockDTOs;
 using RMS.Shared.QueryParams;
@@ -21,17 +22,26 @@ namespace RMS.Presentation.Controllers
             _branchService = branchService;
         }
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<BranchStockDTO>>> GetAllBranches()
+        public async Task<ActionResult<IEnumerable<BranchDTO>>> GetAllBranches()
         {
             var BranchStocks = await _branchService.GetAllBranchesAsync();
             return Ok(BranchStocks);
         }
-        [HttpGet("{id}")]
-        public async Task<ActionResult<BranchDTO>> GetBranch(int id)
+        [HttpGet("GetAllBranchesWithTables")]
+        public async Task<ActionResult<PaginatedResult<GetBranchDTO>>> GetAllBranchesWithOrdersAndTablesAsync([FromQuery] BranchQueryParams param)
         {
-            var Branch = await _branchService.GetBranchByIdAsync(id);
-            return Ok(Branch);
+            var result = await _branchService.GetAllBranchesWithOrdersAndTablesAsync(param);
+            return Ok(result);
         }
+     
+
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult<GetBranchDTO>> GetBranchById(int id)
+        {
+            var result = await _branchService.GetBranchByIdAsync(id);
+            return Ok(result);
+        }
+
         [HttpPut("{id}")]
         public async Task<ActionResult<UpdateBranchDTO>> UpdateBranch(int id, UpdateBranchDTO updateBranch)
         {

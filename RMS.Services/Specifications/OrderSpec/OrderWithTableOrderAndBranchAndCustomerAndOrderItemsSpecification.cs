@@ -12,13 +12,15 @@ namespace RMS.Services.Specifications.OrderSpec
         public OrderWithTableOrderAndBranchAndCustomerAndOrderItemsSpecification(int orderId) 
             : base(o => o.Id == orderId)
         {
-            AddInclude(o => o.Customer!);
+            AddInclude(o => o.User!);
             AddInclude(o => o.Branch!);
             AddInclude(o => o.OrderItems);
             AddInclude(o => o.TableOrder!);
             AddInclude(o => o.Delivery!);
             AddInclude(o => o.Payment!);
             AddInclude("OrderItems.MenuItem");
+            //AddInclude("Customer.Role");
+
 
         }
 

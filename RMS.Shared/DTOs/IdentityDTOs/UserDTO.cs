@@ -9,5 +9,8 @@
         public string Name { get; set; } = default!;
 
         public string Role { get; set; } = default!;
+
+        public int? BranchId { get; set; }
+        public string? BranchName { get; set; }
     }
 }
