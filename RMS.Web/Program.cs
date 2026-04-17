@@ -10,6 +10,7 @@ using RMS.Persistence;
 using RMS.Persistence.Data.Contexts;
 using RMS.Persistence.Data.DataSeed;
 using RMS.Persistence.Repositories;
+using RMS.Persistence.Repositries;
 using RMS.Services.BranchServices;
 using RMS.Services.BranchStockServices;
 using RMS.Services.CategoryServices;
@@ -33,6 +34,7 @@ using RMS.ServicesAbstraction.IIdentityService;
 using RMS.ServicesAbstraction.IKitchenServices;
 using RMS.ServicesAbstraction.IUserServices;
 using RMS.Web.Extensions;
+using StackExchange.Redis;
 using System.Text;
 namespace RMS.Web
 {
@@ -179,10 +181,13 @@ namespace RMS.Web
 
 
             builder.Services.AddScoped<ICategoryService,CategoryService>();
+            builder.Services.AddScoped<IBasketRepository, BasketRepository>();
 
 
-
-
+            builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+            {
+                return ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("RedisConnection")!);
+            });
 
 
 
