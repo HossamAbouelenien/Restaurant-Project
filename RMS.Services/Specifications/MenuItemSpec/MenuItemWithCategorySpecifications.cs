@@ -16,7 +16,7 @@ namespace RMS.Services.Specifications.MenuItemSpec
         {
             //Include the category information when retrieving menu items
             AddInclude(m => m.Category!);
-
+            AddInclude("Recipes.Ingredient.BranchStocks");
             // Apply sorting based on the specified sorting option in the query parameters
             switch (queryParams.Sort)
             {
