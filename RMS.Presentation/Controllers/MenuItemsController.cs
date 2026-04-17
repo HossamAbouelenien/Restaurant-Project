@@ -28,7 +28,7 @@ namespace RMS.Presentation.Controllers
 
         //[Authorize]
         [HttpGet]
-        [Cache]
+        //[Cache]
         public async Task<ActionResult<PaginatedResult<MenuItemDTO>>> GetAllMenuItems([FromQuery] MenuItemQueryParams queryParams)
         {
             var result = await _menuItemService.GetAllMenuItemsAsync(queryParams);

@@ -36,29 +36,29 @@ namespace RMS.Services.MenuItemsServices
             var spec = new MenuItemWithCategorySpecifications(queryParams);
             var menuItems = await repo.GetAllAsync(spec);
             //var menuItemsExistsInBranch = menuItems.Where(m => m.Recipes.Any(r => r.Ingredient!.BranchStocks.Any(bs => bs.BranchId == queryParams.BranchId)));
-            var menuItemExistsInBranch = new List<MenuItem>();
-            foreach (var menuItem in menuItems)
-            {
-                bool isAvailableInBranch = true;
-                foreach (var recipe in menuItem.Recipes)
-                {
-                    var ingredient = recipe.Ingredient;
-                    if (ingredient != null && queryParams.BranchId != 0 )
-                    {
-                        var branchStock = ingredient.BranchStocks.FirstOrDefault(bs => bs.BranchId == queryParams.BranchId);
-                        if (branchStock == null || branchStock.QuantityAvailable < recipe.QuantityRequired)
-                        {
-                            isAvailableInBranch = false;
-                            break;
-                        }
-                    }
-                }
-                if (isAvailableInBranch)
-                {
-                    menuItemExistsInBranch.Add(menuItem);
-                }
-            }
-            var returnedMenuItems = _mapper.Map<IEnumerable<MenuItemDTO>>(menuItemExistsInBranch);
+            //var menuItemExistsInBranch = new List<MenuItem>();
+            //foreach (var menuItem in menuItems)
+            //{
+            //    bool isAvailableInBranch = true;
+            //    foreach (var recipe in menuItem.Recipes)
+            //    {
+            //        var ingredient = recipe.Ingredient;
+            //        if (ingredient != null && queryParams.BranchId != 0 )
+            //        {
+            //            var branchStock = ingredient.BranchStocks.FirstOrDefault(bs => bs.BranchId == queryParams.BranchId);
+            //            if (branchStock == null || branchStock.QuantityAvailable < recipe.QuantityRequired)
+            //            {
+            //                isAvailableInBranch = false;
+            //                break;
+            //            }
+            //        }
+            //    }
+            //    if (isAvailableInBranch)
+            //    {
+            //        menuItemExistsInBranch.Add(menuItem);
+            //    }
+            //}
+            var returnedMenuItems = _mapper.Map<IEnumerable<MenuItemDTO>>(menuItems);
             var countOfReturnedMenuItems = returnedMenuItems.Count();
             var countSpec = new MenuItemCountSpecification(queryParams);
             var countOfAllMenuItems = await repo.CountAsync(countSpec);
