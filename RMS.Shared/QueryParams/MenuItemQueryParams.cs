@@ -13,7 +13,7 @@ namespace RMS.Shared.QueryParams
         public bool? IsAvailable { get; set; }
         public string? Search { get; set; }
         public MenuItemSortingOptions Sort { get; set; }
-
+        public int BranchId { get; set; }
 
         #region Pagination
         private int _pageIndex = 1;
