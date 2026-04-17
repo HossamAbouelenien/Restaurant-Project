@@ -11,9 +11,11 @@ using RMS.Persistence.Data.Contexts;
 using RMS.Persistence.Data.DataSeed;
 using RMS.Persistence.Repositories;
 using RMS.Persistence.Repositries;
+using RMS.Services;
 using RMS.Services.BasketService;
 using RMS.Services.BranchServices;
 using RMS.Services.BranchStockServices;
+using RMS.Services.CacheServices;
 using RMS.Services.CategoryServices;
 using RMS.Services.DeliveryServices;
 using RMS.Services.EmailServices;
@@ -71,8 +73,8 @@ namespace RMS.Web
 
 
 
-
-
+            builder.Services.AddScoped<ICacheService, CacheService>();
+            builder.Services.AddScoped<ICacheRepository, CacheRepository>();
             builder.Services.AddScoped<IRecipeService, RecipeService>();
             builder.Services.AddScoped<IImageService, ImageService>();
             //================= Amr (60 : 75) =====================
