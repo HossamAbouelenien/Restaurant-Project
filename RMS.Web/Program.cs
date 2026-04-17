@@ -11,6 +11,7 @@ using RMS.Persistence.Data.Contexts;
 using RMS.Persistence.Data.DataSeed;
 using RMS.Persistence.Repositories;
 using RMS.Persistence.Repositries;
+using RMS.Services.BasketService;
 using RMS.Services.BranchServices;
 using RMS.Services.BranchStockServices;
 using RMS.Services.CategoryServices;
@@ -182,6 +183,7 @@ namespace RMS.Web
 
             builder.Services.AddScoped<ICategoryService,CategoryService>();
             builder.Services.AddScoped<IBasketRepository, BasketRepository>();
+            builder.Services.AddScoped<IBasketService, BasketService>();
 
 
             builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
