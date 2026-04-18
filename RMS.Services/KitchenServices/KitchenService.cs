@@ -96,7 +96,7 @@ namespace RMS.Services.KitchenServices
                 ticket.Status = TicketStatus.Done;
                 ticket.CompletedAt = DateTime.UtcNow;
 
-                await DecrementStock(ticket);
+                //await DecrementStock(ticket);
             }
             else
             {
@@ -150,67 +150,67 @@ namespace RMS.Services.KitchenServices
         }
 
 
-        private async Task DecrementStock(KitchenTicket ticket)
-        {
-            var orderRepo = _unitOfWork.GetRepository<Order>();
-            var stockRepo = _unitOfWork.GetRepository<BranchStock>();
+        //private async Task DecrementStock(KitchenTicket ticket)
+        //{
+        //    var orderRepo = _unitOfWork.GetRepository<Order>();
+        //    var stockRepo = _unitOfWork.GetRepository<BranchStock>();
 
-            var spec = new OrderWithItemsAndRecipesSpecification(ticket.OrderId);
-            var order = await orderRepo.GetByIdAsync(spec);
+        //    var spec = new OrderWithItemsAndRecipesSpecification(ticket.OrderId);
+        //    var order = await orderRepo.GetByIdAsync(spec);
 
-            var branchId = order!.BranchId;
+        //    var branchId = order!.BranchId;
 
-            var ingredientIds = order.OrderItems
-                .SelectMany(i => i.MenuItem!.Recipes)
-                .Select(r => r.IngredientId)
-                .Distinct()
-                .ToList();
+        //    var ingredientIds = order.OrderItems
+        //        .SelectMany(i => i.MenuItem!.Recipes)
+        //        .Select(r => r.IngredientId)
+        //        .Distinct()
+        //        .ToList();
 
-            var stocks = await stockRepo.GetAllAsync(
-                new StockByBranchAndIngredientsSpecification(branchId, ingredientIds)
-            );
+        //    var stocks = await stockRepo.GetAllAsync(
+        //        new StockByBranchAndIngredientsSpecification(branchId, ingredientIds)
+        //    );
 
-            var stockDict = stocks.ToDictionary(s => s.IngredientId);
+        //    var stockDict = stocks.ToDictionary(s => s.IngredientId);
 
-            foreach (var item in order.OrderItems)
-            {
-                foreach (var recipe in item.MenuItem!.Recipes)
-                {
-                    var ingredientId = recipe.IngredientId;
-                    var ingredientName = recipe.Ingredient?.Name ?? "Unknown";
-
-                   
-                    if (!stockDict.TryGetValue(ingredientId, out var stock))
-                    {
-                        throw new Exception(
-                            $"❌ Ingredient not found → Branch: {branchId} | Id: {ingredientId} | Name: {ingredientName}"
-                        );
-                    }
-
-                    var required = recipe.QuantityRequired * item.Quantity;
+        //    foreach (var item in order.OrderItems)
+        //    {
+        //        foreach (var recipe in item.MenuItem!.Recipes)
+        //        {
+        //            var ingredientId = recipe.IngredientId;
+        //            var ingredientName = recipe.Ingredient?.Name ?? "Unknown";
 
                    
-                    if (stock.QuantityAvailable < required)
-                    {
-                        throw new Exception(
-                            $"❌ Not enough stock → Branch: {branchId} | Ingredient: {ingredientName} (Id: {ingredientId}) | Required: {required} | Available: {stock.QuantityAvailable}"
-                        );
-                    }
+        //            if (!stockDict.TryGetValue(ingredientId, out var stock))
+        //            {
+        //                throw new Exception(
+        //                    $"❌ Ingredient not found → Branch: {branchId} | Id: {ingredientId} | Name: {ingredientName}"
+        //                );
+        //            }
+
+        //            var required = recipe.QuantityRequired * item.Quantity;
+
+                   
+        //            if (stock.QuantityAvailable < required)
+        //            {
+        //                throw new Exception(
+        //                    $"❌ Not enough stock → Branch: {branchId} | Ingredient: {ingredientName} (Id: {ingredientId}) | Required: {required} | Available: {stock.QuantityAvailable}"
+        //                );
+        //            }
 
                     
-                    stock.QuantityAvailable -= required;
+        //            stock.QuantityAvailable -= required;
 
                   
-                    if (stock.QuantityAvailable < stock.LowThreshold)
-                    {
-                        //Notification
-                        Console.WriteLine(
-                            $"⚠️ Low stock → Branch: {branchId} | Ingredient: {ingredientName} (Id: {ingredientId}) | Remaining: {stock.QuantityAvailable}"
-                        );
-                    }
-                }
-            }
-        }
+        //            if (stock.QuantityAvailable < stock.LowThreshold)
+        //            {
+        //                //Notification
+        //                Console.WriteLine(
+        //                    $"⚠️ Low stock → Branch: {branchId} | Ingredient: {ingredientName} (Id: {ingredientId}) | Remaining: {stock.QuantityAvailable}"
+        //                );
+        //            }
+        //        }
+        //    }
+        //}
 
     }
 }
