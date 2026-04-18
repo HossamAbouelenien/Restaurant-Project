@@ -8,6 +8,7 @@ using RMS.Services.Specifications.MenuItemSpec;
 using RMS.Services.Specifications.OrderSpec;
 using RMS.Services.Specifications.StockSpec;
 using RMS.ServicesAbstraction;
+using RMS.ServicesAbstraction.Notifications;
 using RMS.Shared;
 using RMS.Shared.DTOs.MenuItemsDTOs;
 using RMS.Shared.DTOs.OrderDTOs;
@@ -25,11 +26,13 @@ namespace RMS.Services.OrderServices
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly INotificationService _notificationService;
 
-        public OrderService(IUnitOfWork unitOfWork,IMapper mapper)
+        public OrderService(IUnitOfWork unitOfWork,IMapper mapper, INotificationService notificationService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _notificationService = notificationService;
         }
         public async Task<OrderDTO> CreateOrderAsync(CreateOrderDTO orderDto)
         {
@@ -136,11 +139,13 @@ namespace RMS.Services.OrderServices
                 stockItem.QuantityAvailable -= totalRequired;
 
 
-                if (stockItem.QuantityAvailable < stockItem.LowThreshold)
+                if (stockItem.QuantityAvailable < stockItem.LowThreshold
+                    && stockItem.QuantityAvailable + totalRequired >= stockItem.LowThreshold)
                 {
-                    //Notification
-                    Console.WriteLine(
-                        $"⚠️ Low stock → Branch: {orderDto.BranchId} | Ingredient: {ingredientName} (Id: {ingredientId}) | Remaining: {stockItem.QuantityAvailable}"
+                    await _notificationService.CreateLowStockNotification(
+                        orderDto.BranchId,
+                        ingredientName,
+                        stockItem.QuantityAvailable
                     );
                 }
             }
@@ -661,13 +666,7 @@ namespace RMS.Services.OrderServices
                 if (stockItem != null)
                 {
                     stockItem.QuantityAvailable += quantity;
-                    if (stockItem.QuantityAvailable >= stockItem.LowThreshold)
-                    {
-                        //Notification
-                        Console.WriteLine(
-                            $"✅ Stock replenished → Branch: {branchId} | Ingredient ID: {ingredientId} | Available: {stockItem.QuantityAvailable}"
-                        );
-                    }
+                   
                 }
             }
         }
