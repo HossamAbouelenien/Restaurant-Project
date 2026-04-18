@@ -180,7 +180,7 @@ namespace RMS.Services.DeliveryServices
                 orderRepo.Update(order);
 
                 
-                delivery.DriverId = null;
+                //delivery.DriverId = null;
             }
 
             
