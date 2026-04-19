@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RMS.Presentation.Hubs
+namespace RMS.Presentation.Hubs.Notification
 {
     public class NotificationHub : Hub
     {
