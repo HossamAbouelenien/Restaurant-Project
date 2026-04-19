@@ -12,6 +12,7 @@ using RMS.ServicesAbstraction.Notifications;
 using RMS.Shared;
 using RMS.Shared.DTOs.MenuItemsDTOs;
 using RMS.Shared.DTOs.OrderDTOs;
+using RMS.Shared.DTOs.Utility;
 using RMS.Shared.QueryParams;
 using System;
 using System.Collections.Generic;
@@ -142,10 +143,17 @@ namespace RMS.Services.OrderServices
                 if (stockItem.QuantityAvailable < stockItem.LowThreshold
                     && stockItem.QuantityAvailable + totalRequired >= stockItem.LowThreshold)
                 {
-                    await _notificationService.CreateLowStockNotification(
-                        orderDto.BranchId,
-                        ingredientName,
-                        stockItem.QuantityAvailable
+                    await _notificationService.CreateNotification(
+                        new Notification
+                        {
+                            Title = "Low Stock Alert",
+                            Message = $"{ingredientName} is low in branch {orderDto.BranchId}",
+                            BranchId = orderDto.BranchId,
+                            Type = "LowStock",
+                            Role = SD.Role_Admin,
+                        },
+                        SD.Group_Admins,
+                        "LowStockAlert"
                     );
                 }
             }

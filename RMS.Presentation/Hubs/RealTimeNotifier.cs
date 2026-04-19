@@ -17,10 +17,10 @@ namespace RMS.Presentation.Hubs
             _hubContext = hubContext;
         }
 
-        public async Task NotifyAdmins(object data)
+        public async Task NotifyAdmins(object data, string groupName, string eventName)
         {
-            await _hubContext.Clients.Group("admins")
-                .SendAsync("LowStockAlert", data);
+            await _hubContext.Clients.Group(groupName)
+                .SendAsync(eventName, data);
         }
     }
 }

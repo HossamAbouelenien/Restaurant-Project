@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using RMS.Shared.DTOs.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,9 +12,9 @@ namespace RMS.Presentation.Hubs
     {
         public override async Task OnConnectedAsync()
         {
-            if (Context.User?.IsInRole("Admin") == true)
+            if (Context.User?.IsInRole(SD.Role_Admin) == true)
             {
-                await Groups.AddToGroupAsync(Context.ConnectionId, "admins");
+                await Groups.AddToGroupAsync(Context.ConnectionId, SD.Group_Admins);
             }
 
             await base.OnConnectedAsync();
