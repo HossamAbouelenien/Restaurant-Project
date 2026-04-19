@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using RMS.Domain.Contracts;
 using RMS.Domain.Entities;
+using RMS.ServicesAbstraction.IEmailServices;
 using RMS.ServicesAbstraction.IIdentityService;
 using RMS.Shared.DTOs.IdentityDTOs;
 using System.IdentityModel.Tokens.Jwt;
@@ -18,10 +19,11 @@ namespace RMS.Services.IdentityService
         private readonly IConfiguration _configuration;
         private readonly IMapper _mapper;
         private readonly ITokenService _tokenService;
+        private readonly IEmailService _emailService;
 
         public AuthService(IUnitOfWork unitOfWork, IConfiguration configuration, IMapper mapper,
              UserManager<User> userManager, RoleManager<IdentityRole> roleManager,
-             ITokenService tokenService)
+             ITokenService tokenService, IEmailService emailService)
         {
             _unitOfWork = unitOfWork;
             _configuration = configuration;
@@ -29,6 +31,8 @@ namespace RMS.Services.IdentityService
             _userManager = userManager;
             _roleManager = roleManager;
             _tokenService = tokenService;
+            _emailService = emailService;
+
         }
 
         public async Task<bool> IsEmailExistsAsync(string email)
@@ -46,6 +50,12 @@ namespace RMS.Services.IdentityService
                 if (user == null || user.IsDeleted)
                 {
                     return null;
+                }
+
+                // Depending on your application's requirements, you might want to allow login even if the email is not confirmed.
+                if (!user.EmailConfirmed)
+                {
+                    throw new InvalidOperationException("Email is not confirmed");
                 }
 
                 bool isValid = await _userManager.CheckPasswordAsync(user, loginRequestDTO.Password);
@@ -96,7 +106,8 @@ namespace RMS.Services.IdentityService
                     Name = registerationRequestDTO.Name,
                     UserName = registerationRequestDTO.Email,
                     NormalizedEmail = registerationRequestDTO.Email.ToUpper(),
-                    EmailConfirmed = true,
+                    // Set EmailConfirmed to false by default, you can change this based on your requirements
+                    EmailConfirmed = false,
                     RoleId = string.IsNullOrEmpty(registerationRequestDTO.Role) ? "Customer" : registerationRequestDTO.Role
                 };
 
@@ -106,6 +117,9 @@ namespace RMS.Services.IdentityService
                     var errors = string.Join(", ", result.Errors.Select(e => e.Description));
                     throw new InvalidOperationException($"User registration failed: {errors}");
                 }
+
+                // Generate email confirmation token (if needed for email verification)
+                var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
                 var role = string.IsNullOrEmpty(registerationRequestDTO.Role) ? "Customer" : registerationRequestDTO.Role;
 
@@ -118,6 +132,13 @@ namespace RMS.Services.IdentityService
 
                 var userDto = _mapper.Map<UserDTO>(user);
                 userDto.Role = role;
+                userDto.ConfirmationToken = token; // Include the confirmation token in the response if needed
+
+
+                // Optionally, you can send the confirmation email here using the generated token
+                var baseUrl = _configuration["URLs:BaseURL"];
+                var confirmationLink = $"{baseUrl}api/Auth/confirm-email?userId={user.Id}&code={Uri.EscapeDataString(token)}";
+                await _emailService.SendEmailAsync(user.Email, "Confirm your email", $"Please confirm your email by clicking this link: {confirmationLink}");
 
                 return userDto;
             }
@@ -219,6 +240,25 @@ namespace RMS.Services.IdentityService
                 Email = user.Email!,
                 Role = role.FirstOrDefault() ?? "Customer"
             };
+        }
+
+        // This method is used to confirm the user's email address using the token sent to their email.
+        public async Task<string> ConfirmEmailAsync(string? userId, string? code)
+        {
+            if (userId == null || code == null)
+                return "ErrorWhenConfirmEmail";
+
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user == null)
+                return "ErrorWhenConfirmEmail";
+
+            var result = await _userManager.ConfirmEmailAsync(user, code);
+
+            if (!result.Succeeded)
+                return "ErrorWhenConfirmEmail";
+
+            return "Success";
         }
     }
 }
