@@ -8,10 +8,12 @@ using RMS.Services.Specifications.MenuItemSpec;
 using RMS.Services.Specifications.OrderSpec;
 using RMS.Services.Specifications.StockSpec;
 using RMS.ServicesAbstraction;
-using RMS.ServicesAbstraction.Notifications;
+using RMS.ServicesAbstraction.IHubServices.INotificationServices;
+using RMS.ServicesAbstraction.IHubServices.IRestaurantNotifier;
 using RMS.Shared;
 using RMS.Shared.DTOs.MenuItemsDTOs;
 using RMS.Shared.DTOs.OrderDTOs;
+using RMS.Shared.DTOs.Utility;
 using RMS.Shared.QueryParams;
 using System;
 using System.Collections.Generic;
@@ -27,12 +29,14 @@ namespace RMS.Services.OrderServices
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly INotificationService _notificationService;
+        private readonly IRestaurantNotifier _restaurantNotifier;
 
-        public OrderService(IUnitOfWork unitOfWork,IMapper mapper, INotificationService notificationService)
+        public OrderService(IUnitOfWork unitOfWork,IMapper mapper, INotificationService notificationService, IRestaurantNotifier restaurantNotifier)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _notificationService = notificationService;
+            _restaurantNotifier = restaurantNotifier;   
         }
         public async Task<OrderDTO> CreateOrderAsync(CreateOrderDTO orderDto)
         {
@@ -142,10 +146,17 @@ namespace RMS.Services.OrderServices
                 if (stockItem.QuantityAvailable < stockItem.LowThreshold
                     && stockItem.QuantityAvailable + totalRequired >= stockItem.LowThreshold)
                 {
-                    await _notificationService.CreateLowStockNotification(
-                        orderDto.BranchId,
-                        ingredientName,
-                        stockItem.QuantityAvailable
+                    await _notificationService.CreateNotification(
+                        new Notification
+                        {
+                            Title = "Low Stock Alert",
+                            Message = $"{ingredientName} is low in branch {orderDto.BranchId}",
+                            BranchId = orderDto.BranchId,
+                            Type = "LowStock",
+                            Role = SD.Role_Admin,
+                        },
+                        SD.Group_Admins,
+                        "LowStockAlert"
                     );
                 }
             }
@@ -219,7 +230,17 @@ namespace RMS.Services.OrderServices
                 await _unitOfWork.SaveChangesAsync();
                 var Spec = new OrderWithBranchAndCustomerAndOrderItemsSpecification(order.Id);
                 order = await Repo.GetByIdAsync(Spec) ?? throw new Exception("Failed to retrieve created order");
-                return _mapper.Map<OrderDTO>(order);               
+               
+                var orderData = _mapper.Map<OrderDTO>(order);
+                await _restaurantNotifier.SendAsync(
+                         "OrderCreated",
+                         orderData,
+                         $"kitchen_branch_{orderDto.BranchId}",
+                                $"waiters_branch_{orderDto.BranchId}",
+                                $"cashiers_branch_{orderDto.BranchId}",
+                                $"customers_id_{orderDto.UserId}",
+                                "admins"
+                        );
             }
             throw new Exception("Failed to create order");
         }
@@ -366,7 +387,19 @@ namespace RMS.Services.OrderServices
             var updatedResult = await _unitOfWork.SaveChangesAsync();
             if (updatedResult > 0)
             {
-                return _mapper.Map<OrderDTO>(orderToUpdate);
+                //return _mapper.Map<OrderDTO>(orderToUpdate);
+                var orderData = _mapper.Map<OrderDTO>(orderToUpdate);
+                await _restaurantNotifier.SendAsync(
+                         "OrderUpdated",
+                         orderData,
+                         $"kitchen_branch_{orderToUpdate.BranchId}",
+                                $"waiters_branch_{orderToUpdate.BranchId}",
+                                $"cashiers_branch_{orderToUpdate.BranchId}",
+                                $"customers_id_{orderToUpdate.UserId}",
+                                "admins"
+                        );
+
+                return orderData;
             }
             else
             {
@@ -524,6 +557,16 @@ namespace RMS.Services.OrderServices
                     }
                 }
                 await _unitOfWork.SaveChangesAsync();
+                var orderData = _mapper.Map<OrderDTO>(order);
+                await _restaurantNotifier.SendAsync(
+                         "OrderUpdated",
+                         orderData,
+                         $"kitchen_branch_{order.BranchId}",
+                                $"waiters_branch_{order.BranchId}",
+                                $"cashiers_branch_{order.BranchId}",
+                                $"customers_id_{order.UserId}",
+                                "admins"
+                        );
                 return addedItemsDto;
             }
             else
@@ -569,7 +612,21 @@ namespace RMS.Services.OrderServices
             order.UpdatedAt = DateTime.Now;
             var result = await _unitOfWork.SaveChangesAsync();
             if (result > 0)
-                return _mapper.Map<OrderDTO>(order);
+            //return _mapper.Map<OrderDTO>(order);
+            {
+                var orderData = _mapper.Map<OrderDTO>(order);
+                await _restaurantNotifier.SendAsync(
+                         "OrderUpdated",
+                         orderData,
+                         $"kitchen_branch_{order.BranchId}",
+                                $"waiters_branch_{order.BranchId}",
+                                $"cashiers_branch_{order.BranchId}",
+                                $"customers_id_{order.UserId}",
+                                "admins"
+                        );
+                return orderData;
+            }
+                
             else
                 throw new Exception("Failed to remove items from order");
         }
@@ -629,9 +686,20 @@ namespace RMS.Services.OrderServices
 
             orderToCancel.UpdatedAt = DateTime.Now;
             var updatedResult = await _unitOfWork.SaveChangesAsync();
+
             if (!(updatedResult > 0))
                 throw new Exception("Failed to update order status");
-            
+
+            var orderData = _mapper.Map<OrderDTO>(orderToCancel);
+            await _restaurantNotifier.SendAsync(
+                     "OrderCancelled",
+                     orderData,
+                     $"kitchen_branch_{orderToCancel.BranchId}",
+                            $"waiters_branch_{orderToCancel.BranchId}",
+                            $"cashiers_branch_{orderToCancel.BranchId}",
+                            $"customers_id_{orderToCancel.UserId}",
+                            "admins"
+                    );
         }
 
         private async Task<Dictionary<int, decimal>> CalculateIngredientConsumptionAsync(IEnumerable<OrderItem> orderItems, int branchId)

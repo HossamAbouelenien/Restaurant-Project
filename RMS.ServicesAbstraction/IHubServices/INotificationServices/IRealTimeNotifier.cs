@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RMS.ServicesAbstraction.Notifications
+namespace RMS.ServicesAbstraction.IHubServices.INotificationServices
 {
     public interface IRealTimeNotifier
     {
-        Task NotifyAdmins(object data);
+        Task NotifyAdmins(object data, string groupName, string eventName);
 
     }
 }

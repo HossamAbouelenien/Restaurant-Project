@@ -6,10 +6,13 @@ using RMS.Services.Specifications.BranchStockSpec;
 using RMS.Services.Specifications.KitchenTicketSpec;
 using RMS.Services.Specifications.StockSpec;
 using RMS.ServicesAbstraction;
+using RMS.ServicesAbstraction.IHubServices.IRestaurantNotifier;
 using RMS.ServicesAbstraction.IKitchenServices;
 using RMS.Shared.DTOs.BranchStockDTOs;
 using RMS.Shared.DTOs.KitchenDTOs;
+using RMS.Shared.DTOs.OrderDTOs;
 using RMS.Shared.QueryParams;
+using System.Net.Sockets;
 
 namespace RMS.Services.KitchenServices
 {
@@ -17,11 +20,13 @@ namespace RMS.Services.KitchenServices
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IRestaurantNotifier _restaurantNotifier;
 
-        public KitchenService(IUnitOfWork unitOfWork, IMapper mapper)
+        public KitchenService(IUnitOfWork unitOfWork, IMapper mapper, IRestaurantNotifier restaurantNotifier)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _restaurantNotifier = restaurantNotifier;
         }
 
         public async Task<KitchenBoardDto> GetAllKitchenTicketsGroupedByStatusForCurrentBranchAsync(KitchenTicketQueryParams queryParams)
@@ -118,10 +123,36 @@ namespace RMS.Services.KitchenServices
 
             dtoResult.IsOrderReady = tickets.All(t => t.Status == TicketStatus.Done);
 
+            await _restaurantNotifier.SendAsync(
+                     "OrderCreated",
+                     dtoResult,
+                     $"kitchen_branch_{ticket.Order!.BranchId}"
+                    );
+
             return dtoResult;
         }
 
+        public async Task<bool> UpdateCofirmServeredColumn(int id)
+        {
+            var repo = _unitOfWork.GetRepository<KitchenTicket>();
+            var spec = new KitchenTicketWithOrderSpecification(id);
+            var kitchenTicket = await repo.GetByIdAsync(spec);
 
+            if (kitchenTicket == null)
+                throw new Exception("Ticket not found");
+
+            kitchenTicket.ConfirmedServed = true;
+
+            await _unitOfWork.SaveChangesAsync();
+            await _restaurantNotifier.SendAsync(
+                     "OrderCreated",
+                     kitchenTicket,
+                     $"waiters_branch_{kitchenTicket.Order!.BranchId}"
+                    );
+
+            return true;
+
+        }
 
         private async Task UpdateOrderStatus(int orderId)
         {

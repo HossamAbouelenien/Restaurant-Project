@@ -11,7 +11,7 @@ namespace RMS.ServicesAbstraction.IKitchenServices
         Task<List<ActivePendingStationsDTOs>> GetListOfActiveStationsWithPendingCountAsync(int branchId);
         Task<KitchenTicketStatusDto> UpdateTicketStatusAsync(int ticketId, UpdateTicketStatusRequestDto dto);
 
-
+       Task<bool> UpdateCofirmServeredColumn(int id);
 
     }
 }

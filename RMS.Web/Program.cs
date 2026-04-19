@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using RMS.Domain.Contracts;
@@ -11,7 +12,8 @@ using RMS.Persistence.Data.Contexts;
 using RMS.Persistence.Data.DataSeed;
 using RMS.Persistence.Repositories;
 using RMS.Persistence.Repositries;
-using RMS.Presentation.Hubs;
+using RMS.Presentation.Hubs.Notification;
+using RMS.Presentation.Hubs.RestaurantHub;
 using RMS.Services;
 using RMS.Services.BasketService;
 using RMS.Services.BranchServices;
@@ -35,12 +37,14 @@ using RMS.ServicesAbstraction;
 using RMS.ServicesAbstraction.ICategoriesService;
 using RMS.ServicesAbstraction.IDeliveryServices;
 using RMS.ServicesAbstraction.IEmailServices;
+using RMS.ServicesAbstraction.IHubServices.INotificationServices;
+using RMS.ServicesAbstraction.IHubServices.IRestaurantNotifier;
 using RMS.ServicesAbstraction.IIdentityService;
 using RMS.ServicesAbstraction.IKitchenServices;
 using RMS.ServicesAbstraction.IUserServices;
-using RMS.ServicesAbstraction.Notifications;
 using RMS.Web.Extensions;
 using StackExchange.Redis;
+using System.Security.Claims;
 using System.Text;
 namespace RMS.Web
 {
@@ -73,7 +77,7 @@ namespace RMS.Web
 
 
 
-
+            builder.Services.AddScoped<IRestaurantNotifier, RestaurantNotifier>();
             builder.Services.AddScoped<INotificationService, NotificationService>();
             builder.Services.AddScoped<IRealTimeNotifier, RealTimeNotifier>();
             builder.Services.AddSignalR();
@@ -119,7 +123,25 @@ namespace RMS.Web
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(key)),
                         ValidateIssuer = false,
-                        ValidateAudience = false
+                        ValidateAudience = false,
+                        RoleClaimType = ClaimTypes.Role
+                    };
+                    x.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            var accessToken = context.Request.Query["access_token"];
+
+                            var path = context.HttpContext.Request.Path;
+
+                            if (!string.IsNullOrEmpty(accessToken) &&
+                                path.StartsWithSegments("/hubs/notifications"))
+                            {
+                                context.Token = accessToken;
+                            }
+
+                            return Task.CompletedTask;
+                        }
                     };
                 });
 
@@ -264,7 +286,7 @@ namespace RMS.Web
             app.UseCors("AllowAll");
             app.UseAuthentication();
             app.UseAuthorization();
-
+            app.MapHub<RestaurantHub>("/hubs/restaurant");
             app.MapHub<NotificationHub>("/hubs/notifications");
 
             app.MapControllers();

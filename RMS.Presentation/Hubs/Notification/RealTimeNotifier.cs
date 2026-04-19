@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using RMS.ServicesAbstraction.Notifications;
+using RMS.ServicesAbstraction.IHubServices.INotificationServices;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RMS.Presentation.Hubs
+namespace RMS.Presentation.Hubs.Notification
 {
     public class RealTimeNotifier : IRealTimeNotifier
     {
@@ -17,10 +17,10 @@ namespace RMS.Presentation.Hubs
             _hubContext = hubContext;
         }
 
-        public async Task NotifyAdmins(object data)
+        public async Task NotifyAdmins(object data, string groupName, string eventName)
         {
-            await _hubContext.Clients.Group("admins")
-                .SendAsync("LowStockAlert", data);
+            await _hubContext.Clients.Group(groupName)
+                .SendAsync(eventName, data);
         }
     }
 }
