@@ -219,7 +219,14 @@ namespace RMS.Services.DeliveryServices
             deliveryRepo.Update(delivery);
             await _unitOfWork.SaveChangesAsync();
 
-            return _mapper.Map<DeliveryDetailsDto>(delivery);
+            var result = _mapper.Map<DeliveryDetailsDto>(delivery);
+         
+            await _restaurantNotifier.SendAsync(
+                "deliveryUpdated",
+                result,
+                $"drivers_id_{delivery.DriverId}");
+
+            return result;
         }
 
 
