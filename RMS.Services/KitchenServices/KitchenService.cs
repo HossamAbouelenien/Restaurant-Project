@@ -121,7 +121,22 @@ namespace RMS.Services.KitchenServices
             return dtoResult;
         }
 
+        public async Task<bool> UpdateCofirmServeredColumn(int id)
+        {
+            var repo = _unitOfWork.GetRepository<KitchenTicket>();
 
+            var kitchenTicket = await repo.GetByIdAsync(id);
+
+            if (kitchenTicket == null)
+                throw new Exception("Ticket not found");
+
+            kitchenTicket.ConfirmedServed = true;
+
+            await _unitOfWork.SaveChangesAsync();
+
+            return true;
+
+        }
 
         private async Task UpdateOrderStatus(int orderId)
         {

@@ -17,6 +17,7 @@ public class KitchenTicketConfigurations : IEntityTypeConfiguration<KitchenTicke
         builder.Property(kt => kt.CreatedAt)
                .HasDefaultValueSql("GETDATE()");
 
+        
         // ── Enum → string ─────────────────────────────────────────────────────
         builder.Property(kt => kt.Status)
                .IsRequired()

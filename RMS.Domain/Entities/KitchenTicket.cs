@@ -14,6 +14,7 @@ public class KitchenTicket : BaseEntity
 
     [ForeignKey(nameof(OrderId))]
     public Order? Order { get; set; }
+    public bool ConfirmedServed { get; set; } = default;
 
     // ── Ticket data ───────────────────────────────────────────────────────────
     [Required]
