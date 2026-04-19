@@ -8,6 +8,8 @@ using RMS.Services.Specifications.BranchStockSpec;
 using RMS.Services.Specifications.DeliverySpec;
 using RMS.Services.Specifications.OrderSpec;
 using RMS.ServicesAbstraction.IDeliveryServices;
+using RMS.ServicesAbstraction.IHubServices.INotificationServices;
+using RMS.ServicesAbstraction.IHubServices.IRestaurantNotifier;
 using RMS.Shared;
 using RMS.Shared.DTOs.BranchStockDTOs;
 using RMS.Shared.DTOs.DeliveryDTOs;
@@ -29,14 +31,19 @@ namespace RMS.Services.DeliveryServices
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly UserManager<User> _userManager;
+        private readonly IRestaurantNotifier _restaurantNotifier;
+        private readonly INotificationService _notificationService;
 
         public DeliveryService(IUnitOfWork unitOfWork, IMapper mapper,
-            IHttpContextAccessor httpContextAccessor,UserManager<User> userManager)
+            IHttpContextAccessor httpContextAccessor,UserManager<User> userManager
+            ,IRestaurantNotifier restaurantNotifier , INotificationService notificationService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
             _userManager = userManager;
+           _restaurantNotifier = restaurantNotifier;
+           _notificationService = notificationService;
         }
 
 
@@ -127,13 +134,36 @@ namespace RMS.Services.DeliveryServices
             delivery.DeliveryStatus = DeliveryStatus.Assigned;
 
             deliveryRepo.Update(delivery);
-            
+
             await _unitOfWork.SaveChangesAsync();
+
+           
+
 
             var spec = new DeliveryByIdSpecification(delivery.Id);
             var createdDelivery = await deliveryRepo.GetByIdAsync(spec);
 
-            return _mapper.Map<DeliveryDetailsDto>(createdDelivery);
+            var result =  _mapper.Map<DeliveryDetailsDto>(createdDelivery);
+            await _restaurantNotifier.SendAsync(
+                "OrderAssignedToDriver",
+                result,
+                $"drivers_id_{dto.DriverId}");
+
+
+            await _notificationService.CreateNotification(
+                        new Notification
+                        {
+                            Title = "New Delivery Has Assigned To You !",
+                            Message = $"Delivery With {delivery.Id} is Assigned To You At {delivery.DeliveryAddress.BuildingNumber} - {delivery.DeliveryAddress.City}",
+                            Type = "Assignation",
+                            Role = SD.Role_Driver,
+                        },
+                        SD.Group_Admins,
+                        "OrderAssignedToDriver"
+                    );
+
+
+            return result;
         }
 
 
