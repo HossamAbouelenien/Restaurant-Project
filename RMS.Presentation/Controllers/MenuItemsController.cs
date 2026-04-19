@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RMS.Presentation.Attributes;
 using RMS.ServicesAbstraction;
 using RMS.Shared;
 using RMS.Shared.DTOs.MenuItemDTOs;
@@ -27,7 +28,7 @@ namespace RMS.Presentation.Controllers
 
         //[Authorize]
         [HttpGet]
-
+        //[Cache]
         public async Task<ActionResult<PaginatedResult<MenuItemDTO>>> GetAllMenuItems([FromQuery] MenuItemQueryParams queryParams)
         {
             var result = await _menuItemService.GetAllMenuItemsAsync(queryParams);

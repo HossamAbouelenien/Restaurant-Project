@@ -6,10 +6,13 @@ using RMS.Services.Specifications.BranchStockSpec;
 using RMS.Services.Specifications.KitchenTicketSpec;
 using RMS.Services.Specifications.StockSpec;
 using RMS.ServicesAbstraction;
+using RMS.ServicesAbstraction.IHubServices.IRestaurantNotifier;
 using RMS.ServicesAbstraction.IKitchenServices;
 using RMS.Shared.DTOs.BranchStockDTOs;
 using RMS.Shared.DTOs.KitchenDTOs;
+using RMS.Shared.DTOs.OrderDTOs;
 using RMS.Shared.QueryParams;
+using System.Net.Sockets;
 
 namespace RMS.Services.KitchenServices
 {
@@ -17,11 +20,13 @@ namespace RMS.Services.KitchenServices
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IRestaurantNotifier _restaurantNotifier;
 
-        public KitchenService(IUnitOfWork unitOfWork, IMapper mapper)
+        public KitchenService(IUnitOfWork unitOfWork, IMapper mapper, IRestaurantNotifier restaurantNotifier)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _restaurantNotifier = restaurantNotifier;
         }
 
         public async Task<KitchenBoardDto> GetAllKitchenTicketsGroupedByStatusForCurrentBranchAsync(KitchenTicketQueryParams queryParams)
@@ -96,7 +101,7 @@ namespace RMS.Services.KitchenServices
                 ticket.Status = TicketStatus.Done;
                 ticket.CompletedAt = DateTime.UtcNow;
 
-                await DecrementStock(ticket);
+                //await DecrementStock(ticket);
             }
             else
             {
@@ -118,10 +123,36 @@ namespace RMS.Services.KitchenServices
 
             dtoResult.IsOrderReady = tickets.All(t => t.Status == TicketStatus.Done);
 
+            await _restaurantNotifier.SendAsync(
+                     "KitchenUpdated",
+                     dtoResult,
+                     $"kitchen_branch_{ticket.Order!.BranchId}"
+                    );
+
             return dtoResult;
         }
 
+        public async Task<bool> UpdateCofirmServeredColumn(int id)
+        {
+            var repo = _unitOfWork.GetRepository<KitchenTicket>();
+            var spec = new KitchenTicketWithOrderSpecification(id);
+            var kitchenTicket = await repo.GetByIdAsync(spec);
 
+            if (kitchenTicket == null)
+                throw new Exception("Ticket not found");
+
+            kitchenTicket.ConfirmedServed = true;
+
+            await _unitOfWork.SaveChangesAsync();
+            await _restaurantNotifier.SendAsync(
+                     "CofirmServeredUpdated",
+                     kitchenTicket,
+                     $"waiters_branch_{kitchenTicket.Order!.BranchId}"
+                    );
+
+            return true;
+
+        }
 
         private async Task UpdateOrderStatus(int orderId)
         {
@@ -150,67 +181,67 @@ namespace RMS.Services.KitchenServices
         }
 
 
-        private async Task DecrementStock(KitchenTicket ticket)
-        {
-            var orderRepo = _unitOfWork.GetRepository<Order>();
-            var stockRepo = _unitOfWork.GetRepository<BranchStock>();
+        //private async Task DecrementStock(KitchenTicket ticket)
+        //{
+        //    var orderRepo = _unitOfWork.GetRepository<Order>();
+        //    var stockRepo = _unitOfWork.GetRepository<BranchStock>();
 
-            var spec = new OrderWithItemsAndRecipesSpecification(ticket.OrderId);
-            var order = await orderRepo.GetByIdAsync(spec);
+        //    var spec = new OrderWithItemsAndRecipesSpecification(ticket.OrderId);
+        //    var order = await orderRepo.GetByIdAsync(spec);
 
-            var branchId = order!.BranchId;
+        //    var branchId = order!.BranchId;
 
-            var ingredientIds = order.OrderItems
-                .SelectMany(i => i.MenuItem!.Recipes)
-                .Select(r => r.IngredientId)
-                .Distinct()
-                .ToList();
+        //    var ingredientIds = order.OrderItems
+        //        .SelectMany(i => i.MenuItem!.Recipes)
+        //        .Select(r => r.IngredientId)
+        //        .Distinct()
+        //        .ToList();
 
-            var stocks = await stockRepo.GetAllAsync(
-                new StockByBranchAndIngredientsSpecification(branchId, ingredientIds)
-            );
+        //    var stocks = await stockRepo.GetAllAsync(
+        //        new StockByBranchAndIngredientsSpecification(branchId, ingredientIds)
+        //    );
 
-            var stockDict = stocks.ToDictionary(s => s.IngredientId);
+        //    var stockDict = stocks.ToDictionary(s => s.IngredientId);
 
-            foreach (var item in order.OrderItems)
-            {
-                foreach (var recipe in item.MenuItem!.Recipes)
-                {
-                    var ingredientId = recipe.IngredientId;
-                    var ingredientName = recipe.Ingredient?.Name ?? "Unknown";
-
-                   
-                    if (!stockDict.TryGetValue(ingredientId, out var stock))
-                    {
-                        throw new Exception(
-                            $"❌ Ingredient not found → Branch: {branchId} | Id: {ingredientId} | Name: {ingredientName}"
-                        );
-                    }
-
-                    var required = recipe.QuantityRequired * item.Quantity;
+        //    foreach (var item in order.OrderItems)
+        //    {
+        //        foreach (var recipe in item.MenuItem!.Recipes)
+        //        {
+        //            var ingredientId = recipe.IngredientId;
+        //            var ingredientName = recipe.Ingredient?.Name ?? "Unknown";
 
                    
-                    if (stock.QuantityAvailable < required)
-                    {
-                        throw new Exception(
-                            $"❌ Not enough stock → Branch: {branchId} | Ingredient: {ingredientName} (Id: {ingredientId}) | Required: {required} | Available: {stock.QuantityAvailable}"
-                        );
-                    }
+        //            if (!stockDict.TryGetValue(ingredientId, out var stock))
+        //            {
+        //                throw new Exception(
+        //                    $"❌ Ingredient not found → Branch: {branchId} | Id: {ingredientId} | Name: {ingredientName}"
+        //                );
+        //            }
+
+        //            var required = recipe.QuantityRequired * item.Quantity;
+
+                   
+        //            if (stock.QuantityAvailable < required)
+        //            {
+        //                throw new Exception(
+        //                    $"❌ Not enough stock → Branch: {branchId} | Ingredient: {ingredientName} (Id: {ingredientId}) | Required: {required} | Available: {stock.QuantityAvailable}"
+        //                );
+        //            }
 
                     
-                    stock.QuantityAvailable -= required;
+        //            stock.QuantityAvailable -= required;
 
                   
-                    if (stock.QuantityAvailable < stock.LowThreshold)
-                    {
-                        //Notification
-                        Console.WriteLine(
-                            $"⚠️ Low stock → Branch: {branchId} | Ingredient: {ingredientName} (Id: {ingredientId}) | Remaining: {stock.QuantityAvailable}"
-                        );
-                    }
-                }
-            }
-        }
+        //            if (stock.QuantityAvailable < stock.LowThreshold)
+        //            {
+        //                //Notification
+        //                Console.WriteLine(
+        //                    $"⚠️ Low stock → Branch: {branchId} | Ingredient: {ingredientName} (Id: {ingredientId}) | Remaining: {stock.QuantityAvailable}"
+        //                );
+        //            }
+        //        }
+        //    }
+        //}
 
     }
 }

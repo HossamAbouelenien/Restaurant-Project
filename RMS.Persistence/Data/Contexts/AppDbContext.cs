@@ -37,4 +37,5 @@ public class AppDbContext : IdentityDbContext<User>
     public DbSet<Delivery> Deliveries { get; set; }
 
     public DbSet<RefreshToken> RefreshTokens { get; set; }
+    public DbSet<Notification> Notifications { get; set; }
 }

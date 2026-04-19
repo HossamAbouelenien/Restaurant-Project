@@ -50,5 +50,16 @@ namespace RMS.Presentation.Controllers
             return Ok(result);
         }
 
+
+
+        [HttpPatch("ConfirmServed/{id}")]
+        public async Task<IActionResult> UpdateCofirmServeredColumn(int id)
+        {
+            var result = await _kitchenService.UpdateCofirmServeredColumn(id);
+            return Ok(result);
+
+
+
+        }
     }
 }

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using RMS.Domain.Contracts;
@@ -11,9 +12,13 @@ using RMS.Persistence.Data.Contexts;
 using RMS.Persistence.Data.DataSeed;
 using RMS.Persistence.Repositories;
 using RMS.Persistence.Repositries;
+using RMS.Presentation.Hubs.Notification;
+using RMS.Presentation.Hubs.RestaurantHub;
+using RMS.Services;
 using RMS.Services.BasketService;
 using RMS.Services.BranchServices;
 using RMS.Services.BranchStockServices;
+using RMS.Services.CacheServices;
 using RMS.Services.CategoryServices;
 using RMS.Services.DeliveryServices;
 using RMS.Services.EmailServices;
@@ -22,6 +27,7 @@ using RMS.Services.IngredientServices;
 using RMS.Services.KitchenServices;
 using RMS.Services.MappingProfiles;
 using RMS.Services.MenuItemsServices;
+using RMS.Services.NotificationServices;
 using RMS.Services.OrderServices;
 using RMS.Services.RecipeServices;
 using RMS.Services.ReportServices;
@@ -31,11 +37,14 @@ using RMS.ServicesAbstraction;
 using RMS.ServicesAbstraction.ICategoriesService;
 using RMS.ServicesAbstraction.IDeliveryServices;
 using RMS.ServicesAbstraction.IEmailServices;
+using RMS.ServicesAbstraction.IHubServices.INotificationServices;
+using RMS.ServicesAbstraction.IHubServices.IRestaurantNotifier;
 using RMS.ServicesAbstraction.IIdentityService;
 using RMS.ServicesAbstraction.IKitchenServices;
 using RMS.ServicesAbstraction.IUserServices;
 using RMS.Web.Extensions;
 using StackExchange.Redis;
+using System.Security.Claims;
 using System.Text;
 namespace RMS.Web
 {
@@ -68,11 +77,12 @@ namespace RMS.Web
 
 
 
-
-
-
-
-
+            builder.Services.AddScoped<IRestaurantNotifier, RestaurantNotifier>();
+            builder.Services.AddScoped<INotificationService, NotificationService>();
+            builder.Services.AddScoped<IRealTimeNotifier, RealTimeNotifier>();
+            builder.Services.AddSignalR();
+            builder.Services.AddScoped<ICacheService, CacheService>();
+            builder.Services.AddScoped<ICacheRepository, CacheRepository>();
             builder.Services.AddScoped<IRecipeService, RecipeService>();
             builder.Services.AddScoped<IImageService, ImageService>();
             //================= Amr (60 : 75) =====================
@@ -113,7 +123,25 @@ namespace RMS.Web
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(key)),
                         ValidateIssuer = false,
-                        ValidateAudience = false
+                        ValidateAudience = false,
+                        RoleClaimType = ClaimTypes.Role
+                    };
+                    x.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            var accessToken = context.Request.Query["access_token"];
+
+                            var path = context.HttpContext.Request.Path;
+
+                            if (!string.IsNullOrEmpty(accessToken) &&
+                                path.StartsWithSegments("/hubs/notifications"))
+                            {
+                                context.Token = accessToken;
+                            }
+
+                            return Task.CompletedTask;
+                        }
                     };
                 });
 
@@ -172,9 +200,10 @@ namespace RMS.Web
                 options.AddPolicy("AllowAll",
                     policy =>
                     {
-                        policy.AllowAnyOrigin()
+                        policy.WithOrigins("http://localhost:4200")
                               .AllowAnyMethod()
-                              .AllowAnyHeader();
+                              .AllowAnyHeader()
+                              .AllowCredentials(); 
                     });
             });
 
@@ -257,6 +286,8 @@ namespace RMS.Web
             app.UseCors("AllowAll");
             app.UseAuthentication();
             app.UseAuthorization();
+            app.MapHub<RestaurantHub>("/hubs/restaurant");
+            app.MapHub<NotificationHub>("/hubs/notifications");
 
             app.MapControllers();
 
