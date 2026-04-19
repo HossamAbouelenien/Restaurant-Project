@@ -8,7 +8,7 @@ namespace RMS.ServicesAbstraction.Notifications
 {
     public interface IRealTimeNotifier
     {
-        Task NotifyAdmins(object data);
+        Task NotifyAdmins(object data, string groupName, string eventName);
 
     }
 }

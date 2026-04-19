@@ -27,21 +27,11 @@ namespace RMS.Services.NotificationServices
             _mapper = mapper;
         }
 
-        public async Task CreateLowStockNotification(int branchId, string ingredientName, decimal quantity)
+        public async Task CreateNotification(Notification sentnotification, string groupName, string eventName)
         {
+
             var repo = _unitOfWork.GetRepository<Notification>();
-
-            var notification = new Notification
-            {
-                Title = "Low Stock Alert",
-                Message = $"{ingredientName} is low in branch {branchId}",
-                BranchId = branchId,
-                Type = "LowStock",
-                Role = SD.Role_Admin,
-            };
-
-            await repo.AddAsync(notification);
-            await _unitOfWork.SaveChangesAsync();
+            var notification = sentnotification;
 
             await _realTimeNotifier.NotifyAdmins(new
             {
@@ -50,7 +40,12 @@ namespace RMS.Services.NotificationServices
                 notification.Message,
                 notification.BranchId,
                 notification.CreatedAt
-            });
+            }, groupName, eventName
+            );
+
+
+            await repo.AddAsync(notification);
+            await _unitOfWork.SaveChangesAsync();
         }
 
         public async Task<IEnumerable<NotificationDTO>> GetAllAsync(NotificationQueryParams queryParams)
