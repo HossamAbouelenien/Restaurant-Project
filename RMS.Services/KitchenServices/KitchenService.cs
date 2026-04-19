@@ -124,7 +124,7 @@ namespace RMS.Services.KitchenServices
             dtoResult.IsOrderReady = tickets.All(t => t.Status == TicketStatus.Done);
 
             await _restaurantNotifier.SendAsync(
-                     "OrderCreated",
+                     "KitchenUpdated",
                      dtoResult,
                      $"kitchen_branch_{ticket.Order!.BranchId}"
                     );
@@ -145,7 +145,7 @@ namespace RMS.Services.KitchenServices
 
             await _unitOfWork.SaveChangesAsync();
             await _restaurantNotifier.SendAsync(
-                     "OrderCreated",
+                     "CofirmServeredUpdated",
                      kitchenTicket,
                      $"waiters_branch_{kitchenTicket.Order!.BranchId}"
                     );

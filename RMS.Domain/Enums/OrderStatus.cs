@@ -12,6 +12,7 @@ namespace RMS.Domain.Enums
         Preparing,
         Ready,
         Delivered,
-        Cancelled
+        Cancelled,
+        AwaitingPayment
     }
 }
