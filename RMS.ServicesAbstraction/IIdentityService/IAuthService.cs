@@ -18,5 +18,9 @@ namespace RMS.ServicesAbstraction.IIdentityService
         Task<UserDTO> UpdateCurrentUserAsync(string email, UpdateCurrentUserDTO dto);
 
         Task<string> ConfirmEmailAsync(string? userId, string? code);
+        Task<string> SendResetPasswordCode(string email);
+        Task<(string result, string? resetSessionToken)> VerifyResetCode(string code);
+        Task<string> ResetPassword(string resetSessionToken, string newPassword, string confirmPassword);
+
     }
 }

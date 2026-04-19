@@ -167,6 +167,41 @@ namespace RMS.Presentation.Controllers
             return BadRequest("Error confirming email");
         }
 
+        // This endpoint is for demonstration purposes. In a real application, the reset code would be sent to the user's email. 
+        [HttpPost("send-reset-code")]
+        public async Task<IActionResult> SendResetCode(string email)
+        {
+            var result = await _authService.SendResetPasswordCode(email);
+            return Ok(result);
+        }
+
+        // This endpoint is for demonstration purposes. In a real application, the verification would be done through a link in the user's email.
+        [HttpPost("verify-reset-code")]
+        public async Task<IActionResult> VerifyCode(string code)
+        {
+            var result = await _authService.VerifyResetCode(code);
+
+            if (result.result != "Valid")
+                return BadRequest(result.result);
+
+            return Ok(new { resetSessionToken = result.resetSessionToken });
+        }
+
+        // This endpoint is for demonstration purposes. In a real application, the reset session token would be validated and used to identify the user for password reset.
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword(ResetPasswordDTO dto)
+        {
+            var result = await _authService.ResetPassword(
+                dto.ResetSessionToken,
+                dto.NewPassword,
+                dto.ConfirmPassword);
+
+            if (result != "Success")
+                return BadRequest(result);
+
+            return Ok(result);
+        }
+
 
 
     }

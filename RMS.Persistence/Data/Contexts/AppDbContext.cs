@@ -38,4 +38,5 @@ public class AppDbContext : IdentityDbContext<User>
 
     public DbSet<RefreshToken> RefreshTokens { get; set; }
     public DbSet<Notification> Notifications { get; set; }
+    public DbSet<ResetSessionToken> ResetSessionTokens { get; set; }
 }
