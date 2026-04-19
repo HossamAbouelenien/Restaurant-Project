@@ -4,10 +4,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using RMS.Domain.Contracts;
 using RMS.Domain.Entities;
+using RMS.Services.EmailServices;
 using RMS.ServicesAbstraction.IEmailServices;
 using RMS.ServicesAbstraction.IIdentityService;
 using RMS.Shared.DTOs.IdentityDTOs;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Cryptography;
 
 namespace RMS.Services.IdentityService
 {
@@ -257,6 +259,94 @@ namespace RMS.Services.IdentityService
 
             if (!result.Succeeded)
                 return "ErrorWhenConfirmEmail";
+
+            return "Success";
+        }
+
+        // This method initiates the password reset process by generating a reset code, saving it in the database, and sending it to the user's email.
+        public async Task<string> SendResetPasswordCode(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+
+            if (user == null)
+                return "UserNotFound";
+
+            var code = RandomNumberGenerator.GetInt32(100000, 999999).ToString();
+
+            var codeHash = BCrypt.Net.BCrypt.HashPassword(code);
+
+            var session = new ResetSessionToken
+            {
+                UserId = user.Id,
+                TokenHash = codeHash,
+                ExpiryDate = DateTime.UtcNow.AddMinutes(10),
+                IsUsed = false
+            };
+
+            await _unitOfWork.GetRepository<ResetSessionToken>().AddAsync(session);
+            await _unitOfWork.SaveChangesAsync();
+
+            await _emailService.SendEmailAsync(user.Email, $"Reset Code: {code}", "Reset Password");
+
+            return "Success";
+        }
+
+        // This method verifies the reset code provided by the user. If the code is valid, it generates a secure session token that can be used to reset the password.
+        public async Task<(string result, string? resetSessionToken)> VerifyResetCode(string code)
+        {
+            var tokens = await _unitOfWork.GetRepository<ResetSessionToken>()
+                .GetAllAsync();
+
+            var session = tokens.FirstOrDefault(t =>
+                !t.IsUsed &&
+                t.ExpiryDate > DateTime.UtcNow &&
+                BCrypt.Net.BCrypt.Verify(code, t.TokenHash));
+
+            if (session == null)
+                return ("InvalidOrExpiredCode", null);
+
+            // generate secure session token
+            var resetSessionToken = Guid.NewGuid().ToString();
+
+            session.TokenHash = BCrypt.Net.BCrypt.HashPassword(resetSessionToken);
+
+            _unitOfWork.GetRepository<ResetSessionToken>().Update(session);
+            await _unitOfWork.SaveChangesAsync();
+
+            return ("Valid", resetSessionToken);
+        }
+
+        // This method resets the user's password using the session token generated in the previous step. It verifies the session token, and if valid, updates the user's password and marks the session as used.
+        public async Task<string> ResetPassword(string resetSessionToken, string newPassword, string confirmPassword)
+        {
+            if (newPassword != confirmPassword)
+                return "PasswordsNotMatch";
+
+            var tokens = await _unitOfWork.GetRepository<ResetSessionToken>()
+                .GetAllAsync();
+
+            var session = tokens.FirstOrDefault(t =>
+                !t.IsUsed &&
+                t.ExpiryDate > DateTime.UtcNow &&
+                BCrypt.Net.BCrypt.Verify(resetSessionToken, t.TokenHash));
+
+            if (session == null)
+                return "InvalidSession";
+
+            var user = await _userManager.FindByIdAsync(session.UserId);
+
+            if (user == null)
+                return "UserNotFound";
+
+            await _userManager.RemovePasswordAsync(user);
+            var result = await _userManager.AddPasswordAsync(user, newPassword);
+
+            if (!result.Succeeded)
+                return "ErrorResetPassword";
+
+            session.IsUsed = true;
+            _unitOfWork.GetRepository<ResetSessionToken>().Update(session);
+            await _unitOfWork.SaveChangesAsync();
 
             return "Success";
         }
