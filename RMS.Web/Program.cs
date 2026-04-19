@@ -11,6 +11,7 @@ using RMS.Persistence.Data.Contexts;
 using RMS.Persistence.Data.DataSeed;
 using RMS.Persistence.Repositories;
 using RMS.Persistence.Repositries;
+using RMS.Presentation.Hubs;
 using RMS.Services;
 using RMS.Services.BasketService;
 using RMS.Services.BranchServices;
@@ -24,6 +25,7 @@ using RMS.Services.IngredientServices;
 using RMS.Services.KitchenServices;
 using RMS.Services.MappingProfiles;
 using RMS.Services.MenuItemsServices;
+using RMS.Services.NotificationServices;
 using RMS.Services.OrderServices;
 using RMS.Services.RecipeServices;
 using RMS.Services.ReportServices;
@@ -36,6 +38,7 @@ using RMS.ServicesAbstraction.IEmailServices;
 using RMS.ServicesAbstraction.IIdentityService;
 using RMS.ServicesAbstraction.IKitchenServices;
 using RMS.ServicesAbstraction.IUserServices;
+using RMS.ServicesAbstraction.Notifications;
 using RMS.Web.Extensions;
 using StackExchange.Redis;
 using System.Text;
@@ -71,8 +74,9 @@ namespace RMS.Web
 
 
 
-
-
+            builder.Services.AddScoped<INotificationService, NotificationService>();
+            builder.Services.AddScoped<IRealTimeNotifier, RealTimeNotifier>();
+            builder.Services.AddSignalR();
             builder.Services.AddScoped<ICacheService, CacheService>();
             builder.Services.AddScoped<ICacheRepository, CacheRepository>();
             builder.Services.AddScoped<IRecipeService, RecipeService>();
@@ -174,9 +178,10 @@ namespace RMS.Web
                 options.AddPolicy("AllowAll",
                     policy =>
                     {
-                        policy.AllowAnyOrigin()
+                        policy.WithOrigins("http://localhost:4200")
                               .AllowAnyMethod()
-                              .AllowAnyHeader();
+                              .AllowAnyHeader()
+                              .AllowCredentials(); 
                     });
             });
 
@@ -259,6 +264,8 @@ namespace RMS.Web
             app.UseCors("AllowAll");
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.MapHub<NotificationHub>("/hubs/notifications");
 
             app.MapControllers();
 

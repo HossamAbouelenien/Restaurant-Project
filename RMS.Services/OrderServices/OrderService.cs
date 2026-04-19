@@ -6,7 +6,9 @@ using RMS.Services.Specifications.BranchStockSpec;
 using RMS.Services.Specifications.KitchenTicketSpec;
 using RMS.Services.Specifications.MenuItemSpec;
 using RMS.Services.Specifications.OrderSpec;
+using RMS.Services.Specifications.StockSpec;
 using RMS.ServicesAbstraction;
+using RMS.ServicesAbstraction.Notifications;
 using RMS.Shared;
 using RMS.Shared.DTOs.MenuItemsDTOs;
 using RMS.Shared.DTOs.OrderDTOs;
@@ -24,11 +26,13 @@ namespace RMS.Services.OrderServices
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly INotificationService _notificationService;
 
-        public OrderService(IUnitOfWork unitOfWork,IMapper mapper)
+        public OrderService(IUnitOfWork unitOfWork,IMapper mapper, INotificationService notificationService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _notificationService = notificationService;
         }
         public async Task<OrderDTO> CreateOrderAsync(CreateOrderDTO orderDto)
         {
@@ -86,6 +90,9 @@ namespace RMS.Services.OrderServices
             }
             foreach (var (ingredientId, totalRequired) in ingredientConsumption)
             {
+                var ingredientName = await _unitOfWork.GetRepository<Ingredient>().GetByIdAsync(ingredientId) is Ingredient ingredient
+                    ? ingredient.Name
+                    : "Unknown";
                 var StockSpec = new BranchStockWithBranchAndIngredient(orderDto.BranchId, ingredientId);
                 var stock = await _unitOfWork.GetRepository<BranchStock>().GetAllAsync(StockSpec);
 
@@ -128,7 +135,22 @@ namespace RMS.Services.OrderServices
                     }
                     throw new Exception($"{ErrorMessage}");
                 }
+
+                stockItem.QuantityAvailable -= totalRequired;
+
+
+                if (stockItem.QuantityAvailable < stockItem.LowThreshold
+                    && stockItem.QuantityAvailable + totalRequired >= stockItem.LowThreshold)
+                {
+                    await _notificationService.CreateLowStockNotification(
+                        orderDto.BranchId,
+                        ingredientName,
+                        stockItem.QuantityAvailable
+                    );
+                }
             }
+
+            ////////////////////
 
             orderDto.Items = orderItems;
             var order = _mapper.Map<Order>(orderDto);                 
@@ -330,6 +352,9 @@ namespace RMS.Services.OrderServices
                             payment.UpdatedAt = DateTime.Now;
                         }
                     }
+
+                    Dictionary<int, decimal> ingredientConsumption = await CalculateIngredientConsumptionAsync(orderToUpdate.OrderItems, orderToUpdate.BranchId);
+                    await RevertStockForCancelledOrderAsync(ingredientConsumption, orderToUpdate.BranchId);
 
                 }
             }
@@ -599,11 +624,51 @@ namespace RMS.Services.OrderServices
                 }
             }
 
+            Dictionary<int, decimal> ingredientConsumption = await CalculateIngredientConsumptionAsync(orderToCancel.OrderItems, orderToCancel.BranchId);
+            await RevertStockForCancelledOrderAsync(ingredientConsumption, orderToCancel.BranchId);
+
             orderToCancel.UpdatedAt = DateTime.Now;
             var updatedResult = await _unitOfWork.SaveChangesAsync();
             if (!(updatedResult > 0))
                 throw new Exception("Failed to update order status");
             
+        }
+
+        private async Task<Dictionary<int, decimal>> CalculateIngredientConsumptionAsync(IEnumerable<OrderItem> orderItems, int branchId)
+        {
+            var ingredientConsumption = new Dictionary<int, decimal>();
+            var menuItemRepo = _unitOfWork.GetRepository<MenuItem>();
+            foreach (var item in orderItems)
+            {
+                var menuItemSpec = new MenuItemWithBranchStockSpecification(item.MenuItemId);
+                var menuItem = await menuItemRepo.GetByIdAsync(menuItemSpec) ?? throw new Exception("Menu item not found");
+                foreach (var recipe in menuItem.Recipes)
+                {
+                    var totalRequired = recipe.QuantityRequired * item.Quantity;
+                    // Accumulate total required quantity for each ingredient across all items
+                    if (ingredientConsumption.ContainsKey(recipe.IngredientId))
+                        ingredientConsumption[recipe.IngredientId] += totalRequired;
+                    else
+                        ingredientConsumption[recipe.IngredientId] = totalRequired;
+                }
+            }
+            return ingredientConsumption;
+        }
+
+        private async Task RevertStockForCancelledOrderAsync(Dictionary<int, decimal> ingredientConsumption, int branchId)
+        {
+            var stockRepo = _unitOfWork.GetRepository<BranchStock>();
+            foreach (var (ingredientId, quantity) in ingredientConsumption)
+            {
+                var stockSpec = new BranchStockWithBranchAndIngredient(branchId, ingredientId);
+                var stockItems = await stockRepo.GetAllAsync(stockSpec);
+                var stockItem = stockItems.FirstOrDefault();
+                if (stockItem != null)
+                {
+                    stockItem.QuantityAvailable += quantity;
+                   
+                }
+            }
         }
     }
 }
