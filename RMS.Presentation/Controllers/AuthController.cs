@@ -154,6 +154,19 @@ namespace RMS.Presentation.Controllers
 
         }
 
+        // This endpoint is for demonstration purposes. In a real application, the confirmation link would be sent to the user's email.
+
+        [HttpGet("confirm-email")]
+        public async Task<IActionResult> ConfirmEmail(string? userId, string? code)
+        {
+            var result = await _authService.ConfirmEmailAsync(userId, code);
+
+            if (result == "Success")
+                return Ok("Email confirmed successfully");
+
+            return BadRequest("Error confirming email");
+        }
+
 
 
     }

@@ -16,5 +16,7 @@ namespace RMS.ServicesAbstraction.IIdentityService
         Task<UserDTO?> GetCurrentUserAsync(string email);
 
         Task<UserDTO> UpdateCurrentUserAsync(string email, UpdateCurrentUserDTO dto);
+
+        Task<string> ConfirmEmailAsync(string? userId, string? code);
     }
 }
