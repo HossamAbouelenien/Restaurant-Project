@@ -5,7 +5,7 @@ namespace RMS.Services.Specifications.KitchenTicketSpec
 {
     public class KitchenTicketsGroupedByStatusForCurrentBranchSpecification : BaseSpecifications<KitchenTicket>
     {
-        public KitchenTicketsGroupedByStatusForCurrentBranchSpecification(int id) : base(b => b.Id == id)
+        public KitchenTicketsGroupedByStatusForCurrentBranchSpecification(int id) : base(b => b.Id == id && (!b.ConfirmedServed))
         {
             AddInclude(t => t.Order!);
             AddInclude("Order.OrderItems");
@@ -18,7 +18,8 @@ namespace RMS.Services.Specifications.KitchenTicketSpec
             && (!queryParams.OrderId.HasValue || b.OrderId == queryParams.OrderId.Value)
             && (string.IsNullOrEmpty(queryParams.Station) || b.Station == queryParams.Station)
             && (!queryParams.Status.HasValue || b.Status == queryParams.Status.Value)
-        )
+            && (!b.ConfirmedServed))
+        
         {
             
             AddInclude(b => b.Order!);
