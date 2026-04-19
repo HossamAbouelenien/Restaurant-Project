@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using RMS.ServicesAbstraction.Notifications;
+using RMS.ServicesAbstraction.IHubServices.INotificationServices;
 using RMS.Shared.QueryParams;
 using System;
 using System.Collections.Generic;

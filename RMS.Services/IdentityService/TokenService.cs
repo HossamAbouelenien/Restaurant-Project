@@ -32,16 +32,17 @@ namespace RMS.Services.IdentityService
 
         public async Task<string> GenerateJwtTokenAsync(User user)
         {
-            var key = Encoding.ASCII.GetBytes(_configuration.GetSection("JwtSettings")["Secret"]);
+            var key = Encoding.ASCII.GetBytes(_configuration.GetSection("JwtSettings")["Secret"]!);
             var roles = await _userManager.GetRolesAsync(user);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(new[] {
                     new Claim(ClaimTypes.NameIdentifier,user.Id.ToString()),
-                    new Claim(ClaimTypes.Email,user.Email),
+                    new Claim(ClaimTypes.Email,user.Email!),
                     new Claim(ClaimTypes.Name,user.Name),
-                    new Claim(ClaimTypes.Role,roles.FirstOrDefault()),
-                    new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
+                    new Claim(ClaimTypes.Role,roles.FirstOrDefault()!),
+                    new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
+                    new Claim("branchId", user.BranchId.ToString()!)
                 }),
                 Expires = DateTime.Now.AddHours(2),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)

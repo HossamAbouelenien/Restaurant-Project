@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using RMS.ServicesAbstraction.Notifications;
+using RMS.ServicesAbstraction.IHubServices.INotificationServices;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RMS.Presentation.Hubs
+namespace RMS.Presentation.Hubs.Notification
 {
     public class RealTimeNotifier : IRealTimeNotifier
     {

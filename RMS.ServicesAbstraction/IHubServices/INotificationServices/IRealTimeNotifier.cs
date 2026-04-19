@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RMS.ServicesAbstraction.Notifications
+namespace RMS.ServicesAbstraction.IHubServices.INotificationServices
 {
     public interface IRealTimeNotifier
     {
