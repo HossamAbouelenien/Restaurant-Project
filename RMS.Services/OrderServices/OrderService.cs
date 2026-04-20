@@ -228,10 +228,10 @@ namespace RMS.Services.OrderServices
                     }
                 }
                 await _unitOfWork.SaveChangesAsync();
-                var Spec = new OrderWithBranchAndCustomerAndOrderItemsSpecification(order.Id);
+                var Spec = new OrderWithItemsAndPaymentAndDeliveryAndKitchenTicketsSpecification(order.Id);
                 order = await Repo.GetByIdAsync(Spec) ?? throw new Exception("Failed to retrieve created order");
-
-                var orderData = _mapper.Map<OrderDTO>(order);
+                var orderToReturn = _mapper.Map<OrderDTO>(order);
+                var orderData = _mapper.Map<OrderDetailsDTO>(order);
                 await _restaurantNotifier.SendAsync(
                          "OrderCreated",
                          orderData,
@@ -242,7 +242,7 @@ namespace RMS.Services.OrderServices
                                 "admins"
                         );
                 await BranchStockNotifierAsync(ingredientConsumption, orderDto.BranchId);
-                return orderData;
+                return orderToReturn;
             }
 
             throw new Exception("Failed to create order");
@@ -394,9 +394,13 @@ namespace RMS.Services.OrderServices
             if (updatedResult > 0)
             {
                 //return _mapper.Map<OrderDTO>(orderToUpdate);
-                var orderData = _mapper.Map<OrderDTO>(orderToUpdate);
+                var Spec = new OrderWithItemsAndPaymentAndDeliveryAndKitchenTicketsSpecification(orderId);
+                var order = await orderRepo.GetByIdAsync(Spec) ?? throw new Exception("Failed to retrieve created order");
+                var orderToReturn = _mapper.Map<OrderDTO>(order);
+                var orderData = _mapper.Map<OrderDetailsDTO>(order);
+                string EventName = orderToUpdate.Status == OrderStatus.Cancelled ? "OrderCancelled" : "OrderUpdated";
                 await _restaurantNotifier.SendAsync(
-                         "OrderUpdated",
+                         EventName,
                          orderData,
                          $"kitchen_branch_{orderToUpdate.BranchId}",
                                 $"waiters_branch_{orderToUpdate.BranchId}",
@@ -405,7 +409,7 @@ namespace RMS.Services.OrderServices
                                 "admins"
                         );
 
-                return orderData;
+                return orderToReturn;
             }
             else
             {
@@ -563,7 +567,9 @@ namespace RMS.Services.OrderServices
                     }
                 }
                 await _unitOfWork.SaveChangesAsync();
-                var orderData = _mapper.Map<OrderDTO>(order);
+                var Spec = new OrderWithItemsAndPaymentAndDeliveryAndKitchenTicketsSpecification(order.Id);
+                order = await orderRepo.GetByIdAsync(Spec) ?? throw new Exception("Failed to retrieve created order");
+                var orderData = _mapper.Map<OrderDetailsDTO>(order);
                 await _restaurantNotifier.SendAsync(
                          "OrderUpdated",
                          orderData,
@@ -627,7 +633,10 @@ namespace RMS.Services.OrderServices
             if (result > 0)
             //return _mapper.Map<OrderDTO>(order);
             {
-                var orderData = _mapper.Map<OrderDTO>(order);
+                var Spec = new OrderWithItemsAndPaymentAndDeliveryAndKitchenTicketsSpecification(orderId);
+                var theorder = await repo.GetByIdAsync(Spec) ?? throw new Exception("Failed to retrieve created order");
+                var orderToReturn = _mapper.Map<OrderDTO>(theorder);
+                var orderData = _mapper.Map<OrderDetailsDTO>(theorder);
                 await _restaurantNotifier.SendAsync(
                          "OrderUpdated",
                          orderData,
@@ -639,7 +648,7 @@ namespace RMS.Services.OrderServices
                         );
                 await BranchStockNotifierAsync(NewIngredientConsumption, order.BranchId);
 
-                return orderData;
+                return orderToReturn;
             }
 
             else

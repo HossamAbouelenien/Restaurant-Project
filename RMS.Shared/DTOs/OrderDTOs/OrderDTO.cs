@@ -11,6 +11,7 @@ namespace RMS.Shared.DTOs.OrderDTOs
     public class OrderDTO
     {
         public int Id { get; set; } = default!;
+        public int BranchId { get; set; }
         public string BranchName { get; set; }=default!;
         public string UserId { get; set; } = default!;
         public string UserName { get; set; } = default!;

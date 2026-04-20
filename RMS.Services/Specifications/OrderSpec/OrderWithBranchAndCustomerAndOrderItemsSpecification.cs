@@ -33,6 +33,8 @@ namespace RMS.Services.Specifications.OrderSpec
             AddInclude(o => o.Payment!);
             //AddInclude("Customer.Role");
 
+            AddOrderByDescending(o => o.CreatedAt);
+
         }
 
         public OrderWithBranchAndCustomerAndOrderItemsSpecification(OrderQueryParams queryParams, string customerId)
@@ -45,6 +47,7 @@ namespace RMS.Services.Specifications.OrderSpec
             AddInclude("OrderItems.MenuItem");
             AddInclude("TableOrder.Table");
             //AddInclude("Customer.Role");
+            AddOrderByDescending(o => o.CreatedAt);
 
 
         }

@@ -142,6 +142,12 @@ namespace RMS.Web
                                 context.Token = accessToken;
                             }
 
+                            if (!string.IsNullOrEmpty(accessToken) &&
+                                path.StartsWithSegments("/hubs/restaurant"))
+                            {
+                                context.Token = accessToken;
+                            }
+
                             return Task.CompletedTask;
                         }
                     };
