@@ -31,12 +31,12 @@ namespace RMS.Services.OrderServices
         private readonly INotificationService _notificationService;
         private readonly IRestaurantNotifier _restaurantNotifier;
 
-        public OrderService(IUnitOfWork unitOfWork,IMapper mapper, INotificationService notificationService, IRestaurantNotifier restaurantNotifier)
+        public OrderService(IUnitOfWork unitOfWork, IMapper mapper, INotificationService notificationService, IRestaurantNotifier restaurantNotifier)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _notificationService = notificationService;
-            _restaurantNotifier = restaurantNotifier;   
+            _restaurantNotifier = restaurantNotifier;
         }
         public async Task<OrderDTO> CreateOrderAsync(CreateOrderDTO orderDto)
         {
@@ -90,7 +90,7 @@ namespace RMS.Services.OrderServices
                     else
                         ingredientConsumption[recipe.IngredientId] = totalRequired;
                 }
-                orderItems.Add(new CreateOrderItemDTO { MenuItemId = menuItem.Id, Quantity = item.Quantity, UnitPrice = menuItem.Price, Notes=item.Notes}); 
+                orderItems.Add(new CreateOrderItemDTO { MenuItemId = menuItem.Id, Quantity = item.Quantity, UnitPrice = menuItem.Price, Notes = item.Notes });
             }
             foreach (var (ingredientId, totalRequired) in ingredientConsumption)
             {
@@ -164,7 +164,7 @@ namespace RMS.Services.OrderServices
             ////////////////////
 
             orderDto.Items = orderItems;
-            var order = _mapper.Map<Order>(orderDto);                 
+            var order = _mapper.Map<Order>(orderDto);
             order.TotalAmount = orderItems.Sum(i => i.Quantity * i.UnitPrice);
 
             order.Payment = new Payment
@@ -230,7 +230,7 @@ namespace RMS.Services.OrderServices
                 await _unitOfWork.SaveChangesAsync();
                 var Spec = new OrderWithBranchAndCustomerAndOrderItemsSpecification(order.Id);
                 order = await Repo.GetByIdAsync(Spec) ?? throw new Exception("Failed to retrieve created order");
-               
+
                 var orderData = _mapper.Map<OrderDTO>(order);
                 await _restaurantNotifier.SendAsync(
                          "OrderCreated",
@@ -241,7 +241,10 @@ namespace RMS.Services.OrderServices
                                 $"customers_id_{orderDto.UserId}",
                                 "admins"
                         );
+                await BranchStockNotifierAsync(ingredientConsumption, orderDto.BranchId);
+                return orderData;
             }
+
             throw new Exception("Failed to create order");
         }
 
@@ -261,9 +264,9 @@ namespace RMS.Services.OrderServices
         public async Task<OrderDetailsDTO> GetOrderByIdAsync(int id)
 
         {
-        var repo = _unitOfWork.GetRepository<Order>();
+            var repo = _unitOfWork.GetRepository<Order>();
             var spec = new OrderWithItemsAndPaymentAndDeliveryAndKitchenTicketsSpecification(id);
-        var order = await repo.GetByIdAsync(spec) ?? throw new Exception("Order not found");
+            var order = await repo.GetByIdAsync(spec) ?? throw new Exception("Order not found");
             if (order == null) throw new Exception("order is not found");
             var orderDetailsDto = _mapper.Map<OrderDetailsDTO>(order);
 
@@ -362,9 +365,9 @@ namespace RMS.Services.OrderServices
                         {
                             delivery.IsDeleted = true;
                             delivery.DeletedAt = DateTime.Now;
-                        }   
+                        }
                     }
-                    if(orderToUpdate.Payment is not null)
+                    if (orderToUpdate.Payment is not null)
                     {
                         var payment = await _unitOfWork.GetRepository<Payment>().GetByIdAsync(orderToUpdate.Payment.Id);
                         if (payment is not null && payment.PaymentStatus == PaymentStatus.Paid)
@@ -376,6 +379,9 @@ namespace RMS.Services.OrderServices
 
                     Dictionary<int, decimal> ingredientConsumption = await CalculateIngredientConsumptionAsync(orderToUpdate.OrderItems, orderToUpdate.BranchId);
                     await RevertStockForCancelledOrderAsync(ingredientConsumption, orderToUpdate.BranchId);
+                    await _unitOfWork.SaveChangesAsync();
+                    await BranchStockNotifierAsync(ingredientConsumption, orderToUpdate.BranchId);
+
 
                 }
             }
@@ -461,7 +467,7 @@ namespace RMS.Services.OrderServices
                     throw new Exception($"Ingredient ID {ingredientId} not found in branch");
 
                 var remainingStock = stockItem.QuantityAvailable - OldIngredientConsumption.GetValueOrDefault(ingredientId, 0);
-
+                stockItem.QuantityAvailable -= totalRequired;
                 if (remainingStock < totalRequired)
                 {
                     // Build detailed error message showing how many of each menu item can be ordered based on the limiting ingredient
@@ -528,7 +534,7 @@ namespace RMS.Services.OrderServices
                     UnitPrice = menuItem.Price,
                     Notes = item.Notes
                 });
-                    order.TotalAmount += item.Quantity * menuItem.Price ;
+                order.TotalAmount += item.Quantity * menuItem.Price;
             }
 
             var addedItemsDto = new AddedItemsDTO
@@ -540,8 +546,8 @@ namespace RMS.Services.OrderServices
             var result = await _unitOfWork.SaveChangesAsync();
             if (result > 0)
             {
-                
-                
+
+
                 foreach (var item in items)
                 {
                     var menuItemSpec = new MenuItemWithBranchStockSpecification(item.MenuItemId);
@@ -567,6 +573,8 @@ namespace RMS.Services.OrderServices
                                 $"customers_id_{order.UserId}",
                                 "admins"
                         );
+                await BranchStockNotifierAsync(NewIngredientConsumption, order.BranchId);
+
                 return addedItemsDto;
             }
             else
@@ -585,10 +593,10 @@ namespace RMS.Services.OrderServices
             if (order.Status != OrderStatus.Received) throw new Exception("Order is not in a state that allows item removal");
             var orderItemSpec = new OrderItemWithCategorySpecification(itemId);
             var orderItemRepo = _unitOfWork.GetRepository<OrderItem>();
-            var orderItem = await orderItemRepo.GetByIdAsync(orderItemSpec);           
-            if(orderItem is null || orderItem.OrderId != orderId) throw new Exception("Order item not found in order");
+            var orderItem = await orderItemRepo.GetByIdAsync(orderItemSpec);
+            if (orderItem is null || orderItem.OrderId != orderId) throw new Exception("Order item not found in order");
             order.OrderItems.Remove(orderItem);
-            if(!order.OrderItems.Any()) throw new Exception("Cannot remove all items from order. Consider cancelling the order instead.");
+            if (!order.OrderItems.Any()) throw new Exception("Cannot remove all items from order. Consider cancelling the order instead.");
             var newCategories = new HashSet<string>();
             foreach (var item in order.OrderItems)
             {
@@ -604,10 +612,15 @@ namespace RMS.Services.OrderServices
                 var ticketToRemove = tickets.FirstOrDefault(t => t.Station == orderItem.MenuItem.Category!.Name);
                 if (ticketToRemove != null)
                 {
-                     kitchenTicketRepo.Remove(ticketToRemove);
+                    kitchenTicketRepo.Remove(ticketToRemove);
                 }
             }
 
+            var NewIngredientConsumption = new Dictionary<int, decimal>();
+
+            var removedItems = new List<OrderItem> { orderItem };
+            NewIngredientConsumption = await CalculateIngredientConsumptionAsync(removedItems, order.BranchId);
+            await RevertStockForCancelledOrderAsync (NewIngredientConsumption, order.BranchId);
             order.TotalAmount -= orderItem.Quantity * orderItem.UnitPrice;
             order.UpdatedAt = DateTime.Now;
             var result = await _unitOfWork.SaveChangesAsync();
@@ -624,16 +637,18 @@ namespace RMS.Services.OrderServices
                                 $"customers_id_{order.UserId}",
                                 "admins"
                         );
+                await BranchStockNotifierAsync(NewIngredientConsumption, order.BranchId);
+
                 return orderData;
             }
-                
+
             else
                 throw new Exception("Failed to remove items from order");
         }
 
         public async Task CancelOrderAsync(int orderId)
         {
-            
+
             // Get order to cancel
             var orderRepo = _unitOfWork.GetRepository<Order>();
             var orderSpec = new OrderWithTableOrderAndBranchAndCustomerAndOrderItemsSpecification(orderId);
@@ -700,6 +715,8 @@ namespace RMS.Services.OrderServices
                             $"customers_id_{orderToCancel.UserId}",
                             "admins"
                     );
+            await BranchStockNotifierAsync(ingredientConsumption, orderToCancel.BranchId);
+
         }
 
         private async Task<Dictionary<int, decimal>> CalculateIngredientConsumptionAsync(IEnumerable<OrderItem> orderItems, int branchId)
@@ -734,7 +751,27 @@ namespace RMS.Services.OrderServices
                 if (stockItem != null)
                 {
                     stockItem.QuantityAvailable += quantity;
-                   
+
+                }
+            }
+        }
+
+
+        private async Task BranchStockNotifierAsync(Dictionary<int, decimal> ingredientConsumption, int branchId)
+        {
+            var stockRepo = _unitOfWork.GetRepository<BranchStock>();
+            foreach (var (ingredientId, quantity) in ingredientConsumption)
+            {
+                var stockSpec = new BranchStockWithBranchAndIngredient(branchId, ingredientId);
+                var stockItems = await stockRepo.GetAllAsync(stockSpec);
+                var stockItem = stockItems.FirstOrDefault();
+                if (stockItem != null)
+                {
+                    await _restaurantNotifier.SendAsync(
+                        "BranchStockUpdated",
+                        stockItem,
+                        $"kitchen_branch_{branchId}",
+                        "admins");
                 }
             }
         }
