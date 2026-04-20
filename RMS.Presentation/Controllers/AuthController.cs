@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using RMS.Domain.Entities;
 using RMS.ServicesAbstraction.IIdentityService;
 using RMS.Shared.DTOs.IdentityDTOs;
@@ -10,9 +11,10 @@ namespace RMS.Presentation.Controllers
 {
     [ApiController]
     [Route("api/[Controller]")]
-    public class AuthController(IAuthService authService) : ControllerBase
+    public class AuthController(IAuthService authService, ILogger<AuthController> logger) : ControllerBase
     {
         private readonly IAuthService _authService = authService;
+        private readonly ILogger<AuthController> _logger = logger;
 
         [HttpPost("register")]
         public async Task<ActionResult<UserDTO>> Register([FromBody] RegisterationRequestDTO registerationRequestDTO)
@@ -21,6 +23,9 @@ namespace RMS.Presentation.Controllers
             {
                 if (registerationRequestDTO == null)
                 {
+                    // Test Log the error for debugging purposes
+                    _logger.LogInformation("Registeration data is required");
+
                     return BadRequest("Registeration data is required");
                 }
 
@@ -48,6 +53,7 @@ namespace RMS.Presentation.Controllers
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, new
                 {
+
                     Message = "An error occurred during registration",
                     Error = ex.Message
                 });
@@ -152,6 +158,54 @@ namespace RMS.Presentation.Controllers
             var updatedUser = await _authService.UpdateCurrentUserAsync(email, dto);
             return Ok(updatedUser);
 
+        }
+
+        // This endpoint is for demonstration purposes. In a real application, the confirmation link would be sent to the user's email.
+
+        [HttpGet("confirm-email")]
+        public async Task<IActionResult> ConfirmEmail(string? userId, string? code)
+        {
+            var result = await _authService.ConfirmEmailAsync(userId, code);
+
+            if (result == "Success")
+                return Ok("Email confirmed successfully");
+
+            return BadRequest("Error confirming email");
+        }
+
+        // This endpoint is for demonstration purposes. In a real application, the reset code would be sent to the user's email. 
+        [HttpPost("send-reset-code")]
+        public async Task<IActionResult> SendResetCode(string email)
+        {
+            var result = await _authService.SendResetPasswordCode(email);
+            return Ok(result);
+        }
+
+        // This endpoint is for demonstration purposes. In a real application, the verification would be done through a link in the user's email.
+        [HttpPost("verify-reset-code")]
+        public async Task<IActionResult> VerifyCode(string code)
+        {
+            var result = await _authService.VerifyResetCode(code);
+
+            if (result.result != "Valid")
+                return BadRequest(result.result);
+
+            return Ok(new { resetSessionToken = result.resetSessionToken });
+        }
+
+        // This endpoint is for demonstration purposes. In a real application, the reset session token would be validated and used to identify the user for password reset.
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword(ResetPasswordDTO dto)
+        {
+            var result = await _authService.ResetPassword(
+                dto.ResetSessionToken,
+                dto.NewPassword,
+                dto.ConfirmPassword);
+
+            if (result != "Success")
+                return BadRequest(result);
+
+            return Ok(result);
         }
 
 

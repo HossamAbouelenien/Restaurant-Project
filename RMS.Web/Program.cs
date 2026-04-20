@@ -43,6 +43,8 @@ using RMS.ServicesAbstraction.IIdentityService;
 using RMS.ServicesAbstraction.IKitchenServices;
 using RMS.ServicesAbstraction.IUserServices;
 using RMS.Web.Extensions;
+using Serilog;
+using Serilog.Context;
 using StackExchange.Redis;
 using System.Security.Claims;
 using System.Text;
@@ -182,7 +184,10 @@ namespace RMS.Web
             builder.Services.AddScoped<IDeliveryService, DeliveryService>();
             builder.Services.AddScoped<IEmailService, EmailService>();
 
-
+            builder.Host.UseSerilog((context, services, configuration) =>
+            {
+                configuration.ReadFrom.Configuration(context.Configuration);
+            });
 
 
 
@@ -284,6 +289,24 @@ namespace RMS.Web
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCors("AllowAll");
+
+            app.Use(async (context, next) =>
+            {
+                var correlationId = Guid.NewGuid().ToString();
+
+                context.Items["CorrelationId"] = correlationId;
+
+                LogContext.PushProperty("CorrelationId", correlationId);
+
+                await next();
+            });
+
+            app.UseSerilogRequestLogging(options =>
+            {
+                options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms";
+            });
+
+
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapHub<RestaurantHub>("/hubs/restaurant");
