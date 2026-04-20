@@ -37,6 +37,13 @@ namespace RMS.Services.ReportServices
                             o.CreatedAt < tomorrow &&
                             o.Status != OrderStatus.Cancelled)
                 .ToList();
+            var branchStocks = await _unitOfWork
+                .GetRepository<BranchStock>() 
+                .GetAllAsync();
+            if (branchStocks == null)
+                throw new Exception("Failed to retrieve branch stock");
+            var lowStockCount = branchStocks
+                .Count(bs => bs.QuantityAvailable < bs.LowThreshold);
 
             return new DashboardDTO
             {
@@ -44,7 +51,9 @@ namespace RMS.Services.ReportServices
                 TotalRevenueToday = todayOrders.Sum(o => o.TotalAmount),
                 AvgOrderValueToday = todayOrders.Any()
                     ? todayOrders.Average(o => o.TotalAmount)
-                    : 0
+                    : 0,
+                LowStockIngredientsCount = lowStockCount
+
             };
         }
         public async Task<OrdersByTypeDTO> GetOrdersByTypeAsync()
