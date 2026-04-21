@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+
 using System.Threading.Tasks;
 
 namespace RMS.Services.IngredientServices
@@ -21,16 +22,12 @@ namespace RMS.Services.IngredientServices
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private readonly IStringLocalizer<SharedResources> _stringLocalizer;
 
-        public IngredientService(
-                                IUnitOfWork unitOfWork , 
-                                IMapper mapper ,
-                                IStringLocalizer<SharedResources> stringLocalizer)
+        public IngredientService(IUnitOfWork unitOfWork ,IMapper mapper )
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
-            _stringLocalizer = stringLocalizer;
+            
         }
 
         // Get all Ingredients
@@ -59,7 +56,7 @@ namespace RMS.Services.IngredientServices
             var ingerdient = await _unitOfWork.GetRepository<Ingredient>().GetByIdAsync(id);
 
             if(ingerdient == null)
-                throw new Exception(_stringLocalizer[SharedResourcesKeys.NotFound]);
+                throw new Exception(SharedResourcesKeys.NotFound);
 
             var result = _mapper.Map<IngredientDTO>(ingerdient);
             return result;
@@ -70,12 +67,12 @@ namespace RMS.Services.IngredientServices
             var repo =  _unitOfWork.GetRepository<Ingredient>();
 
             if (string.IsNullOrWhiteSpace(dto.Name))
-                throw new Exception(_stringLocalizer[SharedResourcesKeys.Required]);
+                throw new Exception("Required");
 
             var existing = await repo.GetAllAsync();
 
             if (existing.Any(i => i.Name.ToLower() == dto.Name.ToLower()))
-                throw new Exception(_stringLocalizer[SharedResourcesKeys.AlreadyExists]);
+                throw new Exception(SharedResourcesKeys.AlreadyExists);
 
             var ingredient = _mapper.Map<Ingredient>(dto);
 
@@ -113,12 +110,12 @@ namespace RMS.Services.IngredientServices
             _mapper.Map(updateIngredientDTO, ingredient);
 
             if (string.IsNullOrWhiteSpace(updateIngredientDTO.Name))
-                throw new Exception(_stringLocalizer[SharedResourcesKeys.Required]);
+                throw new Exception(SharedResourcesKeys.NotFound);
 
             var existing = await repo.GetAllAsync();
 
             if (existing.Any(i => i.Name.ToLower() == updateIngredientDTO.Name.ToLower()))
-                throw new Exception(_stringLocalizer[SharedResourcesKeys.AlreadyExists]);
+                throw new Exception(SharedResourcesKeys.AlreadyExists);
 
             repo.Update(ingredient!);
 

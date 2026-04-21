@@ -9,6 +9,7 @@ using RMS.Domain.Entities;
 using RMS.Services.Specifications.CategorySpec;
 using RMS.ServicesAbstraction.ICategoriesService;
 using RMS.Shared.DTOs.CategoryDTOs;
+using RMS.Shared.SharedResources;
 
 namespace RMS.Services.CategoryServices
 {
@@ -51,7 +52,7 @@ namespace RMS.Services.CategoryServices
 
             if(string.IsNullOrEmpty(DTO.Name))
             {
-                throw new Exception("Category name is required");
+                throw new Exception(SharedResourcesKeys.Required);
             }
 
             var repository = _unitOfWork.GetRepository<Category>();
@@ -60,7 +61,7 @@ namespace RMS.Services.CategoryServices
 
             if (ExitingCategories.Any(C => C.Name.ToLower() == DTO.Name.ToLower()))
             {
-                throw new Exception("Category already exists");
+                throw new Exception(SharedResourcesKeys.AlreadyExists);
             }
 
             var Category = _mapper.Map<Category>(DTO);
@@ -84,7 +85,7 @@ namespace RMS.Services.CategoryServices
 
             if(Category == null || Category.IsDeleted)
             {
-                throw new Exception("Category not found");
+                throw new Exception(SharedResourcesKeys.NotFound);
             }
 
             _mapper.Map(DTO,Category);
@@ -110,12 +111,12 @@ namespace RMS.Services.CategoryServices
 
             if(Category == null || Category.IsDeleted)
             {
-                throw new Exception("Category not found");
+                throw new Exception(SharedResourcesKeys.NotFound);
             }
 
             if (Category.MenuItems.Any())
             {
-                throw new Exception("Category cannot be deleted because it has menu items");
+                throw new Exception(SharedResourcesKeys.DeleteCategoryWithMenuItems);
             }
 
             Category.IsDeleted = true;
