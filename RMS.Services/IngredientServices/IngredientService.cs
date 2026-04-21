@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.Localization;
 using RMS.Domain.Contracts;
 using RMS.Domain.Entities;
 using RMS.Services.Specifications;
@@ -7,6 +8,7 @@ using RMS.ServicesAbstraction;
 using RMS.Shared;
 using RMS.Shared.DTOs.BranchStockDTOs;
 using RMS.Shared.DTOs.IngredientDTOs;
+using RMS.Shared.SharedResources;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,10 +21,16 @@ namespace RMS.Services.IngredientServices
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        public IngredientService(IUnitOfWork unitOfWork , IMapper mapper)
+        private readonly IStringLocalizer<SharedResources> _stringLocalizer;
+
+        public IngredientService(
+                                IUnitOfWork unitOfWork , 
+                                IMapper mapper ,
+                                IStringLocalizer<SharedResources> stringLocalizer)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _stringLocalizer = stringLocalizer;
         }
 
         // Get all Ingredients
@@ -49,6 +57,10 @@ namespace RMS.Services.IngredientServices
         public async Task<IngredientDTO> GetIngredientByIdAsync(int id)
         {
             var ingerdient = await _unitOfWork.GetRepository<Ingredient>().GetByIdAsync(id);
+
+            if(ingerdient == null)
+                throw new Exception(_stringLocalizer[SharedResourcesKeys.NotFound]);
+
             var result = _mapper.Map<IngredientDTO>(ingerdient);
             return result;
         }
@@ -58,26 +70,36 @@ namespace RMS.Services.IngredientServices
             var repo =  _unitOfWork.GetRepository<Ingredient>();
 
             if (string.IsNullOrWhiteSpace(dto.Name))
-                throw new Exception("Ingredient name is required");
+                throw new Exception(_stringLocalizer[SharedResourcesKeys.Required]);
 
             var existing = await repo.GetAllAsync();
+
             if (existing.Any(i => i.Name.ToLower() == dto.Name.ToLower()))
-                throw new Exception("Ingredient already exists");
+                throw new Exception(_stringLocalizer[SharedResourcesKeys.AlreadyExists]);
 
             var ingredient = _mapper.Map<Ingredient>(dto);
+
             await repo.AddAsync(ingredient);
+
             await _unitOfWork.SaveChangesAsync();
+
             return _mapper.Map<IngredientDTO>(ingredient);
         }
 
         public async Task DeleteIngredientAsync(int id)
         {
             var repo = _unitOfWork.GetRepository<Ingredient>();
+
             var ingredient = await repo.GetByIdAsync(id);
+
             if (ingredient is null) return;
+
             ingredient.IsDeleted = true;
+
             ingredient.DeletedAt = DateTime.UtcNow;
+
             repo.Update(ingredient);
+
             await _unitOfWork.SaveChangesAsync();
 
         }
@@ -90,14 +112,16 @@ namespace RMS.Services.IngredientServices
             var ingredient = await repo.GetByIdAsync(id);
             _mapper.Map(updateIngredientDTO, ingredient);
 
-            //if (string.IsNullOrWhiteSpace(updateIngredientDTO.Name))
-            //    throw new Exception("Ingredient name is required");
+            if (string.IsNullOrWhiteSpace(updateIngredientDTO.Name))
+                throw new Exception(_stringLocalizer[SharedResourcesKeys.Required]);
 
-            //var existing = await repo.GetAllAsync();
-            //if (existing.Any(i => i.Name.ToLower() == updateIngredientDTO.Name.ToLower()))
-            //    throw new Exception("Ingredient already exists");
+            var existing = await repo.GetAllAsync();
+
+            if (existing.Any(i => i.Name.ToLower() == updateIngredientDTO.Name.ToLower()))
+                throw new Exception(_stringLocalizer[SharedResourcesKeys.AlreadyExists]);
 
             repo.Update(ingredient!);
+
             ingredient.UpdatedAt = DateTime.UtcNow;
             await _unitOfWork.SaveChangesAsync();
             
