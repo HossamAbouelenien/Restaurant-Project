@@ -30,6 +30,7 @@ public class User : IdentityUser
 
     public ICollection<Delivery> Deliveries { get; set; } = new List<Delivery>();
     public ICollection<Address> Addresses{ get; set; } = new List<Address>();
+    public ICollection<UserProvider> Providers { get; set; } = new HashSet<UserProvider>();
 
 
 }

@@ -1,5 +1,6 @@
 ﻿using RMS.Shared.DTOs.IdentityDTOs;
 using RMS.Shared.DTOs.UserDTOs;
+using System.Security.Claims;
 
 namespace RMS.ServicesAbstraction.IIdentityService
 {
@@ -21,6 +22,7 @@ namespace RMS.ServicesAbstraction.IIdentityService
         Task<string> SendResetPasswordCode(string email);
         Task<(string result, string? resetSessionToken)> VerifyResetCode(string code);
         Task<string> ResetPassword(string resetSessionToken, string newPassword, string confirmPassword);
+        Task<TokenDTO?> ExternalLoginAsync(ClaimsPrincipal principal, string provider);
 
     }
 }

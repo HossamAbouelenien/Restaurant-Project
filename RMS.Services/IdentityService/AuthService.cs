@@ -5,10 +5,12 @@ using Microsoft.Extensions.Configuration;
 using RMS.Domain.Contracts;
 using RMS.Domain.Entities;
 using RMS.Services.EmailServices;
+using RMS.Services.Specifications.IdentitySpec;
 using RMS.ServicesAbstraction.IEmailServices;
 using RMS.ServicesAbstraction.IIdentityService;
 using RMS.Shared.DTOs.IdentityDTOs;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Security.Cryptography;
 
 namespace RMS.Services.IdentityService
@@ -349,6 +351,95 @@ namespace RMS.Services.IdentityService
             await _unitOfWork.SaveChangesAsync();
 
             return "Success";
+        }
+
+        // This method handles external login using a third-party provider (e.g., Google, Facebook). It checks if the user already exists based on the provider information, and if not, it creates a new user and associates it with the provider. Finally, it generates a JWT token for the user.
+        public async Task<TokenDTO?> ExternalLoginAsync(ClaimsPrincipal principal, string provider)
+        {
+            try
+            {
+                var email = principal.FindFirst(ClaimTypes.Email)?.Value;
+                var name = principal.FindFirst(ClaimTypes.Name)?.Value;
+                var providerId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if (string.IsNullOrEmpty(providerId))
+                    return null;
+
+                
+                var repo = _unitOfWork.GetRepository<UserProvider>();
+                var spec = new UserProviderByProviderSpec(provider, providerId);
+                var userProvider = await repo.GetByIdAsync(spec);
+
+                User user;
+
+                if (userProvider != null)
+                {
+                    user = userProvider.User;
+                }
+                else
+                {
+                    user = null;
+
+                    if (!string.IsNullOrEmpty(email))
+                    {
+                        user = await _userManager.FindByEmailAsync(email);
+                    }
+
+                    if (user == null)
+                    {
+                        user = new User
+                        {
+                            Email = email,
+                            Name = name,
+                            UserName = email ?? Guid.NewGuid().ToString(),
+                            EmailConfirmed = true,
+                            RoleId = "Customer"
+                        };
+
+                        var createResult = await _userManager.CreateAsync(user);
+
+                        if (!createResult.Succeeded)
+                            throw new Exception(string.Join(", ", createResult.Errors.Select(e => e.Description)));
+
+                        if (!await _roleManager.RoleExistsAsync("Customer"))
+                            await _roleManager.CreateAsync(new IdentityRole("Customer"));
+
+                        await _userManager.AddToRoleAsync(user, "Customer");
+                    }
+
+                    var newProvider = new UserProvider
+                    {
+                        Provider = provider,
+                        ProviderId = providerId,
+                        UserId = user.Id
+                    };
+
+                    await _unitOfWork.GetRepository<UserProvider>().AddAsync(newProvider);
+                    await _unitOfWork.SaveChangesAsync();
+                }
+
+                var token = await _tokenService.GenerateJwtTokenAsync(user);
+
+                var handler = new JwtSecurityTokenHandler();
+                var jwt = handler.ReadJwtToken(token);
+                var jti = jwt.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Jti)?.Value;
+
+                var refreshToken = await _tokenService.GenerateRefreshTokenAsync();
+                var expiry = DateTime.UtcNow.AddDays(7);
+
+                await _tokenService.SaveRefreshTokenAsync(user.Id, jti, refreshToken, expiry);
+
+                return new TokenDTO
+                {
+                    AccessToken = token,
+                    RefreshToken = refreshToken,
+                    ExpiresAt = jwt.ValidTo
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException("External login failed", ex);
+            }
         }
     }
 }
