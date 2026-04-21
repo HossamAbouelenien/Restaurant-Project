@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
@@ -47,6 +48,7 @@ using RMS.Web.Extensions;
 using Serilog;
 using Serilog.Context;
 using StackExchange.Redis;
+using System.Globalization;
 using System.Security.Claims;
 using System.Text;
 namespace RMS.Web
@@ -56,7 +58,7 @@ namespace RMS.Web
         public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            
+
             // Add services to the container.
 
             builder.Services.AddControllers();
@@ -247,14 +249,14 @@ namespace RMS.Web
                         policy.WithOrigins("http://localhost:4200")
                               .AllowAnyMethod()
                               .AllowAnyHeader()
-                              .AllowCredentials(); 
+                              .AllowCredentials();
                     });
             });
 
 
 
 
-            builder.Services.AddScoped<ICategoryService,CategoryService>();
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
             builder.Services.AddScoped<IBasketRepository, BasketRepository>();
             builder.Services.AddScoped<IBasketService, BasketService>();
 
@@ -305,9 +307,32 @@ namespace RMS.Web
 
             //=====================================================
 
+            #region Localization
+            builder.Services.AddControllersWithViews();
+            builder.Services.AddLocalization(opt =>
+            {
+                opt.ResourcesPath = "Resources";
+            });
+
+            builder.Services.Configure<RequestLocalizationOptions>(options =>
+            {
+                List<CultureInfo> supportedCultures = new List<CultureInfo>
+                {
+                    new CultureInfo("en-US"),
+                    new CultureInfo("ar-EG"),
+                    new CultureInfo("fr-FR"),
+                    new CultureInfo("en-GB")
+                };
+
+                options.DefaultRequestCulture = new RequestCulture("ar-EG");
+                options.SupportedCultures = supportedCultures;
+                options.SupportedUICultures = supportedCultures;
+            });
 
 
 
+
+            #endregion
 
             var app = builder.Build();
 
@@ -317,6 +342,11 @@ namespace RMS.Web
             await app.SeedDatabaseAsync();
 
             #endregion Data Seeding
+
+            #region Localization Middleware
+            var options = app.Services.GetService<IOptions<RequestLocalizationOptions>>();
+            app.UseRequestLocalization(options.Value);
+            #endregion
 
             // Configure the HTTP request pipeline.
             //if (app.Environment.IsDevelopment())
