@@ -433,7 +433,7 @@ namespace RMS.Services.IdentityService
                 {
                     AccessToken = token,
                     RefreshToken = refreshToken,
-                    ExpiresAt = jwt.ValidTo
+                    ExpiresAt = jwt.ValidTo.ToUniversalTime()
                 };
             }
             catch (Exception ex)

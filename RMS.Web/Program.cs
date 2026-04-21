@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -111,24 +112,43 @@ namespace RMS.Web
             builder.Services.AddScoped<IAuthService, AuthService>();
 
             var key = builder.Configuration.GetValue<string>("JwtSettings:Secret");
+            
             builder.Services.AddAuthentication(options =>
             {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             })
-                .AddCookie()
-                .AddGoogle(options =>
+           
+            .AddCookie(options =>                         
+            {
+                options.Cookie.SameSite = SameSiteMode.Lax;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.None;
+                options.Cookie.HttpOnly = true;
+                
+            })
+             .AddGoogle(options =>
+             {
+                 options.ClientId = builder.Configuration["Authentication:Google:ClientId"]!;
+                 options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]!;
+                 options.CallbackPath = "/signin-google";
+                 options.SignInScheme = IdentityConstants.ExternalScheme; 
+             })
+            .AddFacebook(options =>
+            {
+                options.AppId = builder.Configuration["Authentication:Facebook:AppId"]!;
+                options.AppSecret = builder.Configuration["Authentication:Facebook:AppSecret"]!;
+                options.CallbackPath = "/signin-facebook";
+                options.SignInScheme = IdentityConstants.ExternalScheme; 
+                options.Fields.Add("email");
+                options.Fields.Add("name");
+
+                options.Events.OnRemoteFailure = context =>
                 {
-                    options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
-                    options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
-                })
-                .AddFacebook(options =>
-                {
-                    options.AppId = builder.Configuration["Authentication:Facebook:AppId"];
-                    options.AppSecret = builder.Configuration["Authentication:Facebook:AppSecret"];
-                    options.CallbackPath = "/signin-google";
-                    options.CallbackPath = "/signin-facebook";
-                })
+                    context.HandleResponse();
+                    context.Response.Redirect("/api/auth/external-cancelled");
+                    return Task.CompletedTask;
+                };
+            })
                  .AddJwtBearer(x =>
                 {
                     x.RequireHttpsMetadata = false;
@@ -136,7 +156,7 @@ namespace RMS.Web
                     x.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuerSigningKey = true,
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(key)),
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(key!)),
                         ValidateIssuer = false,
                         ValidateAudience = false,
                         RoleClaimType = ClaimTypes.Role
