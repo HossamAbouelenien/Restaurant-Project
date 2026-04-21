@@ -1,11 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using RMS.Domain.Entities;
 using RMS.ServicesAbstraction.IIdentityService;
 using RMS.Shared.DTOs.IdentityDTOs;
+using System.Net;
 using System.Security.Claims;
 
 namespace RMS.Presentation.Controllers
@@ -215,6 +218,13 @@ namespace RMS.Presentation.Controllers
         [HttpGet("external-login")]
         public IActionResult ExternalLogin(string provider)
         {
+            var normalizedProvider = provider?.Trim();
+
+           
+            var supportedProviders = new[] { "Google", "Facebook" };
+            if (!supportedProviders.Contains(normalizedProvider, StringComparer.OrdinalIgnoreCase))
+                return BadRequest("Unsupported provider");
+
             var redirectUrl = Url.Action(nameof(ExternalLoginCallback), new { provider });
 
             var properties = new AuthenticationProperties
@@ -225,13 +235,19 @@ namespace RMS.Presentation.Controllers
             return Challenge(properties, provider);
         }
 
+
         [HttpGet("external-callback")]
         public async Task<IActionResult> ExternalLoginCallback([FromQuery] string provider)
         {
-            var authenticateResult = await HttpContext.AuthenticateAsync();
+            var authenticateResult = await HttpContext.AuthenticateAsync(
+                IdentityConstants.ExternalScheme
+            );
 
             if (!authenticateResult.Succeeded)
                 return BadRequest("OAuth failed");
+
+            
+            await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
 
             var result = await _authService.ExternalLoginAsync(
                 authenticateResult.Principal,
@@ -244,6 +260,11 @@ namespace RMS.Presentation.Controllers
             return Ok(result);
         }
 
+        [HttpGet("external-cancelled")]
+        public IActionResult ExternalCancelled()
+        {
+            return Ok(new { message = "Login was cancelled by the user." });
+        }
 
         #endregion
 
