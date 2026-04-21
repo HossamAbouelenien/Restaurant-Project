@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -208,6 +209,43 @@ namespace RMS.Presentation.Controllers
             return Ok(result);
         }
 
+
+        #region  External Login (Google / Facebook)
+
+        [HttpGet("external-login")]
+        public IActionResult ExternalLogin(string provider)
+        {
+            var redirectUrl = Url.Action(nameof(ExternalLoginCallback), new { provider });
+
+            var properties = new AuthenticationProperties
+            {
+                RedirectUri = redirectUrl
+            };
+
+            return Challenge(properties, provider);
+        }
+
+        [HttpGet("external-callback")]
+        public async Task<IActionResult> ExternalLoginCallback([FromQuery] string provider)
+        {
+            var authenticateResult = await HttpContext.AuthenticateAsync();
+
+            if (!authenticateResult.Succeeded)
+                return BadRequest("OAuth failed");
+
+            var result = await _authService.ExternalLoginAsync(
+                authenticateResult.Principal,
+                provider
+            );
+
+            if (result == null)
+                return BadRequest("Login failed");
+
+            return Ok(result);
+        }
+
+
+        #endregion
 
 
     }
