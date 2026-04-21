@@ -311,7 +311,7 @@ namespace RMS.Web
             builder.Services.AddControllersWithViews();
             builder.Services.AddLocalization(opt =>
             {
-                opt.ResourcesPath = "Resources";
+                opt.ResourcesPath = "";
             });
 
             builder.Services.Configure<RequestLocalizationOptions>(options =>
@@ -344,8 +344,14 @@ namespace RMS.Web
             #endregion Data Seeding
 
             #region Localization Middleware
-            var options = app.Services.GetService<IOptions<RequestLocalizationOptions>>();
-            app.UseRequestLocalization(options.Value);
+            var locOptions = app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>();
+
+            app.UseRequestLocalization(locOptions.Value);
+
+            app.UseMiddleware<ExceptionMiddleware>();
+
+            app.UseStaticFiles();
+            app.UseRouting();
             #endregion
 
             // Configure the HTTP request pipeline.

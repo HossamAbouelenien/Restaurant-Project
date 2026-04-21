@@ -9,6 +9,7 @@ using RMS.Shared;
 using RMS.Shared.DTOs.BranchDTOs;
 using RMS.Shared.DTOs.MenuItemsDTOs;
 using RMS.Shared.QueryParams;
+using RMS.Shared.SharedResources;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -62,7 +63,7 @@ namespace RMS.Services.BranchServices
             var branch = await _unitOfWork
                 .GetRepository<Branch>()
                 .GetByIdAsync(spec)
-                ?? throw new KeyNotFoundException($"Branch with id {id} not found");
+                ?? throw new KeyNotFoundException(SharedResourcesKeys.NotFound);
 
             return _mapper.Map<GetBranchDTO>(branch);
         }
@@ -72,7 +73,7 @@ namespace RMS.Services.BranchServices
             var repo = _unitOfWork.GetRepository<Branch>();
             var branch = await repo.GetByIdAsync(Id);
             if (branch is null)
-                throw new KeyNotFoundException($"Branch  not found.");
+                throw new KeyNotFoundException(SharedResourcesKeys.NotFound);
 
             _mapper.Map(BranchDTO, branch);
 
@@ -97,7 +98,7 @@ namespace RMS.Services.BranchServices
             if (Branch is null) return;
 
             if (!Branch.IsActive)
-                throw new Exception("Cannot delete an inactive branch");
+                throw new Exception(SharedResourcesKeys.DeleteInActiveBranch);
 
             var orders = await _unitOfWork.GetRepository<Order>().GetAllAsync();
             var hasActiveOrders = orders.Any(o => o.BranchId == id &&
@@ -105,7 +106,7 @@ namespace RMS.Services.BranchServices
                                   o.Status != OrderStatus.Cancelled);
 
             if (hasActiveOrders)
-                throw new Exception("Cannot delete branch with active orders");
+                throw new Exception(SharedResourcesKeys.DeleteBranchWithActiveOrders);
 
             Branch.IsDeleted = true;
             repo.Update(Branch);
@@ -117,7 +118,7 @@ namespace RMS.Services.BranchServices
             var Branch = await repo.GetByIdAsync(id);
 
             if (Branch is null)
-                throw new KeyNotFoundException("Branch not found");
+                throw new KeyNotFoundException(SharedResourcesKeys.NotFound);
 
             Branch.IsActive = !Branch.IsActive;
             repo.Update(Branch);
