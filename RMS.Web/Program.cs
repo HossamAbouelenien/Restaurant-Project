@@ -43,6 +43,7 @@ using RMS.ServicesAbstraction.IHubServices.INotificationServices;
 using RMS.ServicesAbstraction.IHubServices.IRestaurantNotifier;
 using RMS.ServicesAbstraction.IIdentityService;
 using RMS.ServicesAbstraction.IKitchenServices;
+using RMS.ServicesAbstraction.IPaymentServices;
 using RMS.ServicesAbstraction.IUserServices;
 using RMS.Web.Extensions;
 using Serilog;
@@ -224,6 +225,8 @@ namespace RMS.Web
             builder.Services.AddScoped<IKitchenService, KitchenService>();
             builder.Services.AddScoped<IDeliveryService, DeliveryService>();
             builder.Services.AddScoped<IEmailService, EmailService>();
+            builder.Services.AddScoped<IPaymentService, PaymentService>();
+            builder.Services.AddHttpClient<IPaymobService, PaymobService>();
 
             builder.Host.UseSerilog((context, services, configuration) =>
             {

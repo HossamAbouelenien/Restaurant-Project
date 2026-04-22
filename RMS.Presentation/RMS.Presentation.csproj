@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\RMS.ServicesAbstraction\RMS.ServicesAbstraction.csproj" />
+    <ProjectReference Include="..\RMS.Services\RMS.Services.csproj" />
   </ItemGroup>
 	
 <ItemGroup>
