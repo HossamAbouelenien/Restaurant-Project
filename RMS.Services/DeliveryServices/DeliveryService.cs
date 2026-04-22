@@ -147,7 +147,8 @@ namespace RMS.Services.DeliveryServices
             await _restaurantNotifier.SendAsync(
                 "OrderAssignedToDriver",
                 result,
-                $"drivers_id_{dto.DriverId}");
+                $"drivers_id_{dto.DriverId}",
+                "admins");
 
 
             await _notificationService.CreateNotification(
@@ -158,7 +159,7 @@ namespace RMS.Services.DeliveryServices
                             Type = "Assignation",
                             Role = SD.Role_Driver,
                         },
-                        SD.Group_Admins,
+                        $"drivers_id_{dto.DriverId}",
                         "OrderAssignedToDriver"
                     );
 
@@ -224,7 +225,7 @@ namespace RMS.Services.DeliveryServices
             await _restaurantNotifier.SendAsync(
                 "deliveryUpdated",
                 result,
-                $"drivers_id_{delivery.DriverId}");
+                $"admins");
 
             return result;
         }

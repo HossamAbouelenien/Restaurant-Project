@@ -126,7 +126,8 @@ namespace RMS.Services.KitchenServices
             await _restaurantNotifier.SendAsync(
                      "KitchenUpdated",
                      dtoResult,
-                     $"kitchen_branch_{ticket.Order!.BranchId}"
+                     $"kitchen_branch_{ticket.Order!.BranchId}",
+                     "admins"
                     );
 
             return dtoResult;

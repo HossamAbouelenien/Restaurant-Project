@@ -11,6 +11,7 @@ using RMS.ServicesAbstraction;
 using RMS.ServicesAbstraction.IHubServices.INotificationServices;
 using RMS.ServicesAbstraction.IHubServices.IRestaurantNotifier;
 using RMS.Shared;
+using RMS.Shared.DTOs.BranchStockDTOs;
 using RMS.Shared.DTOs.MenuItemsDTOs;
 using RMS.Shared.DTOs.OrderDTOs;
 using RMS.Shared.DTOs.Utility;
@@ -774,13 +775,18 @@ namespace RMS.Services.OrderServices
                 var stockSpec = new BranchStockWithBranchAndIngredient(branchId, ingredientId);
                 var stockItems = await stockRepo.GetAllAsync(stockSpec);
                 var stockItem = stockItems.FirstOrDefault();
+
                 if (stockItem != null)
                 {
-                    await _restaurantNotifier.SendAsync(
+                    var stockItemdto = _mapper.Map<BranchStockDTO>(stockItem!);
+                    if (stockItemdto != null)
+                    {
+                        await _restaurantNotifier.SendAsync(
                         "BranchStockUpdated",
-                        stockItem,
+                        stockItemdto,
                         $"kitchen_branch_{branchId}",
                         "admins");
+                    }
                 }
             }
         }
