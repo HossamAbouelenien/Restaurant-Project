@@ -63,5 +63,14 @@ namespace RMS.Shared.SharedResources
         // Order
         public const string FailedOrders = "FailedOrders";
 
+        // Table
+        public const string TableCapacityInvalid = "TableCapacityInvalid";
+        public const string OccupiedTable = "OccupiedTable";
+        public const string TableBranch = "TableBranch";
+        public const string FreeTable = "FreeTable";
+        public const string CompletedTableOrder = "CompletedTableOrder";
+
+
+
     }
 }
