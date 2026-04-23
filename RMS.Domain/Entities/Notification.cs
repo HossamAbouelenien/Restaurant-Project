@@ -9,7 +9,9 @@ namespace RMS.Domain.Entities
     public class Notification : BaseEntity
     {
         public string Title { get; set; } = string.Empty;
+        public string ArabicTitle { get; set; } = string.Empty;
         public string Message { get; set; } = string.Empty;
+        public string ArabicMessage { get; set; } = string.Empty;
         public string Type { get; set; } = "General";
         public bool IsRead { get; set; } = false;
         public string? Role { get; set; }

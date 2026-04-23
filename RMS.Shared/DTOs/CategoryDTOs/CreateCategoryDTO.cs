@@ -14,5 +14,11 @@ namespace RMS.Shared.DTOs.CategoryDTOs
         [MaxLength(100)]
         public string Name { get; set; } = default!;
 
+        [Required]
+        [MaxLength(100)]
+        public string ArabicName { get; set; } = default!;
+
+
+
     }
 }

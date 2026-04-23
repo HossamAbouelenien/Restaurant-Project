@@ -8,6 +8,10 @@ public class Category : BaseEntity
     [MaxLength(100)]
     public string Name { get; set; } = string.Empty;
 
+    [Required]
+    [MaxLength(100)]
+    public string ArabicName { get; set; } = string.Empty;
+
     // ── Navigation ───────────────────────────────────────────────────────────
     public ICollection<MenuItem> MenuItems { get; set; } = new List<MenuItem>();
 }
