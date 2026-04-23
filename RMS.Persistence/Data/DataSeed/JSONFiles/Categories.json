@@ -1,20 +1,26 @@
 [
   {
-    "Name": "Burgers"
+    "Name": "Burgers",
+    "ArabicName": "ا"
   },
   {
-    "Name": "Pizza"
+    "Name": "Pizza",
+    "ArabicName": "ا"
   },
   {
-    "Name": "Grills"
+    "Name": "Grills",
+    "ArabicName": "ا"
   },
   {
-    "Name": "Salads"
+    "Name": "Salads",
+    "ArabicName": "ا"
   },
   {
-    "Name": "Drinks"
+    "Name": "Drinks",
+    "ArabicName": "ا"
   },
   {
-    "Name": "Desserts"
+    "Name": "Desserts",
+    "ArabicName": "ا"
   }
 ]

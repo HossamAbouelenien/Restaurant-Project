@@ -1,74 +1,92 @@
 [
   {
     "Name": "Beef Patty",
+    "ArabicName": "ا",
     "Unit": "Kg"
   },
   {
     "Name": "Burger Bun",
+    "ArabicName": "ا",
     "Unit": "Piece"
   },
   {
     "Name": "Cheddar Cheese",
+    "ArabicName": "ا",
     "Unit": "Gram"
   },
   {
     "Name": "Lettuce",
+    "ArabicName": "ا",
     "Unit": "Gram"
   },
   {
     "Name": "Tomato",
+    "ArabicName": "ا",
     "Unit": "Gram"
   },
   {
     "Name": "Pizza Dough",
+    "ArabicName": "ا",
     "Unit": "Gram"
   },
   {
     "Name": "Tomato Sauce",
+    "ArabicName": "ا",
     "Unit": "Liter"
   },
   {
     "Name": "Mozzarella",
+    "ArabicName": "ا",
     "Unit": "Gram"
   },
   {
     "Name": "Chicken Breast",
+    "ArabicName": "ا",
     "Unit": "Kg"
   },
   {
     "Name": "Olive Oil",
+    "ArabicName": "ا",
     "Unit": "Liter"
   },
   {
     "Name": "Cucumber",
+    "ArabicName": "ا",
     "Unit": "Gram"
   },
   {
     "Name": "Feta Cheese",
+    "ArabicName": "ا",
     "Unit": "Gram"
   },
   {
     "Name": "Soft Drink Can",
+    "ArabicName": "ا",
     "Unit": "Piece"
   },
   {
     "Name": "Mineral Water",
+    "ArabicName": "ا",
     "Unit": "Liter"
   },
   {
     "Name": "Chocolate",
+    "ArabicName": "ا",
     "Unit": "Gram"
   },
   {
     "Name": "Cream",
+    "ArabicName": "ا",
     "Unit": "Liter"
   },
   {
     "Name": "Mushrooms",
+    "ArabicName": "ا",
     "Unit": "Gram"
   },
   {
     "Name": "Bell Pepper",
+    "ArabicName": "ا",
     "Unit": "Gram"
   }
 ]

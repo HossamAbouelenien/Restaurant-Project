@@ -131,4 +131,30 @@ public class PaymentService : IPaymentService
 
         await _unitOfWork.SaveChangesAsync();
     }
+
+
+    public async Task ConfirmCashPaymentAsync(int orderId)
+    {
+        var orderRepo = _unitOfWork.GetRepository<Order>();
+        var paymentRepo = _unitOfWork.GetRepository<Payment>();
+
+        var order = await orderRepo.GetByIdAsync(orderId);
+        if (order == null)
+            throw new Exception("Order not found");
+
+        var payment = await paymentRepo.GetByIdAsync(
+            new PaymentByOrderIdSpecification(orderId)
+        );
+
+        if (payment == null)
+            throw new Exception("Payment not found");
+
+        if (payment.PaymentStatus == PaymentStatus.Paid)
+            throw new Exception("Already paid");
+
+        payment.PaymentStatus = PaymentStatus.Paid;
+        payment.PaidAt = DateTime.Now;
+
+        await _unitOfWork.SaveChangesAsync();
+    }
 }

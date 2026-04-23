@@ -167,12 +167,20 @@ namespace RMS.Services.OrderServices
             orderDto.Items = orderItems;
             var order = _mapper.Map<Order>(orderDto);
             order.TotalAmount = orderItems.Sum(i => i.Quantity * i.UnitPrice);
-
             order.Payment = new Payment
             {
                 PaymentMethod = paymentMethod,
-                PaymentStatus = PaymentStatus.Pending
+                PaymentStatus = paymentMethod == PaymentMethod.Card ? PaymentStatus.Pending : PaymentStatus.Pending 
             };
+
+            order.Status = paymentMethod == PaymentMethod.Card
+                ? OrderStatus.AwaitingPayment
+                : OrderStatus.Received;
+            //order.Payment = new Payment
+            //{
+            //    PaymentMethod = paymentMethod,
+            //    PaymentStatus = PaymentStatus.Pending
+            //};
 
             //OrderType-specific records
             if (orderType == OrderType.DineIn)

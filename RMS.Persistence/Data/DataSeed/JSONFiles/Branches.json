@@ -9,10 +9,11 @@
       "City": "Cairo",
       "Note": "Main flagship branch",
       "SpecialMark": "Next to the metro station"
-    }
+    }, "ArabicName": "ا"
   },
   {
     "Name": "Maadi Branch",
+    "ArabicName": "ا",
     "Phone": "01123456789",
     "IsActive": true,
     "Address": {
@@ -25,6 +26,7 @@
 
   },
   {
+    "ArabicName": "ا",
     "Name": "Alexandria Branch",
     "Phone": "01234567890",
     "IsActive": true,
