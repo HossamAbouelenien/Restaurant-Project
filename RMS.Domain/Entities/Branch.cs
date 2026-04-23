@@ -7,7 +7,11 @@ public class Branch : BaseEntity
     [Required]
     [MaxLength(100)]
     public string Name { get; set; } = default!;
-    
+
+    [Required]
+    [MaxLength(100)]
+    public string ArabicName { get; set; } = default!;
+
 
     public Address Address { get; set; } = default!;
 

@@ -8,6 +8,9 @@ public class Ingredient : BaseEntity
     [Required]
     [MaxLength(150)]
     public string Name { get; set; } = string.Empty;
+    [Required]
+    [MaxLength(150)]
+    public string ArabicName { get; set; } = string.Empty;
 
     // kg | piece | liter | gram
     [Required]

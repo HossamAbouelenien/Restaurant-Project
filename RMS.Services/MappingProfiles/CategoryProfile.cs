@@ -13,11 +13,14 @@ namespace RMS.Services.MappingProfiles
     {
         public CategoryProfile()
         {
-            CreateMap<Category,CategoryDTO>()
-                .ForMember(dest => dest.MenuItemsCount,opt => opt.MapFrom(src => src.MenuItems.Count));
+            CreateMap<Category, CategoryDTO>()
+                .ForMember(dest => dest.MenuItemsCount, opt => opt.MapFrom(src => src.MenuItems.Count));
+
+
 
 
             CreateMap<CreateCategoryDTO, Category>();
+
 
             CreateMap<UpdateCategoryDTO, Category>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())

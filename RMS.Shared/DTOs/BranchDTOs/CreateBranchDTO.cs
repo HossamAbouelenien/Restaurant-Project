@@ -9,6 +9,7 @@ namespace RMS.Shared.DTOs.BranchDTOs
     public class CreateBranchDTO
     {
         public string Name { get; set; } = default!;
+        public string ArabicName { get; set; } = default!;
         public string Phone { get; set; } = default!;
         public int BuildingNumber { get; set; }
         public string Street { get; set; } = default!;

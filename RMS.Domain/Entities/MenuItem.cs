@@ -10,6 +10,10 @@ public class MenuItem : BaseEntity
     public string Name { get; set; } = string.Empty;
 
     [Required]
+    [MaxLength(150)]
+    public string ArabicName { get; set; } = string.Empty;
+
+    [Required]
     [Column(TypeName = "decimal(10,2)")]
     [Range(0.01, 999999.99)]
     public decimal Price { get; set; }
