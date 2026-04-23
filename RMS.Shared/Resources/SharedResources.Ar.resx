@@ -156,4 +156,40 @@
   <data name="InvalidStatusTransition" xml:space="preserve">
     <value>انتقال حالة غير صالح</value>
   </data>
+  <data name="EmailIsNotConfirmed" xml:space="preserve">
+    <value>البريد الإلكتروني غير مؤكد</value>
+  </data>
+  <data name="ErrorHappend" xml:space="preserve">
+    <value>حدث خطأ غير متوقع أثناء تسجيل دخول المستخدم</value>
+  </data>
+  <data name="Failed" xml:space="preserve">
+    <value>فشل</value>
+  </data>
+  <data name="ConfirmEmail" xml:space="preserve">
+    <value>أكد بريدك الإلكتروني</value>
+  </data>
+  <data name="Success" xml:space="preserve">
+    <value>نجاح</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>خطأ</value>
+  </data>
+  <data name="MenuItemIngredient" xml:space="preserve">
+    <value>يجب أن يحتوي عنصر القائمة على مكون واحد على الأقل</value>
+  </data>
+  <data name="DuplicateIngredient" xml:space="preserve">
+    <value>المكونات المكررة غير مسموح بها</value>
+  </data>
+  <data name="OrderAlreadyPaid" xml:space="preserve">
+    <value>تم دفع الطلب بالفعل</value>
+  </data>
+  <data name="FailedToUpdate" xml:space="preserve">
+    <value>فشل التحديث </value>
+  </data>
+  <data name="FailedToDelete" xml:space="preserve">
+    <value>فشل المسح</value>
+  </data>
+  <data name="FailedOrders" xml:space="preserve">
+    <value>فشل تحميل الطلبات</value>
+  </data>
 </root>

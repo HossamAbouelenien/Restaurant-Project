@@ -7,6 +7,7 @@ using RMS.Services.Specifications.PaymentSpec;
 using RMS.ServicesAbstraction;
 using RMS.ServicesAbstraction.IEmailServices;
 using RMS.ServicesAbstraction.IPaymentServices;
+using RMS.Shared.SharedResources;
 
 public class PaymentService : IPaymentService
 {
@@ -36,10 +37,10 @@ public class PaymentService : IPaymentService
         var order = await orderRepo.GetByIdAsync(orderId);
 
         if (order == null)
-            throw new Exception("Order not found");
+            throw new Exception(SharedResourcesKeys.NotFound);
 
         if (order.UserId != userId)
-            throw new Exception("Unauthorized");
+            throw new Exception(SharedResourcesKeys.Unauthorized);
 
         var existingPayment = await paymentRepo.GetByIdAsync(
             new PaymentByOrderIdSpecification(orderId)
@@ -48,7 +49,7 @@ public class PaymentService : IPaymentService
         if (existingPayment != null)
         {
             if (existingPayment.PaymentStatus == PaymentStatus.Paid)
-                throw new Exception("Order already paid");
+                throw new Exception(SharedResourcesKeys.OrderAlreadyPaid);
 
             var token = await _paymob.GetPaymentKeyAsync(order.TotalAmount, order.Id);
             return _paymob.BuildIframeUrl(token);

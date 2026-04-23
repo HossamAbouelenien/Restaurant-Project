@@ -7,6 +7,7 @@ using RMS.Shared;
 using RMS.Shared.DTOs.MenuItemsDTOs;
 using RMS.Shared.DTOs.RecipeDTOs;
 using RMS.Shared.QueryParams;
+using RMS.Shared.SharedResources;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,16 +46,15 @@ namespace RMS.Services.RecipeServices
             var repo = _unitOfWork.GetRepository<Recipe>();
             var menuItem = await _unitOfWork.GetRepository<MenuItem>().GetByIdAsync(dto.MenuItemId);
             if (menuItem == null)
-                throw new Exception("Menu Item Not Found");
+                throw new Exception(SharedResourcesKeys.NotFound);
 
             var ingredient = await _unitOfWork.GetRepository<Ingredient>().GetByIdAsync(dto.IngredientId);
             if (ingredient == null)
-                throw new Exception("Ingredient Not Found");
-
+                throw new Exception(SharedResourcesKeys.NotFound);
             var existingRecipes = await repo.GetAllAsync();
             var recipeExists = existingRecipes.Any(r => r.MenuItemId == dto.MenuItemId && r.IngredientId == dto.IngredientId);
             if (recipeExists)
-                throw new Exception("This ingredient already exists in the recipe.");
+                throw new Exception(SharedResourcesKeys.AlreadyExists);
 
             var recipe = _mapper.Map<Recipe>(dto);
             await repo.AddAsync(recipe);
@@ -66,14 +66,14 @@ namespace RMS.Services.RecipeServices
                 return _mapper.Map<RecipesListDTO>(recipe);
             } 
             else
-                throw new Exception("Failed To Create Recipe");
+                throw new Exception(SharedResourcesKeys.Failed);
         }
 
         public async Task<RecipesListDTO> UpdateRecipeQuantityRequiredAsync(int recipeId, UpdateRecipeQuantityDTO dto)
         {
             var repo = _unitOfWork.GetRepository<Recipe>();
             var recipe = await repo.GetByIdAsync(recipeId);
-            if (recipe is null) throw new Exception("Recipe Not Found");
+            if (recipe is null) throw new Exception(SharedResourcesKeys.NotFound);
 
             recipe.QuantityRequired = dto.QuantityRequired;
             recipe.UpdatedAt = DateTime.Now;
@@ -87,19 +87,19 @@ namespace RMS.Services.RecipeServices
                 return _mapper.Map<RecipesListDTO>(updatedRecipe);
             }
             else
-                throw new Exception("Failed To Update Recipe");
+                throw new Exception(SharedResourcesKeys.FailedToUpdate);
         }
 
         public async Task DeleteRecipeAsync(int id)
         {
             var recipe = await _unitOfWork.GetRepository<Recipe>().GetByIdAsync(id);
-            if (recipe is null) throw new Exception("Recipe Not Found");
+            if (recipe is null) throw new Exception(SharedResourcesKeys.NotFound);
 
             recipe.IsDeleted = true;
             recipe.DeletedAt = DateTime.Now;
 
             var result = await _unitOfWork.SaveChangesAsync();
-            if (result == 0) throw new Exception("Failed To Delete Recipe");
+            if (result == 0) throw new Exception(SharedResourcesKeys.FailedToDelete);
         }
     }
 }

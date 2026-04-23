@@ -9,6 +9,7 @@ using RMS.Services.Specifications.IdentitySpec;
 using RMS.ServicesAbstraction.IEmailServices;
 using RMS.ServicesAbstraction.IIdentityService;
 using RMS.Shared.DTOs.IdentityDTOs;
+using RMS.Shared.SharedResources;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -59,7 +60,7 @@ namespace RMS.Services.IdentityService
                
                 if (!user.EmailConfirmed)
                 {
-                    throw new InvalidOperationException("Email is not confirmed");
+                    throw new InvalidOperationException(SharedResourcesKeys.EmailIsNotConfirmed);
                 }
 
                 bool isValid = await _userManager.CheckPasswordAsync(user, loginRequestDTO.Password);
@@ -91,7 +92,7 @@ namespace RMS.Services.IdentityService
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException("An unexpected error occurred during user login", ex);
+                throw new InvalidOperationException(SharedResourcesKeys.ErrorHappend, ex);
             }
         }
 
@@ -101,7 +102,7 @@ namespace RMS.Services.IdentityService
             {
                 if (await IsEmailExistsAsync(registerationRequestDTO.Email))
                 {
-                    throw new InvalidOperationException($"User with email '{registerationRequestDTO.Email}' already exists");
+                    throw new InvalidOperationException(SharedResourcesKeys.AlreadyExists);
                 }
 
                 User user = new()
@@ -119,7 +120,7 @@ namespace RMS.Services.IdentityService
                 if (!result.Succeeded)
                 {
                     var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-                    throw new InvalidOperationException($"User registration failed: {errors}");
+                    throw new InvalidOperationException($"{SharedResourcesKeys.Failed}: {errors}");
                 }
 
                
@@ -148,7 +149,7 @@ namespace RMS.Services.IdentityService
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException("An unexpected error occurred during user registration", ex);
+                throw new InvalidOperationException(SharedResourcesKeys.ErrorHappend, ex);
             }
         }
 
@@ -257,19 +258,19 @@ namespace RMS.Services.IdentityService
         public async Task<string> ConfirmEmailAsync(string? userId, string? code)
         {
             if (userId == null || code == null)
-                return "ErrorWhenConfirmEmail";
+                return SharedResourcesKeys.EmailIsNotConfirmed;
 
             var user = await _userManager.FindByIdAsync(userId);
 
             if (user == null)
-                return "ErrorWhenConfirmEmail";
+                return SharedResourcesKeys.EmailIsNotConfirmed;
 
             var result = await _userManager.ConfirmEmailAsync(user, code);
 
             if (!result.Succeeded)
-                return "ErrorWhenConfirmEmail";
+                return SharedResourcesKeys.ErrorHappend;
 
-            return "Success";
+            return SharedResourcesKeys.Success;
         }
 
         
@@ -278,7 +279,7 @@ namespace RMS.Services.IdentityService
             var user = await _userManager.FindByEmailAsync(email);
 
             if (user == null)
-                return "UserNotFound";
+                return SharedResourcesKeys.NotFound;
 
             var code = RandomNumberGenerator.GetInt32(100000, 999999).ToString();
 
@@ -297,7 +298,7 @@ namespace RMS.Services.IdentityService
 
             await _emailService.SendEmailAsync(user.Email, $"Reset Code: {code}", "Reset Password");
 
-            return "Success";
+            return SharedResourcesKeys.Success;
         }
 
         
@@ -340,24 +341,24 @@ namespace RMS.Services.IdentityService
                 BCrypt.Net.BCrypt.Verify(resetSessionToken, t.TokenHash));
 
             if (session == null)
-                return "InvalidSession";
+                return SharedResourcesKeys.Invalid;
 
             var user = await _userManager.FindByIdAsync(session.UserId);
 
             if (user == null)
-                return "UserNotFound";
+                return SharedResourcesKeys.NotFound;
 
             await _userManager.RemovePasswordAsync(user);
             var result = await _userManager.AddPasswordAsync(user, newPassword);
 
             if (!result.Succeeded)
-                return "ErrorResetPassword";
+                return SharedResourcesKeys.Error;
 
             session.IsUsed = true;
             _unitOfWork.GetRepository<ResetSessionToken>().Update(session);
             await _unitOfWork.SaveChangesAsync();
 
-            return "Success";
+            return SharedResourcesKeys.Success;
         }
 
        
@@ -445,7 +446,7 @@ namespace RMS.Services.IdentityService
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException("External login failed", ex);
+                throw new InvalidOperationException(SharedResourcesKeys.ErrorHappend, ex);
             }
         }
 

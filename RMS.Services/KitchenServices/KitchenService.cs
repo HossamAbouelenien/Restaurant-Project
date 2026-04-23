@@ -12,6 +12,7 @@ using RMS.Shared.DTOs.BranchStockDTOs;
 using RMS.Shared.DTOs.KitchenDTOs;
 using RMS.Shared.DTOs.OrderDTOs;
 using RMS.Shared.QueryParams;
+using RMS.Shared.SharedResources;
 using System.Net.Sockets;
 
 namespace RMS.Services.KitchenServices
@@ -82,13 +83,13 @@ namespace RMS.Services.KitchenServices
             var ticket = await repo.GetByIdAsync(spec);
 
             if (ticket == null)
-                throw new Exception("Ticket not found");
+                throw new Exception(SharedResourcesKeys.NotFound);
 
            
             if (dto.Status == TicketStatus.Preparing)
             {
                 if (ticket.Status != TicketStatus.Pending)
-                    throw new Exception("Invalid transition");
+                    throw new Exception(SharedResourcesKeys.InvalidStatusTransition);
 
                 ticket.Status = TicketStatus.Preparing;
                 ticket.StartedAt = DateTime.UtcNow;
@@ -96,7 +97,7 @@ namespace RMS.Services.KitchenServices
             else if (dto.Status == TicketStatus.Done)
             {
                 if (ticket.Status != TicketStatus.Preparing)
-                    throw new Exception("Invalid transition");
+                    throw new Exception(SharedResourcesKeys.InvalidStatusTransition);
 
                 ticket.Status = TicketStatus.Done;
                 ticket.CompletedAt = DateTime.UtcNow;
@@ -105,7 +106,7 @@ namespace RMS.Services.KitchenServices
             }
             else
             {
-                throw new Exception("Invalid status");
+                throw new Exception(SharedResourcesKeys.InvalidStatusValue);
             }
 
            
@@ -140,7 +141,7 @@ namespace RMS.Services.KitchenServices
             var kitchenTicket = await repo.GetByIdAsync(spec);
 
             if (kitchenTicket == null)
-                throw new Exception("Ticket not found");
+                throw new Exception(SharedResourcesKeys.NotFound);
 
             kitchenTicket.ConfirmedServed = true;
 
@@ -165,7 +166,7 @@ namespace RMS.Services.KitchenServices
             var order = await orderRepo.GetByIdAsync(orderId);
 
             if (order == null)
-                throw new Exception("Order not found");
+                throw new Exception(SharedResourcesKeys.NotFound);
 
             if (tickets.All(t => t.Status == TicketStatus.Done))
             {

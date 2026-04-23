@@ -156,4 +156,40 @@
   <data name="InvalidStatusTransition" xml:space="preserve">
     <value>Invalid status transition</value>
   </data>
+  <data name="EmailIsNotConfirmed" xml:space="preserve">
+    <value>Email is not confirmed</value>
+  </data>
+  <data name="ErrorHappend" xml:space="preserve">
+    <value>An unexpected error occurred </value>
+  </data>
+  <data name="Failed" xml:space="preserve">
+    <value>Failed</value>
+  </data>
+  <data name="ConfirmEmail" xml:space="preserve">
+    <value>Confirm your email</value>
+  </data>
+  <data name="Success" xml:space="preserve">
+    <value>Success</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="MenuItemIngredient" xml:space="preserve">
+    <value>MenuItem must have at least one ingredient</value>
+  </data>
+  <data name="DuplicateIngredient" xml:space="preserve">
+    <value>Duplicate ingredients not allowed</value>
+  </data>
+  <data name="OrderAlreadyPaid" xml:space="preserve">
+    <value>Order already paid</value>
+  </data>
+  <data name="FailedToUpdate" xml:space="preserve">
+    <value>Failed to update</value>
+  </data>
+  <data name="FailedToDelete" xml:space="preserve">
+    <value>Failed to delete</value>
+  </data>
+  <data name="FailedOrders" xml:space="preserve">
+    <value>Failed to retrieve orders</value>
+  </data>
 </root>
