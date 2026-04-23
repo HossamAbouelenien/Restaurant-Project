@@ -16,6 +16,7 @@ using RMS.Shared.DTOs.DeliveryDTOs;
 using RMS.Shared.DTOs.OrderDTOs;
 using RMS.Shared.DTOs.Utility;
 using RMS.Shared.QueryParams;
+using RMS.Shared.SharedResources;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -72,7 +73,7 @@ namespace RMS.Services.DeliveryServices
                 .User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(driverId))
             {
-                throw new Exception("Driver ID not found ");
+                throw new Exception(SharedResourcesKeys.NotFound);
             }
             var spec = new DeliveriesWithOrderSpecification(driverId);
             var deliveries = await _unitOfWork.GetRepository<Delivery>().GetAllAsync(spec);
@@ -87,7 +88,7 @@ namespace RMS.Services.DeliveryServices
             var delivery = await Repo.GetByIdAsync(spec);
             if (delivery == null)
             {
-                throw new Exception("Delivery not found");
+                throw new Exception(SharedResourcesKeys.NotFound);
             }
             var data = _mapper.Map<DeliveryDetailsDto>(delivery);
             return data;
@@ -104,28 +105,28 @@ namespace RMS.Services.DeliveryServices
             var order = await orderRepo.GetByIdAsync(orderSpec);
 
             if (order == null)
-                throw new Exception("Order not found");
+                throw new Exception(SharedResourcesKeys.NotFound);
 
             if (order.OrderType != OrderType.Delivery)
-                throw new Exception("Order is not a delivery type");
+                throw new Exception(SharedResourcesKeys.InvalidOrderType);
 
             if (order.Delivery != null && order.Delivery.DriverId != null)
-                throw new Exception("Order already assigned");
+                throw new Exception(SharedResourcesKeys.OrderAssignedToDelivery);
 
             var driver = await _userManager.FindByIdAsync(dto.DriverId);
 
             if (driver == null)
-                throw new Exception("Driver not found");
+                throw new Exception(SharedResourcesKeys.NotFound);
 
             if (!await _userManager.IsInRoleAsync(driver, SD.Role_Driver))
-                throw new Exception("User is not a driver");
+                throw new Exception(SharedResourcesKeys.Invalid);
 
             
             var deliverySpec = new DeliveryByOrderIdSpecification(dto.OrderId);
             var delivery = await deliveryRepo.GetByIdAsync(deliverySpec);
 
             if (delivery == null)
-                throw new Exception("Delivery not found");
+                throw new Exception(SharedResourcesKeys.NotFound);
 
             delivery.DriverId = dto.DriverId;
             //delivery.AssignedAt = DateTime.UtcNow;
@@ -154,7 +155,7 @@ namespace RMS.Services.DeliveryServices
             await _notificationService.CreateNotification(
                         new Notification
                         {
-                            Title = "New Delivery Has Assigned To You !",
+                            Title = SharedResourcesKeys.OrderAssignedToYou,
                             Message = $"Delivery With {delivery.Id} is Assigned To You At {delivery.DeliveryAddress.BuildingNumber} - {delivery.DeliveryAddress.City}",
                             Type = "Assignation",
                             Role = SD.Role_Driver,
@@ -179,20 +180,19 @@ namespace RMS.Services.DeliveryServices
             var delivery = await deliveryRepo.GetByIdAsync(spec);
 
             if (delivery == null)
-                throw new Exception("Delivery not found");
+                throw new Exception(SharedResourcesKeys.NotFound);
 
            
             if (!isAdmin && delivery.DriverId != userId)
-                throw new Exception("Unauthorized");
+                throw new Exception(SharedResourcesKeys.Unauthorized);
 
             
             if (!Enum.TryParse<DeliveryStatus>(dto.Status, true, out var parsedStatus))
-                throw new Exception("Invalid status value");
+                throw new Exception(SharedResourcesKeys.InvalidStatusValue);
 
             
             if (!IsValidTransition(delivery.DeliveryStatus, parsedStatus))
-                throw new Exception("Invalid status transition");
-
+                throw new Exception(SharedResourcesKeys.InvalidStatusTransition);
             if (parsedStatus == DeliveryStatus.Delivered)
             {
                 delivery.DeliveredAt = DateTime.UtcNow;
@@ -204,7 +204,7 @@ namespace RMS.Services.DeliveryServices
                 var order = await orderRepo.GetByIdAsync(delivery.OrderId);
 
                 if (order == null)
-                    throw new Exception("Related order not found");
+                    throw new Exception(SharedResourcesKeys.NotFound);
 
                 order.Status = OrderStatus.Delivered; 
 
