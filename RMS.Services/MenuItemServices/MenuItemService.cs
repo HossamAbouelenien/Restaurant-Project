@@ -212,5 +212,17 @@ namespace RMS.Services.MenuItemsServices
 
             await _unitOfWork.SaveChangesAsync();
         }
+
+
+        public async Task<IEnumerable<MenuItemDTO>> GetPopularMenuItemsAsync(int limit)
+        {
+            var repo = _unitOfWork.GetRepository<MenuItem>();
+
+            var spec = new PopularMenuItemsSpecification(limit);
+
+            var items = await repo.GetAllAsync(spec);
+
+            return _mapper.Map<IEnumerable<MenuItemDTO>>(items);
+        }
     }
 }

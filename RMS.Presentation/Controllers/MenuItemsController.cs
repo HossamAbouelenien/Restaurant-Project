@@ -97,5 +97,12 @@ namespace RMS.Presentation.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        [HttpGet("popular")]
+        public async Task<IActionResult> GetPopular()
+        {
+            var result = await _menuItemService.GetPopularMenuItemsAsync(3);
+            return Ok(result);
+        }
     }
 }
