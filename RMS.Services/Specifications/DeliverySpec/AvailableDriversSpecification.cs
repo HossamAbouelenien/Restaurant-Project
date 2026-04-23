@@ -10,8 +10,8 @@ public class AvailableDriversSpecification : BaseSpecifications<User>
             (query.BranchId == null || u.BranchId == query.BranchId) &&       
             (string.IsNullOrEmpty(query.Search) ||
              u.Name.Contains(query.Search) ||
-             u.PhoneNumber.Contains(query.Search)) &&
-            !u.Deliveries.Any(d => d.DeliveryStatus != DeliveryStatus.Delivered)
+             u.PhoneNumber.Contains(query.Search))
+            //!u.Deliveries.Any(d => d.DeliveryStatus != DeliveryStatus.Delivered)
         )
     {
        
