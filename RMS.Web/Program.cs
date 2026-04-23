@@ -45,6 +45,7 @@ using RMS.ServicesAbstraction.IIdentityService;
 using RMS.ServicesAbstraction.IKitchenServices;
 using RMS.ServicesAbstraction.IPaymentServices;
 using RMS.ServicesAbstraction.IUserServices;
+using RMS.Shared.Utility;
 using RMS.Web.Extensions;
 using Serilog;
 using Serilog.Context;
@@ -115,7 +116,16 @@ namespace RMS.Web
             builder.Services.AddScoped<IAuthService, AuthService>();
 
             var key = builder.Configuration.GetValue<string>("JwtSettings:Secret");
-            
+
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("JwtPolicy", policy =>
+                {
+                    policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
+                    policy.RequireAuthenticatedUser();
+                });
+            });
+
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -233,6 +243,9 @@ namespace RMS.Web
                 configuration.ReadFrom.Configuration(context.Configuration);
             });
 
+            builder.Services.Configure<PaymobSettings>(
+                builder.Configuration.GetSection("Paymob")
+            );
 
 
 

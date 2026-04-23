@@ -139,7 +139,7 @@ namespace RMS.Presentation.Controllers
         }
 
 
-        [Authorize]
+        [Authorize(Policy = "JwtPolicy")]
         [HttpGet("CurrentUser")]
         public async Task<ActionResult<UserDTO>> GetCurrentUser()
         {

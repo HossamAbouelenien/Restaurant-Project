@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using RMS.Domain.Entities;
 using RMS.Services.PaymobServices;
 using RMS.ServicesAbstraction.IPaymentServices;
+using System.Security.Claims;
 
 namespace RMS.Presentation.Controllers
 {
@@ -19,10 +21,11 @@ namespace RMS.Presentation.Controllers
             _config = config;
         }
 
+        [Authorize(Policy = "JwtPolicy")]
         [HttpPost("pay/{orderId:int}")]
         public async Task<IActionResult> Pay(int orderId)
         {
-            var userId = User.FindFirst("sub")?.Value;
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             if (string.IsNullOrWhiteSpace(userId))
                 return Unauthorized("User not authenticated");
@@ -43,13 +46,13 @@ namespace RMS.Presentation.Controllers
             if (string.IsNullOrWhiteSpace(secret))
                 return StatusCode(500, "Missing Paymob secret");
 
-            // 🔐 HMAC validation
+           
             var isValid = PaymobHmacHelper.ValidateHmac(dto, secret);
 
             if (!isValid)
                 return Unauthorized("Invalid HMAC");
 
-            // 💡 مهم: خليه fire-and-forget logic داخل service
+            
             await _payment.HandleWebhookAsync(dto);
 
             return Ok();

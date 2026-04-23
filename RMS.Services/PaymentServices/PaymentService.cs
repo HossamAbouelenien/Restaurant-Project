@@ -1,7 +1,9 @@
-﻿using RMS.Domain.Contracts;
+﻿using Microsoft.Extensions.Configuration;
+using RMS.Domain.Contracts;
 using RMS.Domain.Entities;
 using RMS.Domain.Enums;
 using RMS.Services.PaymobServices;
+using RMS.Services.Specifications.PaymentSpec;
 using RMS.ServicesAbstraction;
 using RMS.ServicesAbstraction.IEmailServices;
 using RMS.ServicesAbstraction.IPaymentServices;
@@ -11,14 +13,21 @@ public class PaymentService : IPaymentService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IPaymobService _paymob;
     private readonly IEmailService _email;
+    private readonly string _secret;
 
-    public PaymentService(IUnitOfWork uow, IPaymobService paymob, IEmailService email)
+    public PaymentService(
+        IUnitOfWork uow,
+        IPaymobService paymob,
+        IEmailService email,
+        IConfiguration config)
     {
         _unitOfWork = uow;
         _paymob = paymob;
         _email = email;
+        _secret = config["Paymob:SecretKey"]!;
     }
 
+   
     public async Task<string> PayOrderAsync(int orderId, string userId)
     {
         var orderRepo = _unitOfWork.GetRepository<Order>();
@@ -32,9 +41,20 @@ public class PaymentService : IPaymentService
         if (order.UserId != userId)
             throw new Exception("Unauthorized");
 
-        if (order.Payment != null && order.Payment.PaymentStatus == PaymentStatus.Paid)
-            throw new Exception("Order already paid");
+        var existingPayment = await paymentRepo.GetByIdAsync(
+            new PaymentByOrderIdSpecification(orderId)
+        );
 
+        if (existingPayment != null)
+        {
+            if (existingPayment.PaymentStatus == PaymentStatus.Paid)
+                throw new Exception("Order already paid");
+
+            var token = await _paymob.GetPaymentKeyAsync(order.TotalAmount, order.Id);
+            return _paymob.BuildIframeUrl(token);
+        }
+
+      
         var payment = new Payment
         {
             OrderId = order.Id,
@@ -49,50 +69,65 @@ public class PaymentService : IPaymentService
 
         await _unitOfWork.SaveChangesAsync();
 
-        var token = await _paymob.GetPaymentKeyAsync(order.TotalAmount, order.Id);
+        var newToken = await _paymob.GetPaymentKeyAsync(order.TotalAmount, order.Id);
 
-        return _paymob.BuildIframeUrl(token);
+        return _paymob.BuildIframeUrl(newToken);
     }
 
+   
     public async Task HandleWebhookAsync(PaymobWebhookDto dto)
     {
-        var valid = PaymobHmacHelper.ValidateHmac(dto, _paymobSecret());
+       
+        var valid = PaymobHmacHelper.ValidateHmac(dto, _secret);
 
         if (!valid)
             return;
 
         var orderRepo = _unitOfWork.GetRepository<Order>();
+        var paymentRepo = _unitOfWork.GetRepository<Payment>();
 
-        if (!int.TryParse(dto.Obj.Order.Split('_')[0], out var orderId))
+        if (string.IsNullOrWhiteSpace(dto.Obj.Order) ||
+            !int.TryParse(dto.Obj.Order.Split('_')[0], out var orderId))
             return;
 
         var order = await orderRepo.GetByIdAsync(orderId);
 
-        if (order == null || order.Payment == null)
+        if (order == null)
+            return;
+
+     
+        var payment = await paymentRepo.GetByIdAsync(
+            new PaymentByOrderIdSpecification(orderId)
+        );
+
+        if (payment == null)
+            return;
+
+     
+        if (payment.PaymentStatus == PaymentStatus.Paid)
             return;
 
         if (dto.Obj.Success)
         {
-            order.Payment.PaymentStatus = PaymentStatus.Paid;
-            order.Payment.PaidAt = DateTime.UtcNow;
+            payment.PaymentStatus = PaymentStatus.Paid;
+            payment.PaidAt = DateTime.UtcNow;
+
             order.Status = OrderStatus.Received;
 
-            await _email.SendEmailAsync(
-                order.User!.Email!,
-                "Payment Success",
-                $"Order #{order.Id} paid successfully 💳");
+           
+            if (!string.IsNullOrEmpty(order.User?.Email))
+            {
+                await _email.SendEmailAsync(
+                    order.User.Email,
+                    "Payment Success",
+                    $"Order #{order.Id} paid successfully 💳");
+            }
         }
         else
         {
-            order.Payment.PaymentStatus = PaymentStatus.Failed;
+            payment.PaymentStatus = PaymentStatus.Failed;
         }
 
         await _unitOfWork.SaveChangesAsync();
-    }
-
-    private string _paymobSecret()
-    {
-        // inject from config in real case
-        return "YOUR_SECRET_KEY";
     }
 }
