@@ -129,7 +129,11 @@ namespace RMS.Presentation.Controllers
 
                 SetTokenCookies(tokenResponse.AccessToken, tokenResponse.RefreshToken, tokenResponse.ExpiresAt);
 
-                return Ok(new { Message = "Token refreshed successfully" });
+                return Ok(new
+                {
+                    Message = "Token refreshed successfully",
+                    Data = tokenResponse
+                });
             }
             catch (Exception ex)
             {
@@ -291,17 +295,15 @@ namespace RMS.Presentation.Controllers
             {
                 HttpOnly = true,
                 Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = expiresAt.HasValue
-                            ? DateTime.SpecifyKind(expiresAt.Value, DateTimeKind.Utc)
-                            : DateTime.UtcNow.AddHours(2) 
+                SameSite = SameSiteMode.None,
+                Expires = DateTime.UtcNow.AddHours(4) 
             };
 
             var refreshTokenOptions = new CookieOptions
             {
                 HttpOnly = true,
                 Secure = true,
-                SameSite = SameSiteMode.Strict,
+                SameSite = SameSiteMode.None,
                 Expires = DateTime.UtcNow.AddDays(7)
             };
 
