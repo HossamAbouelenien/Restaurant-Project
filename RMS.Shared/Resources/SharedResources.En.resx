@@ -192,4 +192,19 @@
   <data name="FailedOrders" xml:space="preserve">
     <value>Failed to retrieve orders</value>
   </data>
+  <data name="TableCapacityInvalid" xml:space="preserve">
+    <value>Capcity must be between 1 and 20</value>
+  </data>
+  <data name="OccupiedTable" xml:space="preserve">
+    <value>Cannot delete an occupied table</value>
+  </data>
+  <data name="TableBranch" xml:space="preserve">
+    <value>Table number already exists in this branch</value>
+  </data>
+  <data name="FreeTable" xml:space="preserve">
+    <value>Cannot free table with active orders</value>
+  </data>
+  <data name="CompletedTableOrder" xml:space="preserve">
+    <value>Table order is already completed</value>
+  </data>
 </root>

@@ -192,4 +192,19 @@
   <data name="FailedOrders" xml:space="preserve">
     <value>فشل تحميل الطلبات</value>
   </data>
+  <data name="TableCapacityInvalid" xml:space="preserve">
+    <value>يجب أن تكون السعة بين 1 و 20</value>
+  </data>
+  <data name="OccupiedTable" xml:space="preserve">
+    <value>لا يمكن حذف طاولة مشغولة</value>
+  </data>
+  <data name="TableBranch" xml:space="preserve">
+    <value>رقم الطاولة موجود بالفعل في هذا الفرع</value>
+  </data>
+  <data name="FreeTable" xml:space="preserve">
+    <value>لا يمكن تحرير الطاولة مع وجود طلبات نشطة</value>
+  </data>
+  <data name="CompletedTableOrder" xml:space="preserve">
+    <value>طلب الطاولة قد اكتمل بالفعل</value>
+  </data>
 </root>

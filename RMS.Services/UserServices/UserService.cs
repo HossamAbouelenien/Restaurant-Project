@@ -13,6 +13,7 @@ using RMS.Shared.DTOs.UserDTOs;
 using RMS.Shared.DTOs.Utility;
 using RMS.Shared.QueryParams;
 using Microsoft.EntityFrameworkCore;
+using RMS.Shared.SharedResources;
 
 namespace RMS.Services.UserServices
 {
@@ -154,8 +155,10 @@ namespace RMS.Services.UserServices
             var repo = _unitOfWork.GetRepository<User>();
             var spec = new UserWithBranchSpecifications(id);
             var user = await repo.GetByIdAsync(spec);
+
             if (user == null)
-                throw new Exception("User not found");
+                throw new Exception(SharedResourcesKeys.NotFound);
+
             _mapper.Map(updateUserDto, user);
             user.UserName = updateUserDto.Email;
             repo.Update(user);
@@ -291,7 +294,7 @@ namespace RMS.Services.UserServices
             var user = await repo.GetByIdAsync(spec);
 
             if (user == null)
-                throw new Exception("User not found");
+                throw new Exception(SharedResourcesKeys.NotFound);
 
             // ✅ Map الـ DTO الأول لـ Address Entity
             var newAddress = _mapper.Map<Address>(updateCustomerAddressDTO.addressDTO);
