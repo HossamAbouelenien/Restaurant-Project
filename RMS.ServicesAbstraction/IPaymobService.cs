@@ -8,14 +8,8 @@ namespace RMS.ServicesAbstraction
 {
    public interface IPaymobService
     {
-
-
-   
-        //Task<ErrorOr<PayOrderWithCardResponse>> PayOrderWithCardAsync(
-        //    string customerId, string orderId, CancellationToken cancellationToken = default);
-
-        //Task<ErrorOr<PayOrderWithCardResponse>> PayPlatformFeeAsync(
-        //    string workerId, CancellationToken cancellationToken = default);
+        Task<string> GetPaymentKeyAsync(decimal amount, int orderId);
+        string BuildIframeUrl(string paymentToken);
     }
 }
 

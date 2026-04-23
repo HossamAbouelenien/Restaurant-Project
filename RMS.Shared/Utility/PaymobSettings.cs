@@ -1,27 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace RMS.Shared.Utility
+﻿namespace RMS.Shared.Utility
 {
     public class PaymobSettings
     {
-        public const string SectionName = "Paymob";
-
+        public string ApiKey { get; set; }
+        public string SecretKey { get; set; }
+        public string PublicKey { get; set; }
         public int IntegrationId { get; set; }
-        public string? SecretKey { get; set; }
-        public string? ApiKey { get; set; }
-        public PaymobEndpoints? EndPoints { get; set; }
+        public string HMAC { get; set; }
+        public int IframeId { get; set; }
+
+        public PaymobEndpoints EndPoints { get; set; } = new();
     }
 
     public class PaymobEndpoints
     {
-        public string? AuthUrl { get; set; }
-        public string? CreateOrderUrl { get; set; }
-        public string? PaymentKeyUrl { get; set; }
-        public string? IFrameUrl { get; set; }
+        public string AuthUrl { get; set; }
+        public string OrderUrl { get; set; }
+        public string PaymentKeyUrl { get; set; }
     }
 }
