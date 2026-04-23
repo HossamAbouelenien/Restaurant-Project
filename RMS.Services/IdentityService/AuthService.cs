@@ -56,7 +56,7 @@ namespace RMS.Services.IdentityService
                     return null;
                 }
 
-                // Depending on your application's requirements, you might want to allow login even if the email is not confirmed.
+               
                 if (!user.EmailConfirmed)
                 {
                     throw new InvalidOperationException("Email is not confirmed");
@@ -76,7 +76,7 @@ namespace RMS.Services.IdentityService
                 var jwtTokenId = jwtToken.Claims.FirstOrDefault(u => u.Type == JwtRegisteredClaimNames.Jti)?.Value;
 
                 var newRefreshToken = await _tokenService.GenerateRefreshTokenAsync();
-                var refreshTokenExpiry = DateTime.Now.AddDays(7);
+                var refreshTokenExpiry = DateTime.UtcNow.AddDays(7);
 
                 await _tokenService.SaveRefreshTokenAsync(user.Id, jwtTokenId, newRefreshToken, refreshTokenExpiry);
 
@@ -110,7 +110,7 @@ namespace RMS.Services.IdentityService
                     Name = registerationRequestDTO.Name,
                     UserName = registerationRequestDTO.Email,
                     NormalizedEmail = registerationRequestDTO.Email.ToUpper(),
-                    // Set EmailConfirmed to false by default, you can change this based on your requirements
+                    
                     EmailConfirmed = false,
                     RoleId = string.IsNullOrEmpty(registerationRequestDTO.Role) ? "Customer" : registerationRequestDTO.Role
                 };
@@ -122,7 +122,7 @@ namespace RMS.Services.IdentityService
                     throw new InvalidOperationException($"User registration failed: {errors}");
                 }
 
-                // Generate email confirmation token (if needed for email verification)
+               
                 var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
 
                 var role = string.IsNullOrEmpty(registerationRequestDTO.Role) ? "Customer" : registerationRequestDTO.Role;
@@ -136,10 +136,10 @@ namespace RMS.Services.IdentityService
 
                 var userDto = _mapper.Map<UserDTO>(user);
                 userDto.Role = role;
-                userDto.ConfirmationToken = token; // Include the confirmation token in the response if needed
+                userDto.ConfirmationToken = token; 
 
 
-                // Optionally, you can send the confirmation email here using the generated token
+               
                 var baseUrl = _configuration["URLs:BaseURL"];
                 var confirmationLink = $"{baseUrl}api/Auth/confirm-email?userId={user.Id}&code={Uri.EscapeDataString(token)}";
                 await _emailService.SendEmailAsync(user.Email, "Confirm your email", $"Please confirm your email by clicking this link: {confirmationLink}");
@@ -205,6 +205,13 @@ namespace RMS.Services.IdentityService
             }
         }
 
+
+        //public async Task RevokeRefreshTokenAsync(string refreshToken)
+        //{
+        //    await _tokenService.RevokeRefreshTokenAsync(refreshToken);
+        //}
+
+
         public async Task<UserDTO?> GetCurrentUserAsync(string email)
         {
             var spec = new UserByEmailSpecification(email);
@@ -246,7 +253,7 @@ namespace RMS.Services.IdentityService
             };
         }
 
-        // This method is used to confirm the user's email address using the token sent to their email.
+        
         public async Task<string> ConfirmEmailAsync(string? userId, string? code)
         {
             if (userId == null || code == null)
@@ -265,7 +272,7 @@ namespace RMS.Services.IdentityService
             return "Success";
         }
 
-        // This method initiates the password reset process by generating a reset code, saving it in the database, and sending it to the user's email.
+        
         public async Task<string> SendResetPasswordCode(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
@@ -293,7 +300,7 @@ namespace RMS.Services.IdentityService
             return "Success";
         }
 
-        // This method verifies the reset code provided by the user. If the code is valid, it generates a secure session token that can be used to reset the password.
+        
         public async Task<(string result, string? resetSessionToken)> VerifyResetCode(string code)
         {
             var tokens = await _unitOfWork.GetRepository<ResetSessionToken>()
@@ -318,7 +325,7 @@ namespace RMS.Services.IdentityService
             return ("Valid", resetSessionToken);
         }
 
-        // This method resets the user's password using the session token generated in the previous step. It verifies the session token, and if valid, updates the user's password and marks the session as used.
+       
         public async Task<string> ResetPassword(string resetSessionToken, string newPassword, string confirmPassword)
         {
             if (newPassword != confirmPassword)
@@ -353,7 +360,7 @@ namespace RMS.Services.IdentityService
             return "Success";
         }
 
-        // This method handles external login using a third-party provider (e.g., Google, Facebook). It checks if the user already exists based on the provider information, and if not, it creates a new user and associates it with the provider. Finally, it generates a JWT token for the user.
+       
         public async Task<TokenDTO?> ExternalLoginAsync(ClaimsPrincipal principal, string provider)
         {
             try
@@ -441,5 +448,7 @@ namespace RMS.Services.IdentityService
                 throw new InvalidOperationException("External login failed", ex);
             }
         }
+
+
     }
 }

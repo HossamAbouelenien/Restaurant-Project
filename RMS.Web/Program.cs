@@ -117,19 +117,12 @@ namespace RMS.Web
 
             var key = builder.Configuration.GetValue<string>("JwtSettings:Secret");
 
-            builder.Services.AddAuthorization(options =>
-            {
-                options.AddPolicy("JwtPolicy", policy =>
-                {
-                    policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
-                    policy.RequireAuthenticatedUser();
-                });
-            });
-
             builder.Services.AddAuthentication(options =>
             {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                
             })
            
             .AddCookie(options =>                         
@@ -178,23 +171,27 @@ namespace RMS.Web
                     {
                         OnMessageReceived = context =>
                         {
-                            var accessToken = context.Request.Query["access_token"];
+                           
+                                var accessTokenFromCookie = context.Request.Cookies["accessToken"];
+                                if (!string.IsNullOrEmpty(accessTokenFromCookie))
+                                {
+                                    context.Token = accessTokenFromCookie;
+                                    return Task.CompletedTask;
+                                }
 
-                            var path = context.HttpContext.Request.Path;
+                             
+                                var accessToken = context.Request.Query["access_token"];
+                                var path = context.HttpContext.Request.Path;
 
-                            if (!string.IsNullOrEmpty(accessToken) &&
-                                path.StartsWithSegments("/hubs/notifications"))
-                            {
-                                context.Token = accessToken;
-                            }
+                                if (!string.IsNullOrEmpty(accessToken) &&
+                                    (path.StartsWithSegments("/hubs/notifications") ||
+                                     path.StartsWithSegments("/hubs/restaurant")))
+                                {
+                                    context.Token = accessToken;
+                                }
 
-                            if (!string.IsNullOrEmpty(accessToken) &&
-                                path.StartsWithSegments("/hubs/restaurant"))
-                            {
-                                context.Token = accessToken;
-                            }
-
-                            return Task.CompletedTask;
+                                return Task.CompletedTask;
+                            
                         }
                     };
                 });

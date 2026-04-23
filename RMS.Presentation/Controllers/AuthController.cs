@@ -87,6 +87,8 @@ namespace RMS.Presentation.Controllers
                     Data = loginResponse
                 };
 
+                SetTokenCookies(loginResponse.AccessToken, loginResponse.RefreshToken, loginResponse.ExpiresAt);
+
                 return Ok(response);
             }
             catch (Exception ex)
@@ -99,47 +101,58 @@ namespace RMS.Presentation.Controllers
             }
         }
 
+
         [HttpPost("refresh-token")]
-        public async Task<ActionResult<UserDTO>> RefreshAccessToken([FromBody] RefreshTokenRequestDTO refreshTokenRequestDTO)
+        public async Task<ActionResult<UserDTO>> RefreshAccessToken()
         {
             try
             {
-                if (refreshTokenRequestDTO == null || String.IsNullOrEmpty(refreshTokenRequestDTO.RefreshToken))
-                {
-                    return BadRequest("Refresh Token is required");
-                }
+              
+                var refreshToken = Request.Cookies["refreshToken"];
 
-                var tokenResponse = await _authService.RefreshAccessTokenAsync(refreshTokenRequestDTO);
+                if (string.IsNullOrEmpty(refreshToken))
+                    return BadRequest("Refresh Token is required");
+
+                var tokenResponse = await _authService.RefreshAccessTokenAsync(
+                    new RefreshTokenRequestDTO { RefreshToken = refreshToken });
 
                 if (tokenResponse == null)
                 {
+                   
+                    ClearTokenCookies();
                     return Unauthorized(new
                     {
                         StatusCode = 401,
-                        Message = "Invalid or expired refresh token. If token reuse was detected, all your sessions have been terminated for security. Please login again."
+                        Message = "Invalid or expired refresh token. Please login again."
                     });
                 }
 
-                var response = new
-                {
-                    Message = "Token refreshed successfully",
-                    Data = tokenResponse
-                };
+                SetTokenCookies(tokenResponse.AccessToken, tokenResponse.RefreshToken, tokenResponse.ExpiresAt);
 
-                return Ok(response);
+                return Ok(new { Message = "Token refreshed successfully" });
             }
             catch (Exception ex)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new
-                {
-                    Message = "An error occurred during token refresh",
-                    Error = ex.Message
-                });
+                return StatusCode(500, new { Message = "An error occurred during token refresh", Error = ex.Message });
             }
         }
 
 
-        [Authorize(Policy = "JwtPolicy")]
+        //[HttpPost("logout")]
+        //[Authorize]
+        //public async Task<IActionResult> Logout()
+        //{
+        //    var refreshToken = Request.Cookies["refreshToken"];
+
+        //    if (!string.IsNullOrEmpty(refreshToken))
+        //        await _authService.RevokeRefreshTokenAsync(refreshToken);
+
+        //    ClearTokenCookies();
+        //    return Ok(new { Message = "Logged out successfully" });
+        //}
+
+
+        [Authorize]
         [HttpGet("CurrentUser")]
         public async Task<ActionResult<UserDTO>> GetCurrentUser()
         {
@@ -164,7 +177,7 @@ namespace RMS.Presentation.Controllers
 
         }
 
-        // This endpoint is for demonstration purposes. In a real application, the confirmation link would be sent to the user's email.
+        
 
         [HttpGet("confirm-email")]
         public async Task<IActionResult> ConfirmEmail(string? userId, string? code)
@@ -177,7 +190,7 @@ namespace RMS.Presentation.Controllers
             return BadRequest("Error confirming email");
         }
 
-        // This endpoint is for demonstration purposes. In a real application, the reset code would be sent to the user's email. 
+        
         [HttpPost("send-reset-code")]
         public async Task<IActionResult> SendResetCode(string email)
         {
@@ -185,7 +198,7 @@ namespace RMS.Presentation.Controllers
             return Ok(result);
         }
 
-        // This endpoint is for demonstration purposes. In a real application, the verification would be done through a link in the user's email.
+        
         [HttpPost("verify-reset-code")]
         public async Task<IActionResult> VerifyCode(string code)
         {
@@ -197,7 +210,7 @@ namespace RMS.Presentation.Controllers
             return Ok(new { resetSessionToken = result.resetSessionToken });
         }
 
-        // This endpoint is for demonstration purposes. In a real application, the reset session token would be validated and used to identify the user for password reset.
+       
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword(ResetPasswordDTO dto)
         {
@@ -257,6 +270,8 @@ namespace RMS.Presentation.Controllers
             if (result == null)
                 return BadRequest("Login failed");
 
+            SetTokenCookies(result.AccessToken, result.RefreshToken, result.ExpiresAt);
+
             return Ok(result);
         }
 
@@ -269,5 +284,35 @@ namespace RMS.Presentation.Controllers
         #endregion
 
 
+
+        private void SetTokenCookies(string accessToken, string refreshToken, DateTime? expiresAt)
+        {
+            var accessTokenOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = expiresAt.HasValue
+                            ? DateTime.SpecifyKind(expiresAt.Value, DateTimeKind.Utc)
+                            : DateTime.UtcNow.AddHours(2) 
+            };
+
+            var refreshTokenOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddDays(7)
+            };
+
+            Response.Cookies.Append("accessToken", accessToken, accessTokenOptions);
+            Response.Cookies.Append("refreshToken", refreshToken, refreshTokenOptions);
+        }
+
+        private void ClearTokenCookies()
+        {
+            Response.Cookies.Delete("accessToken");
+            Response.Cookies.Delete("refreshToken");
+        }
     }
 }
