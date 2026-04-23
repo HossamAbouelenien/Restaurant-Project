@@ -13,6 +13,7 @@ namespace RMS.ServicesAbstraction.IIdentityService
         Task<bool> IsEmailExistsAsync(string email);
 
         Task<TokenDTO?> RefreshAccessTokenAsync(RefreshTokenRequestDTO refreshTokenRequestDTO);
+        //Task RevokeRefreshTokenAsync(string refreshToken);
 
         Task<UserDTO?> GetCurrentUserAsync(string email);
 
