@@ -15,6 +15,13 @@ namespace RMS.Shared.SharedResources
         public const string NotFound = "NotFound";
         public const string AlreadyExists = "AlreadyExists";
         public const string Unauthorized = "Unauthorized";
+        public const string Failed = "Failed";
+        public const string Success = "Success";
+        public const string Error = "Error";
+        public const string FailedToUpdate = "FailedToUpdate";
+        public const string FailedToDelete = "FailedToDelete";
+
+
 
 
         // Branch
@@ -35,6 +42,26 @@ namespace RMS.Shared.SharedResources
         public const string OrderAssignedToYou = "OrderAssignedToYou";
         public const string InvalidStatusValue = "InvalidStatusValue";
         public const string InvalidStatusTransition = "InvalidStatusTransition";
+
+
+        // Auth
+         
+        public const string EmailIsNotConfirmed = "EmailIsNotConfirmed";
+        public const string ConfirmEmail = "ConfirmEmail";
+        public const string ErrorHappend = "ErrorHappend";
+
+
+        // MenuItem
+
+        public const string MenuItemIngredient = "MenuItemIngredient";
+        public const string DuplicateIngredient = "DuplicateIngredient";
+
+        // Payment
+
+        public const string OrderAlreadyPaid = "OrderAlreadyPaid";
+
+        // Order
+        public const string FailedOrders = "FailedOrders";
 
     }
 }

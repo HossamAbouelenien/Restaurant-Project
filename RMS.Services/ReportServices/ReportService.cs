@@ -4,6 +4,7 @@ using RMS.Domain.Enums;
 using RMS.Services.Specifications.ReportSpec;
 using RMS.ServicesAbstraction;
 using RMS.Shared.DTOs.ReportsDTOs;
+using RMS.Shared.SharedResources;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,7 +30,7 @@ namespace RMS.Services.ReportServices
             var orders = await _unitOfWork.GetRepository<Order>().GetAllAsync();
 
             if (orders == null)
-                throw new Exception("Failed to retrieve orders");
+                throw new Exception(SharedResourcesKeys.FailedOrders);
 
             var todayOrders = orders
                 .Where(o => !o.IsDeleted &&
@@ -41,7 +42,8 @@ namespace RMS.Services.ReportServices
                 .GetRepository<BranchStock>() 
                 .GetAllAsync();
             if (branchStocks == null)
-                throw new Exception("Failed to retrieve branch stock");
+                throw new Exception(SharedResourcesKeys.Failed);
+
             var lowStockCount = branchStocks
                 .Count(bs => bs.QuantityAvailable < bs.LowThreshold);
 

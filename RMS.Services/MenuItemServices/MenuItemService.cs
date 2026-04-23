@@ -9,6 +9,7 @@ using RMS.Shared.DTOs.MenuItemDTOs;
 using RMS.Shared.DTOs.MenuItemsDTOs;
 using RMS.Shared.DTOs.RecipeDTOs;
 using RMS.Shared.QueryParams;
+using RMS.Shared.SharedResources;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -79,11 +80,11 @@ namespace RMS.Services.MenuItemsServices
             var repo = _unitOfWork.GetRepository<MenuItem>();
             // Validation
             if (menuItemDto.Recipes == null || !menuItemDto.Recipes.Any())
-                throw new Exception("MenuItem must have at least one ingredient");
+                throw new Exception(SharedResourcesKeys.MenuItemIngredient);
             // Check for duplicate ingredients
             var duplicates = menuItemDto.Recipes.GroupBy(r => r.IngredientId).Where(g => g.Count() > 1);
             if (duplicates.Any())
-                throw new Exception("Duplicate ingredients not allowed");
+                throw new Exception(SharedResourcesKeys.DuplicateIngredient);
 
             var ingredientIds = menuItemDto.Recipes.Select(r => r.IngredientId).Distinct().ToHashSet();
             var spec = new IngredientByIdsSpecification(ingredientIds);
@@ -118,14 +119,14 @@ namespace RMS.Services.MenuItemsServices
             //  Check exists
             var spec = new MenuItemWithCategoryAndRecipesSpecification(id);
             var menuItem = await repo.GetByIdAsync(spec);
-            if (menuItem is null) throw new Exception("MenuItem not found");
+            if (menuItem is null) throw new Exception(SharedResourcesKeys.NotFound);
             //  Validation
             if (menuItemDto.Recipes == null || !menuItemDto.Recipes.Any())
-                throw new Exception("MenuItem must have at least one ingredient");
+                throw new Exception(SharedResourcesKeys.MenuItemIngredient);
             // Check for duplicate ingredients
             var duplicates = menuItemDto.Recipes.GroupBy(r => r.IngredientId).Where(g => g.Count() > 1);
             if (duplicates.Any())
-                throw new Exception("Duplicate ingredients not allowed");
+                throw new Exception(SharedResourcesKeys.DuplicateIngredient);
             //  Validate Ingredients
             var ingredientIds = menuItemDto.Recipes.Select(r => r.IngredientId).Distinct().ToHashSet();
 
@@ -190,7 +191,7 @@ namespace RMS.Services.MenuItemsServices
         public async Task ToggleAvailabilityAsync(int id)
         {
             var menuItem = await _unitOfWork.GetRepository<MenuItem>().GetByIdAsync(id);
-            if (menuItem is null) throw new Exception("MenuItem not found");
+            if (menuItem is null) throw new Exception(SharedResourcesKeys.NotFound);
 
             menuItem.IsAvailable = !menuItem.IsAvailable;
 
@@ -201,7 +202,7 @@ namespace RMS.Services.MenuItemsServices
         {
             var menuItemWithRecipesSpec = new MenuItemWithRecipesSpecification(id);
             var menuItem = await _unitOfWork.GetRepository<MenuItem>().GetByIdAsync(menuItemWithRecipesSpec);
-            if (menuItem is null) throw new Exception("MenuItem not found");
+            if (menuItem is null) throw new Exception(SharedResourcesKeys.NotFound);
 
             foreach (var recipe in menuItem.Recipes)
             {

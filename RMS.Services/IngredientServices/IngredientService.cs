@@ -67,7 +67,7 @@ namespace RMS.Services.IngredientServices
             var repo =  _unitOfWork.GetRepository<Ingredient>();
 
             if (string.IsNullOrWhiteSpace(dto.Name))
-                throw new Exception("Required");
+                throw new Exception(SharedResourcesKeys.Required);
 
             var existing = await repo.GetAllAsync();
 
