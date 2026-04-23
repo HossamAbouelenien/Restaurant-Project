@@ -132,10 +132,28 @@
   <data name="Invalid" xml:space="preserve">
     <value>Invalid</value>
   </data>
+  <data name="InvalidOrderType" xml:space="preserve">
+    <value>Order is not a delivery type</value>
+  </data>
+  <data name="InvalidStatusValue" xml:space="preserve">
+    <value>Invalid status value</value>
+  </data>
   <data name="NotFound" xml:space="preserve">
     <value>Not Found</value>
   </data>
+  <data name="OrderAssignedToDelivery" xml:space="preserve">
+    <value>Order already assigned</value>
+  </data>
+  <data name="OrderAssignedToYou" xml:space="preserve">
+    <value>New Delivery Has Assigned To You !</value>
+  </data>
   <data name="Required" xml:space="preserve">
     <value>this field is required</value>
+  </data>
+  <data name="Unauthorized" xml:space="preserve">
+    <value>Unauthorized</value>
+  </data>
+  <data name="InvalidStatusTransition" xml:space="preserve">
+    <value>Invalid status transition</value>
   </data>
 </root>

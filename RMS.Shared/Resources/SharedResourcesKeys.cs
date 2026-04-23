@@ -14,6 +14,7 @@ namespace RMS.Shared.SharedResources
         public const string Invalid = "Invalid";
         public const string NotFound = "NotFound";
         public const string AlreadyExists = "AlreadyExists";
+        public const string Unauthorized = "Unauthorized";
 
 
         // Branch
@@ -27,6 +28,13 @@ namespace RMS.Shared.SharedResources
         // Category
 
         public const string DeleteCategoryWithMenuItems = "DeleteCategoryWithMenuItems";
+
+        // Delivery
+        public const string InvalidOrderType = "InvalidOrderType";
+        public const string OrderAssignedToDelivery = "OrderAssignedToDelivery";
+        public const string OrderAssignedToYou = "OrderAssignedToYou";
+        public const string InvalidStatusValue = "InvalidStatusValue";
+        public const string InvalidStatusTransition = "InvalidStatusTransition";
 
     }
 }
