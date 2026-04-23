@@ -57,5 +57,13 @@ namespace RMS.Presentation.Controllers
 
             return Ok();
         }
+
+        [Authorize]
+        [HttpPost("confirm-cash/{orderId}")]
+        public async Task<IActionResult> ConfirmCashPayment(int orderId)
+        {
+            await _payment.ConfirmCashPaymentAsync(orderId);
+            return Ok();
+        }
     }
 }

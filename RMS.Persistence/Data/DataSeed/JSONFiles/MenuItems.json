@@ -1,6 +1,7 @@
 [
   {
     "Name": "Classic Beef Burger",
+    "ArabicName": "ا",
     "Price": 89.0,
     "IsAvailable": true,
     "PrepTimeMinutes": 15,
@@ -9,6 +10,7 @@
   },
   {
     "Name": "Double Smash Burger",
+    "ArabicName": "ا",
     "Price": 120.0,
     "IsAvailable": true,
     "PrepTimeMinutes": 18,
@@ -18,6 +20,7 @@
   },
   {
     "Name": "Crispy Chicken Burger",
+    "ArabicName": "ا",
     "Price": 95.0,
     "IsAvailable": true,
     "PrepTimeMinutes": 20,
@@ -27,6 +30,7 @@
   },
   {
     "Name": "Margherita Pizza",
+    "ArabicName": "ا",
     "Price": 130.0,
     "IsAvailable": true,
     "PrepTimeMinutes": 25,
@@ -36,6 +40,7 @@
   },
   {
     "Name": "BBQ Chicken Pizza",
+    "ArabicName": "ا",
     "Price": 155.0,
     "IsAvailable": true,
     "PrepTimeMinutes": 28,
@@ -45,6 +50,7 @@
   },
   {
     "Name": "Mushroom Pizza",
+    "ArabicName": "ا",
     "Price": 140.0,
     "IsAvailable": true,
     "PrepTimeMinutes": 25,
@@ -54,6 +60,7 @@
   },
   {
     "Name": "Grilled Chicken",
+    "ArabicName": "ا",
     "Price": 110.0,
     "IsAvailable": true,
     "PrepTimeMinutes": 30,
@@ -63,6 +70,7 @@
   },
   {
     "Name": "Mixed Grill Platter",
+    "ArabicName": "ا",
     "Price": 220.0,
     "IsAvailable": true,
     "PrepTimeMinutes": 40,
@@ -72,6 +80,7 @@
   },
   {
     "Name": "Greek Salad",
+    "ArabicName": "ا",
     "Price": 60.0,
     "IsAvailable": true,
     "PrepTimeMinutes": 10,
@@ -81,6 +90,7 @@
   },
   {
     "Name": "Caesar Salad",
+    "ArabicName": "ا",
     "Price": 70.0,
     "IsAvailable": true,
     "PrepTimeMinutes": 10,
@@ -90,6 +100,7 @@
   },
   {
     "Name": "Soft Drink",
+    "ArabicName": "ا",
     "Price": 25.0,
     "IsAvailable": true,
     "PrepTimeMinutes": 2,
@@ -99,6 +110,7 @@
   },
   {
     "Name": "Mineral Water",
+    "ArabicName": "ا",
     "Price": 15.0,
     "IsAvailable": true,
     "PrepTimeMinutes": 1,
@@ -108,6 +120,7 @@
   },
   {
     "Name": "Chocolate Lava Cake",
+    "ArabicName": "ا",
     "Price": 75.0,
     "IsAvailable": true,
     "PrepTimeMinutes": 15,
@@ -117,6 +130,7 @@
   },
   {
     "Name": "Cream Brulee",
+    "ArabicName": "ا",
     "Price": 65.0,
     "IsAvailable": false,
     "PrepTimeMinutes": 20,
