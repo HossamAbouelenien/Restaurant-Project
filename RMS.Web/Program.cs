@@ -244,7 +244,10 @@ namespace RMS.Web
                 builder.Configuration.GetSection("Paymob")
             );
 
-
+            builder.Services.AddHttpClient("RecipeSuggestionClient", client =>
+            {
+                client.BaseAddress = new Uri(builder.Configuration["AiServices:RecipeSuggestionBaseUrl"]!);
+            });
 
 
 
