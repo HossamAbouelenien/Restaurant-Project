@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using RMS.Domain.Entities;
 using RMS.ServicesAbstraction.IImageServices;
@@ -9,6 +11,7 @@ using System.Net;
 using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
+using ResourceType = CloudinaryDotNet.Actions.ResourceType;
 
 namespace RMS.Services.ImageServices
 {
