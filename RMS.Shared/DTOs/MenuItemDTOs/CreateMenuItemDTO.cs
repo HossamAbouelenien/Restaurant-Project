@@ -31,6 +31,7 @@ namespace RMS.Shared.DTOs.MenuItemDTOs
 
         [Required]
         public IFormFile? Image { get; set; } = default!;
+        public string? ImagePublicId { get; set; }
 
         [Required]
         public List<CreateRecipeDTO> Recipes { get; set; } = [];

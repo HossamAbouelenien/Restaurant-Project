@@ -95,9 +95,14 @@ namespace RMS.Services.MenuItemsServices
                 throw new Exception($"Invalid IngredientIds: {string.Join(",", invalidIds)}");
 
             // Image upload using IImageService
-            var imagePath = await _imageService.UploadImageAsync(menuItemDto.Image);
+            //var imagePath = await _imageService.UploadImageAsync(menuItemDto.Image);
+            var image = await _imageService.UploadImageAsync(menuItemDto.Image);
+            if (image == null)
+                throw new Exception("Image upload failed");
             var menuItem = _mapper.Map<MenuItem>(menuItemDto);
-            menuItem.ImageUrl = imagePath;
+            //menuItem.ImageUrl = imagePath;
+            menuItem.ImageUrl = image.Url;
+            menuItem.ImagePublicId = image.PublicId;
             menuItem.Recipes = menuItemDto.Recipes.Select(r => new Recipe
             {
                 IngredientId = r.IngredientId,
@@ -141,7 +146,15 @@ namespace RMS.Services.MenuItemsServices
             if (menuItemDto.Image != null)
             {
                 // Replace Old Image
-                menuItem.ImageUrl = await _imageService.ReplaceImageAsync(menuItemDto.Image, menuItem.ImageUrl);
+                //menuItem.ImageUrl = await _imageService.ReplaceImageAsync(menuItemDto.Image, menuItem.ImageUrl);
+                var image = await _imageService.ReplaceImageAsync( menuItemDto.Image,menuItem.ImagePublicId);
+                if (image != null)
+                {
+                    menuItem.ImageUrl = image.Url;
+                    menuItem.ImagePublicId = image.PublicId;
+                }
+
+
             }
             //  Map updated fields ignoreing Recipes and ImageUrl as they are handled separately
             _mapper.Map(menuItemDto, menuItem);
@@ -208,8 +221,17 @@ namespace RMS.Services.MenuItemsServices
             {
                 _unitOfWork.GetRepository<Recipe>().Remove(recipe);
             }
+            //menuItem.IsDeleted = true;
+            //menuItem.DeletedAt = DateTime.Now;
+            // ☁️ Delete image from Cloudinary
+            if (!string.IsNullOrWhiteSpace(menuItem.ImagePublicId))
+            {
+                await _imageService.DeleteImageAsync(menuItem.ImagePublicId);
+            }
+
+            // 🗑️ Soft delete menu item
             menuItem.IsDeleted = true;
-            menuItem.DeletedAt = DateTime.Now;
+            menuItem.DeletedAt = DateTime.UtcNow;
 
             await _unitOfWork.SaveChangesAsync();
         }
