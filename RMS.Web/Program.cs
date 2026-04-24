@@ -17,6 +17,7 @@ using RMS.Persistence.Repositries;
 using RMS.Presentation.Hubs.Notification;
 using RMS.Presentation.Hubs.RestaurantHub;
 using RMS.Services;
+using RMS.Services.AiServices;
 using RMS.Services.BasketService;
 using RMS.Services.BranchServices;
 using RMS.Services.BranchStockServices;
@@ -36,6 +37,7 @@ using RMS.Services.ReportServices;
 using RMS.Services.TableServices;
 using RMS.Services.UserServices;
 using RMS.ServicesAbstraction;
+using RMS.ServicesAbstraction.IAiServices;
 using RMS.ServicesAbstraction.ICategoriesService;
 using RMS.ServicesAbstraction.IDeliveryServices;
 using RMS.ServicesAbstraction.IEmailServices;
@@ -249,7 +251,7 @@ namespace RMS.Web
                 client.BaseAddress = new Uri(builder.Configuration["AiServices:RecipeSuggestionBaseUrl"]!);
             });
 
-
+            builder.Services.AddScoped<IAiRecipeService, AiRecipeService>();
 
 
 
