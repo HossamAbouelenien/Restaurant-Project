@@ -196,7 +196,7 @@ namespace RMS.Presentation.Controllers
 
         
         [HttpPost("send-reset-code")]
-        public async Task<IActionResult> SendResetCode(string email)
+        public async Task<IActionResult> SendResetCode([FromBody] string email)
         {
             var result = await _authService.SendResetPasswordCode(email);
             return Ok(result);
@@ -276,7 +276,7 @@ namespace RMS.Presentation.Controllers
 
             SetTokenCookies(result.AccessToken, result.RefreshToken, result.ExpiresAt);
 
-            return Ok(result);
+            return Redirect("http://localhost:4200/auth/auth-callback");
         }
 
         [HttpGet("external-cancelled")]
