@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Json;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace RMS.Services.AiServices
@@ -26,7 +27,15 @@ namespace RMS.Services.AiServices
         {
             var response = await _httpClient.PostAsJsonAsync("/suggest/internal", request);
             response.EnsureSuccessStatusCode();
-            return await response.Content.ReadFromJsonAsync<SuggestResponseDTO>()
+
+            var json = await response.Content.ReadAsStringAsync();
+
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+
+            return JsonSerializer.Deserialize<SuggestResponseDTO>(json, options)
                    ?? new SuggestResponseDTO();
         }
 
@@ -35,14 +44,25 @@ namespace RMS.Services.AiServices
             var repo = _unitOfWork.GetRepository<Recipe>();
             var recipes = await repo.GetAllAsync();
 
+            
+            var menuItemRepo = _unitOfWork.GetRepository<MenuItem>();
+            var ingredientRepo = _unitOfWork.GetRepository<Ingredient>();
+
+            var menuItems = await menuItemRepo.GetAllAsync();
+            var ingredients = await ingredientRepo.GetAllAsync();
+
+            var menuItemDict = menuItems.ToDictionary(m => m.Id);
+            var ingredientDict = ingredients.ToDictionary(i => i.Id);
+
             var grouped = recipes
-                .GroupBy(r => new { r.MenuItemId, r.MenuItem!.Name })
+                .Where(r => menuItemDict.ContainsKey(r.MenuItemId) && ingredientDict.ContainsKey(r.IngredientId))
+                .GroupBy(r => new { r.MenuItemId, Name = menuItemDict[r.MenuItemId].Name })
                 .Select(g => new
                 {
                     menu_item_id = g.Key.MenuItemId,
                     menu_item_name = g.Key.Name,
-                    ingredients = g.Select(r => r.Ingredient!.Name).ToList()
-                });
+                    ingredients = g.Select(r => ingredientDict[r.IngredientId].Name).ToList()
+                }).ToList();
 
             var payload = new { recipes = grouped };
 
