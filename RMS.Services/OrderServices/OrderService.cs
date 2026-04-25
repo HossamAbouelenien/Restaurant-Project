@@ -210,7 +210,7 @@ namespace RMS.Services.OrderServices
                 order.Delivery = new Delivery
                 {
                     DeliveryAddress = _mapper.Map<Address>(orderDto.DeliveryAddress),
-                    DeliveryStatus = DeliveryStatus.Assigned,
+                    DeliveryStatus = DeliveryStatus.UnAssigned,
                     //DriverId = "0"  // ← assigned later by Admin
                 };
             }
@@ -293,6 +293,19 @@ namespace RMS.Services.OrderServices
             var countOfOrders = await repo.CountAsync(countSpec);
             var pageSize = orderDtos.Count();
             var paginatedResult = new PaginatedResult<OrderDTO>(queryParams.PageIndex, pageSize, countOfOrders, orderDtos);
+            return paginatedResult;
+        }
+
+        public async Task<PaginatedResult<MyDeliveryActiveCustomersDTO>> GetCustomerOrdersActiveAsync(OrderQueryParams queryParams, string customerId)
+        {
+            var repo = _unitOfWork.GetRepository<Order>();
+            var spec = new OrderWithBranchAndCustomerAndOrderItemsAndDeliverySpecification(queryParams, customerId);
+            var orders = await repo.GetAllAsync(spec);
+            var orderDtos = _mapper.Map<IEnumerable<MyDeliveryActiveCustomersDTO>>(orders);
+            var countSpec = new OrderCountSpecification(queryParams, customerId);
+            var countOfOrders = await repo.CountAsync(countSpec);
+            var pageSize = orderDtos.Count();
+            var paginatedResult = new PaginatedResult<MyDeliveryActiveCustomersDTO>(queryParams.PageIndex, pageSize, countOfOrders, orderDtos);
             return paginatedResult;
         }
 
