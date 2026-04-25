@@ -62,11 +62,24 @@ namespace RMS.Shared.SharedResources
 
         // Order
         public const string FailedOrders = "FailedOrders";
+        public const string FailedUpdatingStatus = "FailedUpdatingStatus";
+        public const string FailedRetrieveCreatedOrder = "FailedRetrieveCreatedOrder";
+        public const string DeleteReceivedOrder = "DeleteReceivedOrder";
+        public const string RemoveAllOrderItems = "RemoveAllOrderItems";
+        public const string DuplicateMenuItems = "DuplicateMenuItems";
+        public const string FailedAddingOrder = "FailedAddingOrder";
+        public const string TableID = "TableID";
+        public const string DeliveryAddress = "DeliveryAddress";
+        public const string OrderItem = "OrderItem";
+
+
 
         // Table
         public const string TableCapacityInvalid = "TableCapacityInvalid";
         public const string OccupiedTable = "OccupiedTable";
+        public const string AlreadyOccupiedTable = "AlreadyOccupiedTable";
         public const string TableBranch = "TableBranch";
+        public const string TableNotInBranch = "TableNotInBranch";
         public const string FreeTable = "FreeTable";
         public const string CompletedTableOrder = "CompletedTableOrder";
 

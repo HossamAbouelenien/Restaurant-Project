@@ -207,4 +207,37 @@
   <data name="CompletedTableOrder" xml:space="preserve">
     <value>Table order is already completed</value>
   </data>
+  <data name="FailedUpdatingStatus" xml:space="preserve">
+    <value>Failed to update order status</value>
+  </data>
+  <data name="FailedRetrieveCreatedOrder" xml:space="preserve">
+    <value>Failed to retrieve created order</value>
+  </data>
+  <data name="DeleteReceivedOrder" xml:space="preserve">
+    <value>Cannot delete a received order</value>
+  </data>
+  <data name="RemoveAllOrderItems" xml:space="preserve">
+    <value>Cannot remove all items from order. Consider cancelling the order instead.</value>
+  </data>
+  <data name="AlreadyOccupiedTable" xml:space="preserve">
+    <value>The table is already occupied</value>
+  </data>
+  <data name="TableNotInBranch" xml:space="preserve">
+    <value>This table doesn't belong to this branch</value>
+  </data>
+  <data name="DuplicateMenuItems" xml:space="preserve">
+    <value>Duplicate MenuItems are not allowed</value>
+  </data>
+  <data name="FailedAddingOrder" xml:space="preserve">
+    <value>Failed to add items to order</value>
+  </data>
+  <data name="TableID" xml:space="preserve">
+    <value>TableId is required for DineIn orders</value>
+  </data>
+  <data name="DeliveryAddress" xml:space="preserve">
+    <value>DeliveryAddress is required for Delivery orders</value>
+  </data>
+  <data name="OrderItem" xml:space="preserve">
+    <value>Order must have at least one item</value>
+  </data>
 </root>
