@@ -36,4 +36,5 @@ public class MenuItem : BaseEntity
     public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
     
     public string? ImageUrl { get; set; }
+    public string? ImagePublicId { get; set; }
 }

@@ -1,3 +1,4 @@
+using CloudinaryDotNet;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -26,6 +27,7 @@ using RMS.Services.CategoryServices;
 using RMS.Services.DeliveryServices;
 using RMS.Services.EmailServices;
 using RMS.Services.IdentityService;
+using RMS.Services.ImageServices;
 using RMS.Services.IngredientServices;
 using RMS.Services.KitchenServices;
 using RMS.Services.MappingProfiles;
@@ -44,6 +46,7 @@ using RMS.ServicesAbstraction.IEmailServices;
 using RMS.ServicesAbstraction.IHubServices.INotificationServices;
 using RMS.ServicesAbstraction.IHubServices.IRestaurantNotifier;
 using RMS.ServicesAbstraction.IIdentityService;
+using RMS.ServicesAbstraction.IImageServices;
 using RMS.ServicesAbstraction.IKitchenServices;
 using RMS.ServicesAbstraction.IPaymentServices;
 using RMS.ServicesAbstraction.IUserServices;
@@ -252,9 +255,22 @@ namespace RMS.Web
             });
 
             builder.Services.AddScoped<IAiRecipeService, AiRecipeService>();
+            builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
+            builder.Services.AddSingleton(sp =>
+            {
+                var settings = sp.GetRequiredService<IOptions<CloudinarySettings>>().Value;
 
+                var account = new Account(
+                    settings.CloudName,
+                    settings.ApiKey,
+                    settings.ApiSecret);
 
+                return new Cloudinary(account);
+            });
 
+            builder.Services.AddScoped<IImageValidator, ImageValidator>();
+            builder.Services.AddScoped<IImageStorageStrategy, CloudinaryStorageStrategy>();
+            builder.Services.AddScoped<IImageService, ImageService>();
 
 
             //================= Hossam (150 : 165) =================
