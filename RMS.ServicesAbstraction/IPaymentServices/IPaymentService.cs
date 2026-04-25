@@ -1,4 +1,6 @@
-﻿using System;
+﻿using RMS.Shared.DTOs.PaymentsDTOS;
+using RMS.Shared.QueryParams;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +13,7 @@ namespace RMS.ServicesAbstraction.IPaymentServices
         Task<string> PayOrderAsync(int orderId, string userId);
         Task HandleWebhookAsync(PaymobWebhookDto dto);
 
-        public Task ConfirmCashPaymentAsync(int orderId);
+        Task ConfirmCashPaymentAsync(int orderId);
+        Task<IReadOnlyList<PaymentDto>> GetAllAsync(PaymentQueryParams queryParams);
     }
 }

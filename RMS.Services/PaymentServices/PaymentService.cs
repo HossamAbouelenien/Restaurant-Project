@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using AutoMapper;
+using Microsoft.Extensions.Configuration;
 using RMS.Domain.Contracts;
 using RMS.Domain.Entities;
 using RMS.Domain.Enums;
@@ -7,6 +8,8 @@ using RMS.Services.Specifications.PaymentSpec;
 using RMS.ServicesAbstraction;
 using RMS.ServicesAbstraction.IEmailServices;
 using RMS.ServicesAbstraction.IPaymentServices;
+using RMS.Shared.DTOs.PaymentsDTOS;
+using RMS.Shared.QueryParams;
 using RMS.Shared.SharedResources;
 
 public class PaymentService : IPaymentService
@@ -15,17 +18,20 @@ public class PaymentService : IPaymentService
     private readonly IPaymobService _paymob;
     private readonly IEmailService _email;
     private readonly string _secret;
+    private readonly IMapper _mapper;
 
     public PaymentService(
         IUnitOfWork uow,
         IPaymobService paymob,
         IEmailService email,
-        IConfiguration config)
+        IConfiguration config,
+        IMapper mapper)
     {
         _unitOfWork = uow;
         _paymob = paymob;
         _email = email;
         _secret = config["Paymob:SecretKey"]!;
+        _mapper = mapper;
     }
 
    
@@ -156,5 +162,16 @@ public class PaymentService : IPaymentService
         payment.PaidAt = DateTime.Now;
 
         await _unitOfWork.SaveChangesAsync();
+    }
+
+
+    public async Task<IReadOnlyList<PaymentDto>> GetAllAsync(PaymentQueryParams queryParams)
+    {
+        var _repo = _unitOfWork.GetRepository<Payment>();
+        var spec = new PaymentSpecifications(queryParams);
+
+        var payments = _repo.GetAllAsync(spec);
+
+        return _mapper.Map<IReadOnlyList<PaymentDto>>(payments);
     }
 }
