@@ -42,10 +42,11 @@ namespace RMS.Shared.SharedResources
         public const string OrderAssignedToYou = "OrderAssignedToYou";
         public const string InvalidStatusValue = "InvalidStatusValue";
         public const string InvalidStatusTransition = "InvalidStatusTransition";
+        public const string OrderIsNotReadyYet = "OrderIsNotReadyYet";
 
 
         // Auth
-         
+
         public const string EmailIsNotConfirmed = "EmailIsNotConfirmed";
         public const string ConfirmEmail = "ConfirmEmail";
         public const string ErrorHappend = "ErrorHappend";
