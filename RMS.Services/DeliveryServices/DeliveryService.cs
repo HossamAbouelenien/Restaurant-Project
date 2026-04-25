@@ -149,7 +149,8 @@ namespace RMS.Services.DeliveryServices
                 "OrderAssignedToDriver",
                 result,
                 $"drivers_id_{dto.DriverId}",
-                "admins");
+                "admins",
+                $"customers_id_{createdDelivery?.Order!.UserId}");
 
 
             await _notificationService.CreateNotification(
@@ -178,11 +179,20 @@ namespace RMS.Services.DeliveryServices
             
             var spec = new DeliveryByIdSpecification(id);
             var delivery = await deliveryRepo.GetByIdAsync(spec);
-
             if (delivery == null)
                 throw new Exception(SharedResourcesKeys.NotFound);
 
-           
+            var order = await orderRepo.GetByIdAsync(delivery.OrderId);
+
+            if (order == null)
+                throw new Exception(SharedResourcesKeys.NotFound);
+
+            if (order.Status != OrderStatus.Ready)
+            {
+                throw new Exception("order is not ready");
+            }
+
+
             if (!isAdmin && delivery.DriverId != userId)
                 throw new Exception(SharedResourcesKeys.Unauthorized);
 
@@ -201,16 +211,15 @@ namespace RMS.Services.DeliveryServices
                     delivery.CashCollected = dto.CashCollected;
 
                
-                var order = await orderRepo.GetByIdAsync(delivery.OrderId);
+                
 
-                if (order == null)
-                    throw new Exception(SharedResourcesKeys.NotFound);
+
 
                 order.Status = OrderStatus.Delivered; 
 
-                orderRepo.Update(order);
+                //orderRepo.Update(order);
 
-                
+
                 //delivery.DriverId = null;
             }
 
@@ -225,7 +234,8 @@ namespace RMS.Services.DeliveryServices
             await _restaurantNotifier.SendAsync(
                 "deliveryUpdated",
                 result,
-                $"admins");
+                $"admins",
+                $"customers_id_{delivery.Order!.UserId}");
 
             return result;
         }
