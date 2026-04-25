@@ -52,6 +52,15 @@ namespace RMS.Services.MappingProfiles
                     .ForMember(dest => dest.UserRole, opt => opt.MapFrom(src => src.User!.RoleId))
                     .ReverseMap();
 
+
+            CreateMap<Order, MyDeliveryActiveCustomersDTO>()
+                    .ForMember(dest => dest.OrderItems, opt => opt.MapFrom(src => src.OrderItems))
+                    .ForMember(dest => dest.BranchName, opt => opt.MapFrom(src => src.Branch!.Name))
+                    .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()))
+                    .ForMember(dest => dest.OrderType, opt => opt.MapFrom(src => src.OrderType.ToString()))
+                    .ForMember(dest => dest.Delivery, opt => opt.MapFrom(src => src.Delivery))
+                    .ReverseMap();
+
             CreateMap<Payment, OrderPaymentDTO>().ReverseMap();
 
             CreateMap<Delivery, OrderDeliveryDTO>()

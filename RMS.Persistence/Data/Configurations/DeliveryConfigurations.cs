@@ -20,7 +20,7 @@ public class DeliveryConfigurations : IEntityTypeConfiguration<Delivery>
                .IsRequired()
                .HasMaxLength(30)
                .HasConversion<string>()
-               .HasDefaultValue(DeliveryStatus.Assigned);
+               .HasDefaultValue(DeliveryStatus.UnAssigned);
 
         // ── CreatedAt used as AssignedAt (set automatically in SaveChangesAsync)
         builder.Property(X => X.CreatedAt)

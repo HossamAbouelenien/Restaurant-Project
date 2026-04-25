@@ -93,6 +93,27 @@ namespace RMS.Presentation.Controllers
 
         }
 
+        [HttpGet("myactive")]
+        //[Authorize(Roles = SD.Role_Customer)]
+        public async Task<ActionResult<PaginatedResult<MyDeliveryActiveCustomersDTO>>> GetCustomerActiveOrdersHistory([FromQuery] OrderQueryParams queryParams)
+        {
+            try
+            {
+                var customerId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(customerId))
+                {
+                    return Unauthorized();
+                }
+                var result = await _orderService.GetCustomerOrdersActiveAsync(queryParams, customerId);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+
+        }
+
         [HttpPut("{orderId}/status")]
         public async Task<ActionResult<OrderDTO>> UpdateOrderStatus(int orderId, [FromBody] string newStatus)
         {

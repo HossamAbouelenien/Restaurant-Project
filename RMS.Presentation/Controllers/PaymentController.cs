@@ -21,7 +21,7 @@ namespace RMS.Presentation.Controllers
             _config = config;
         }
 
-        [Authorize(Policy = "JwtPolicy")]
+        [Authorize]
         [HttpPost("pay/{orderId:int}")]
         public async Task<IActionResult> Pay(int orderId)
         {
