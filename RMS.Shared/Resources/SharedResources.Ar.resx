@@ -207,4 +207,37 @@
   <data name="CompletedTableOrder" xml:space="preserve">
     <value>طلب الطاولة قد اكتمل بالفعل</value>
   </data>
+  <data name="FailedUpdatingStatus" xml:space="preserve">
+    <value>فشل في تحديث حالة الطلب</value>
+  </data>
+  <data name="FailedRetrieveCreatedOrder" xml:space="preserve">
+    <value>فشل في استرجاع الطلب الذي تم إنشاؤه</value>
+  </data>
+  <data name="DeleteReceivedOrder" xml:space="preserve">
+    <value>لا يمكن حذف طلب مستلم</value>
+  </data>
+  <data name="RemoveAllOrderItems" xml:space="preserve">
+    <value>لا يمكن إزالة جميع العناصر من الطلب. فكر في إلغاء الطلب بدلاً من ذلك.</value>
+  </data>
+  <data name="AlreadyOccupiedTable" xml:space="preserve">
+    <value>الطاولة مشغولة بالفعل</value>
+  </data>
+  <data name="TableNotInBranch" xml:space="preserve">
+    <value>هذا الطاولة لا تنتمي إلى هذا الفرع</value>
+  </data>
+  <data name="DuplicateMenuItems" xml:space="preserve">
+    <value>لا يُسمح بتكرار عناصر القائمة</value>
+  </data>
+  <data name="FailedAddingOrder" xml:space="preserve">
+    <value>فشل في إضافة العناصر إلى الطلب</value>
+  </data>
+  <data name="TableID" xml:space="preserve">
+    <value>رقم الطاولة مطلوب لطلبات تناول الطعام في المطعم</value>
+  </data>
+  <data name="DeliveryAddress" xml:space="preserve">
+    <value>عنوان التوصيل مطلوب لطلبات التوصيل</value>
+  </data>
+  <data name="OrderItem" xml:space="preserve">
+    <value>يجب أن يحتوي الطلب على عنصر واحد على الأقل</value>
+  </data>
 </root>
