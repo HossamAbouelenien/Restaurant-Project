@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using RMS.Domain.Entities;
 using RMS.Services.PaymobServices;
 using RMS.ServicesAbstraction.IPaymentServices;
+using RMS.Shared.QueryParams;
 using System.Security.Claims;
 
 namespace RMS.Presentation.Controllers
@@ -64,6 +65,13 @@ namespace RMS.Presentation.Controllers
         {
             await _payment.ConfirmCashPaymentAsync(orderId);
             return Ok();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll([FromQuery] PaymentQueryParams queryParams)
+        {
+            var result = await _payment.GetAllAsync(queryParams);
+            return Ok(result);
         }
     }
 }
