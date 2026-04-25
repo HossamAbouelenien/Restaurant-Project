@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using RMS.Domain.Entities;
 using RMS.ServicesAbstraction.IImageServices;
+using RMS.Shared.DTOs.ImageDTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -4,6 +4,7 @@ using RMS.Domain.Contracts;
 using RMS.Domain.Entities;
 using RMS.Services.Specifications.MenuItemSpec;
 using RMS.ServicesAbstraction;
+using RMS.ServicesAbstraction.IImageServices;
 using RMS.Shared;
 using RMS.Shared.DTOs.MenuItemDTOs;
 using RMS.Shared.DTOs.MenuItemsDTOs;
