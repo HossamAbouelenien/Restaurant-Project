@@ -8,6 +8,7 @@ using RMS.Services.Specifications.PaymentSpec;
 using RMS.ServicesAbstraction;
 using RMS.ServicesAbstraction.IEmailServices;
 using RMS.ServicesAbstraction.IPaymentServices;
+using RMS.Shared;
 using RMS.Shared.DTOs.PaymentsDTOS;
 using RMS.Shared.QueryParams;
 using RMS.Shared.SharedResources;
@@ -165,13 +166,20 @@ public class PaymentService : IPaymentService
     }
 
 
-    public async Task<IReadOnlyList<PaymentDto>> GetAllAsync(PaymentQueryParams queryParams)
+    public async Task<PaginatedResult<PaymentDto>> GetAllAsync(PaymentQueryParams queryParams)
     {
-        var _repo = _unitOfWork.GetRepository<Payment>();
+        var repo = _unitOfWork.GetRepository<Payment>();
+
         var spec = new PaymentSpecifications(queryParams);
+        var countSpec = new PaymentCountSpecifications(queryParams);
 
-        var payments = _repo.GetAllAsync(spec);
+        var payments = await repo.GetAllAsync(spec);
 
-        return _mapper.Map<IReadOnlyList<PaymentDto>>(payments);
+        var count = await repo.CountAsync(countSpec);
+
+        var data = _mapper.Map<List<PaymentDto>>(payments);
+
+        return new PaginatedResult<PaymentDto>(queryParams.PageIndex,queryParams.PageSize,count,data);
+      
     }
 }
