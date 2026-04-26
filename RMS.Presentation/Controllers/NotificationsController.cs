@@ -27,7 +27,7 @@ namespace RMS.Presentation.Controllers
         {
             var queryParamsWithUserInfo = new NotificationQueryParams
             {
-                UserId = User.FindFirst("sub")?.Value,
+                UserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value,
                 Role = User.FindFirst(ClaimTypes.Role)?.Value,
                 BranchId = queryParams.BranchId
             };

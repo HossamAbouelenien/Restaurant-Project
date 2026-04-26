@@ -160,6 +160,7 @@ namespace RMS.Services.DeliveryServices
                             Message = $"Delivery With {delivery.Id} is Assigned To You At {delivery.DeliveryAddress.BuildingNumber} - {delivery.DeliveryAddress.City}",
                             Type = "Assignation",
                             Role = SD.Role_Driver,
+                            UserId = delivery.DriverId
                         },
                         $"drivers_id_{dto.DriverId}",
                         "OrderAssignedToDriver"
@@ -228,6 +229,19 @@ namespace RMS.Services.DeliveryServices
 
             deliveryRepo.Update(delivery);
             await _unitOfWork.SaveChangesAsync();
+
+            await _notificationService.CreateNotification(
+                        new Notification
+                        {
+                            Title = "Order Update",
+                            Message = $"your order is {delivery.DeliveryStatus}",
+                            Type = "DeliveryStatus",
+                            Role = SD.Role_Customer,
+                            UserId = delivery.Order!.UserId
+                        },
+                        $"customers_id_{delivery.Order!.UserId}",
+                        "DeliveryStatusChange"
+                    );
 
             var result = _mapper.Map<DeliveryDetailsDto>(delivery);
          
