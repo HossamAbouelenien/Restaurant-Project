@@ -3,6 +3,7 @@ using RMS.Domain.Entities;
 using RMS.ServicesAbstraction;
 using RMS.ServicesAbstraction.IUserServices;
 using RMS.Shared;
+using RMS.Shared.DTOs.AddressDTOs;
 using RMS.Shared.DTOs.UserDTOs;
 using RMS.Shared.QueryParams;
 
@@ -95,6 +96,61 @@ namespace RMS.Presentation.Controllers
         {
             var result = await _userService.UpdateCustomerAddress(id, updateCustomerAddressDTO);
             return Ok(result);
+        }
+
+
+        
+        [HttpPut("{userId}/addresses")]
+        public async Task<IActionResult> UpdateAddress(
+            [FromRoute] string userId,
+            [FromBody] UpdateAddressDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                await _userService.UpdateAddressAsync(userId, dto);
+
+                return Ok(new
+                {
+                    message = "Address updated successfully"
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    message = ex.Message
+                });
+            }
+        }
+
+        
+        [HttpDelete("{userId}/addresses")]
+        public async Task<IActionResult> DeleteAddress(
+            [FromRoute] string userId,
+            [FromBody] DeleteAddressDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                await _userService.DeleteAddressAsync(userId, dto);
+
+                return Ok(new
+                {
+                    message = "Address deleted successfully"
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    message = ex.Message
+                });
+            }
         }
 
 

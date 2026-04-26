@@ -1,5 +1,6 @@
 ﻿using RMS.Domain.Entities;
 using RMS.Shared;
+using RMS.Shared.DTOs.AddressDTOs;
 using RMS.Shared.DTOs.BranchStockDTOs;
 using RMS.Shared.DTOs.UserDTOs;
 using RMS.Shared.QueryParams;
@@ -24,6 +25,8 @@ namespace RMS.ServicesAbstraction.IUserServices
         Task<GetCustomerDTO> AddCustomerAsync(CreateCustomerDTO createCustomerDTO);
         Task<PaginatedResult<GetCustomerDTO>> GetAllCustomerUserAysnc(CustomerQueryParams queryParams);
         Task<GetCustomerDTO> UpdateCustomerAddress(string id, UpdateCustomerAddressDTO updateCustomerAddressDTO);
+        Task UpdateAddressAsync(string userId, UpdateAddressDto dto);
+        Task DeleteAddressAsync(string userId, DeleteAddressDto dto);
 
     }
 }
