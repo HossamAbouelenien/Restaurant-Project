@@ -17,7 +17,11 @@ namespace RMS.Services.MappingProfiles
                 .ForMember(dest => dest.PaymentMethod,
                     opt => opt.MapFrom(src => src.PaymentMethod.ToString()))
                 .ForMember(dest => dest.PaymentStatus,
-                    opt => opt.MapFrom(src => src.PaymentStatus.ToString()));
+                    opt => opt.MapFrom(src => src.PaymentStatus.ToString()))
+               .ForMember(d => d.BranchId,
+                    o => o.MapFrom(s => s.Order.BranchId))
+                .ForMember(d => d.BranchName,
+                    o => o.MapFrom(s => s.Order.Branch.Name));
         }
     }
 }

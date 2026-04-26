@@ -13,6 +13,7 @@ namespace RMS.Services.Specifications.PaymentSpec
             )
         {
             AddInclude(p => p.Order);
+            AddInclude("Order.Branch");
 
             AddOrderByDescending(p => p.CreatedAt);
 
