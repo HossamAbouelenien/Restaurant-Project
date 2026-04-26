@@ -169,5 +169,12 @@ namespace RMS.Presentation.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpPatch("{orderId}/mark-paid")]
+        public async Task<IActionResult> MarkAsPaid(int orderId)
+        {
+            var result = await _orderService.MarkOrderAsPaidAsync(orderId);
+            return Ok(result);
+        }
     }
 }
