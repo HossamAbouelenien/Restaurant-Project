@@ -240,4 +240,7 @@
   <data name="OrderItem" xml:space="preserve">
     <value>يجب أن يحتوي الطلب على عنصر واحد على الأقل</value>
   </data>
+  <data name="OrderIsNotReadyYet" xml:space="preserve">
+    <value>الطلب ليس جاهزا بعد </value>
+  </data>
 </root>

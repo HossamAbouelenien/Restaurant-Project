@@ -240,4 +240,7 @@
   <data name="OrderItem" xml:space="preserve">
     <value>Order must have at least one item</value>
   </data>
+  <data name="OrderIsNotReadyYet" xml:space="preserve">
+    <value>Order is not ready yet</value>
+  </data>
 </root>
