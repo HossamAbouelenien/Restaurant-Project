@@ -24,19 +24,17 @@ namespace RMS.Services.MappingProfiles
                 .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.OrderItems));
 
 
-
             CreateMap<Delivery, DeliveryDetailsDto>()
                 .ForMember(dest => dest.DeliveryStatus, opt => opt.MapFrom(src => src.DeliveryStatus.ToString()))
                 .ForMember(dest => dest.DriverName, opt => opt.MapFrom(src => src.Driver != null ? src.Driver.Name : null))
+                .ForMember(dest => dest.DriverNumber, opt => opt.MapFrom(src => src.Driver != null ? src.Driver.PhoneNumber.Trim() : null))
+                .ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => src.Order != null && src.Order.User != null ? src.Order.User.Name : null))
+                .ForMember(dest => dest.CustomerPhoneNumber, opt => opt.MapFrom(src => src.Order != null && src.Order.User != null ? src.Order.User.PhoneNumber.Trim() : null))
                 .ForMember(dest => dest.Order, opt => opt.MapFrom(src => src.Order))
                 .ForMember(dest => dest.DeliveryAddress, opt => opt.MapFrom(src => src.DeliveryAddress))
-                .ForMember(dest => dest.CashCollected, opt => opt.MapFrom(src => src.CashCollected))
-                .ForMember(dest => dest.CustomerPhoneNumber,
-                 opt => opt.MapFrom(src => src.Order != null && src.Order.User != null ? src.Order.User.PhoneNumber : null))
-                .ForMember(dest => dest.CustomerPhoneNumber,opt => opt.MapFrom(src => src.Order != null && src.Order.User != null? src.Order.User.PhoneNumber.Trim(): null))
-                .ForMember(dest => dest.DriverNumber,opt => opt.MapFrom(src => src.Driver != null? src.Driver.PhoneNumber.Trim() : null));
-        
-       
+                .ForMember(dest => dest.CashCollected, opt => opt.MapFrom(src => src.CashCollected));
+
+
 
             CreateMap<OrderItem, OrderItemDto>()
                 .ForMember(dest => dest.MenuItemName,opt => opt.MapFrom(src => src.MenuItem!.Name));
