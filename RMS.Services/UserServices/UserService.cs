@@ -334,6 +334,32 @@ namespace RMS.Services.UserServices
             repo.Update(user);
             await _unitOfWork.SaveChangesAsync();
         }
+
+        public async Task DeleteAddressAsync(string userId, DeleteAddressDto dto)
+        {
+            var repo = _unitOfWork.GetRepository<User>();
+
+            var spec = new UserByIdWithAddressesSpecification(userId);
+
+            var user = await repo.GetByIdAsync(spec);
+
+            if (user == null)
+                throw new Exception("User Not Found");
+
+            var address = user.Addresses.FirstOrDefault(a =>
+                a.BuildingNumber == dto.BuildingNumber &&
+                a.Street == dto.Street &&
+                a.City == dto.City
+            );
+
+            if (address == null)
+                throw new Exception("Address Not Found");
+
+            user.Addresses.Remove(address);
+
+            repo.Update(user);
+            await _unitOfWork.SaveChangesAsync();
+        }
     }
 
 }

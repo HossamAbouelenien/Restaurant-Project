@@ -126,6 +126,33 @@ namespace RMS.Presentation.Controllers
             }
         }
 
+        
+        [HttpDelete("{userId}/addresses")]
+        public async Task<IActionResult> DeleteAddress(
+            [FromRoute] string userId,
+            [FromBody] DeleteAddressDto dto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                await _userService.DeleteAddressAsync(userId, dto);
+
+                return Ok(new
+                {
+                    message = "Address deleted successfully"
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    message = ex.Message
+                });
+            }
+        }
+
 
     }    
 }

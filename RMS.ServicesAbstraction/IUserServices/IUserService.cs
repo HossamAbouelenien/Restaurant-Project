@@ -26,6 +26,7 @@ namespace RMS.ServicesAbstraction.IUserServices
         Task<PaginatedResult<GetCustomerDTO>> GetAllCustomerUserAysnc(CustomerQueryParams queryParams);
         Task<GetCustomerDTO> UpdateCustomerAddress(string id, UpdateCustomerAddressDTO updateCustomerAddressDTO);
         Task UpdateAddressAsync(string userId, UpdateAddressDto dto);
+        Task DeleteAddressAsync(string userId, DeleteAddressDto dto);
 
     }
 }
