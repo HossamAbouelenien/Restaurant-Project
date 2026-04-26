@@ -189,7 +189,7 @@ namespace RMS.Services.DeliveryServices
 
             if (order.Status != OrderStatus.Ready)
             {
-                throw new Exception("order is not ready");
+                throw new Exception(SharedResourcesKeys.OrderIsNotReadyYet);
             }
 
 
