@@ -30,8 +30,14 @@ namespace RMS.Services.MappingProfiles
                 .ForMember(dest => dest.DriverName, opt => opt.MapFrom(src => src.Driver != null ? src.Driver.Name : null))
                 .ForMember(dest => dest.Order, opt => opt.MapFrom(src => src.Order))
                 .ForMember(dest => dest.DeliveryAddress, opt => opt.MapFrom(src => src.DeliveryAddress))
-                .ForMember(dest => dest.CashCollected, opt => opt.MapFrom(src => src.CashCollected));
-    
+                .ForMember(dest => dest.CashCollected, opt => opt.MapFrom(src => src.CashCollected))
+                .ForMember(dest => dest.CustomerPhoneNumber,
+                opt => opt.MapFrom(src =>src.Order != null && src.Order.User != null? src.Order.User.PhoneNumber: null));
+            
+        
+            
+
+
 
             CreateMap<OrderItem, OrderItemDto>()
                 .ForMember(dest => dest.MenuItemName,opt => opt.MapFrom(src => src.MenuItem!.Name));
