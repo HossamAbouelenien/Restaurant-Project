@@ -20,6 +20,7 @@ namespace RMS.Shared.DTOs.DeliveryDTOs
         public decimal? CashCollected { get; set; }
 
         public string? DriverName { get; set; }
+        public string? CustomerName { get; set; }
         public string? CustomerPhoneNumber { get; set; }
 
         public OrderSummaryDto Order { get; set; } = default!;

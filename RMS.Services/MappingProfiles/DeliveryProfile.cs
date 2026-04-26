@@ -32,10 +32,16 @@ namespace RMS.Services.MappingProfiles
                 .ForMember(dest => dest.DeliveryAddress, opt => opt.MapFrom(src => src.DeliveryAddress))
                 .ForMember(dest => dest.CashCollected, opt => opt.MapFrom(src => src.CashCollected))
                 .ForMember(dest => dest.CustomerPhoneNumber,
-                opt => opt.MapFrom(src =>src.Order != null && src.Order.User != null? src.Order.User.PhoneNumber: null));
-            
+                opt => opt.MapFrom(src => src.Order != null && src.Order.User != null ? src.Order.User.PhoneNumber : null))
+                .ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => src.Order != null && src.Order.User != null ? src.Order.User.Name : null));
+
+    
         
+           
             
+
+
+
 
 
 
