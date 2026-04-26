@@ -32,7 +32,6 @@ namespace RMS.Shared.DTOs.MenuItemDTOs
         [Required]
         public bool IsAvailable { get; set; }
 
-        // null = keep existing image | new file = replace image
         public IFormFile? Image { get; set; }
 
         [Required]
