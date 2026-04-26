@@ -15,20 +15,21 @@ namespace RMS.Services.MappingProfiles
     {
         public MenuItemProfile()
         {
-            CreateMap<MenuItem, MenuItemDTO>().ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category!.Name))
-                .ForMember(dest => dest.ImageUrl,
-                    opt => opt.MapFrom<MenuItemImagesUrlResolver<MenuItemDTO>>());
+            CreateMap<MenuItem, MenuItemDTO>()
+                .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.Category!.Name))
+                .ForMember(dest => dest.ImageUrl,opt => opt.MapFrom<MenuItemImagesUrlResolver<MenuItemDTO>>())
+                .ForMember(dest => dest.CategoryArabicName, opt => opt.MapFrom(src => src.Category!.ArabicName));
 
             CreateMap<MenuItem, MenuItemDetailsDTO>()
-                .ForMember(dest => dest.CategoryName,
-                    opt => opt.MapFrom(src => src.Category!.Name))
+                .ForMember(dest => dest.CategoryName,opt => opt.MapFrom(src => src.Category!.Name))
+                .ForMember(dest => dest.CategoryArabicName, opt => opt.MapFrom(src => src.Category!.ArabicName))
                 .ForMember(dest => dest.ImageUrl,opt => opt.MapFrom<MenuItemImagesUrlResolver<MenuItemDetailsDTO>>()); 
 
-            CreateMap<Recipe, RecipesListDTO>()
-                .ForMember(dest => dest.IngredientName,
-                    opt => opt.MapFrom(src => src.Ingredient!.Name))
-                .ForMember(dest => dest.Unit,
-                    opt => opt.MapFrom(src => src.Ingredient!.Unit.ToString()));
+            //CreateMap<Recipe, RecipesListDTO>()
+            //    .ForMember(dest => dest.IngredientName,
+            //        opt => opt.MapFrom(src => src.Ingredient!.Name))
+            //    .ForMember(dest => dest.Unit,
+            //        opt => opt.MapFrom(src => src.Ingredient!.Unit.ToString()));
 
 
             CreateMap<CreateMenuItemDTO, MenuItem>()
