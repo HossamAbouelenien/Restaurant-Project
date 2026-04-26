@@ -104,5 +104,12 @@ namespace RMS.Presentation.Controllers
             var result = await _menuItemService.GetPopularMenuItemsAsync(4);
             return Ok(result);
         }
+
+        [HttpGet("stats")]
+        public async Task<ActionResult<MenuItemsStatsDTO>> GetStats()
+        {
+            var stats = await _menuItemService.GetStatsAsync();
+            return Ok(stats);
+        }
     }
 }
