@@ -30,8 +30,13 @@ namespace RMS.Services.MappingProfiles
                 .ForMember(dest => dest.DriverName, opt => opt.MapFrom(src => src.Driver != null ? src.Driver.Name : null))
                 .ForMember(dest => dest.Order, opt => opt.MapFrom(src => src.Order))
                 .ForMember(dest => dest.DeliveryAddress, opt => opt.MapFrom(src => src.DeliveryAddress))
-                .ForMember(dest => dest.CashCollected, opt => opt.MapFrom(src => src.CashCollected));
-    
+                .ForMember(dest => dest.CashCollected, opt => opt.MapFrom(src => src.CashCollected))
+                .ForMember(dest => dest.CustomerPhoneNumber,
+                 opt => opt.MapFrom(src => src.Order != null && src.Order.User != null ? src.Order.User.PhoneNumber : null))
+                .ForMember(dest => dest.CustomerPhoneNumber,opt => opt.MapFrom(src => src.Order != null && src.Order.User != null? src.Order.User.PhoneNumber.Trim(): null))
+                .ForMember(dest => dest.DriverNumber,opt => opt.MapFrom(src => src.Driver != null? src.Driver.PhoneNumber.Trim() : null));
+        
+       
 
             CreateMap<OrderItem, OrderItemDto>()
                 .ForMember(dest => dest.MenuItemName,opt => opt.MapFrom(src => src.MenuItem!.Name));
@@ -47,7 +52,12 @@ namespace RMS.Services.MappingProfiles
                 .ForMember(dest => dest.BranchName, opt => opt.MapFrom(src => src.Order!.Branch!.Name))
                 .ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => src.Order!.User!.Name))
                 .ForMember(dest => dest.ItemsCount, opt => opt.MapFrom(src => src.Order!.OrderItems.Count))
-                .ForMember(dest => dest.DeliveryAddress, opt => opt.MapFrom(src => src.DeliveryAddress));
+                .ForMember(dest => dest.DeliveryAddress, opt => opt.MapFrom(src => src.DeliveryAddress))
+                .ForMember(dest => dest.CustomerPhoneNumber,opt => opt.MapFrom(src => src.Order != null && src.Order.User != null ? src.Order.User.PhoneNumber.Trim() : null));
+
+
+
+
 
             CreateMap<User, AvailableDriverDto>()
                 .ForMember(dest => dest.DriverId,opt => opt.MapFrom(src => src.Id))
