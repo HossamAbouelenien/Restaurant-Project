@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using RMS.Domain.Contracts;
 using RMS.Domain.Entities;
 using RMS.Services.EmailServices;
@@ -8,11 +9,11 @@ using RMS.Services.Specifications.UserSpec;
 using RMS.ServicesAbstraction.IEmailServices;
 using RMS.ServicesAbstraction.IUserServices;
 using RMS.Shared;
+using RMS.Shared.DTOs.AddressDTOs;
 using RMS.Shared.DTOs.BranchStockDTOs;
 using RMS.Shared.DTOs.UserDTOs;
 using RMS.Shared.DTOs.Utility;
 using RMS.Shared.QueryParams;
-using Microsoft.EntityFrameworkCore;
 using RMS.Shared.SharedResources;
 
 namespace RMS.Services.UserServices
@@ -308,6 +309,30 @@ namespace RMS.Services.UserServices
             await _unitOfWork.SaveChangesAsync();
 
             return _mapper.Map<GetCustomerDTO>(user);
+        }
+
+
+        public async Task UpdateAddressAsync(string userId, UpdateAddressDto dto)
+        {
+            var repo = _unitOfWork.GetRepository<User>();
+
+            var spec = new UserWithSpecificAddressSpecification(userId, dto);
+
+            var user = await repo.GetByIdAsync(spec);
+
+            if (user == null)
+                throw new Exception("User or Address Not Found");
+
+            var address = user.Addresses.First(a =>
+                a.BuildingNumber == dto.OldBuildingNumber &&
+                a.Street == dto.OldStreet &&
+                a.City == dto.OldCity
+            );
+
+            _mapper.Map(dto, address);
+
+            repo.Update(user);
+            await _unitOfWork.SaveChangesAsync();
         }
     }
 
