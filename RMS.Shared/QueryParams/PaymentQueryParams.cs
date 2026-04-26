@@ -15,6 +15,7 @@ namespace RMS.Shared.QueryParams
         public string? Status { get; set; }
 
         public string? Method { get; set; }
+        public int? BranchId { get; set; }
 
         #endregion
 
