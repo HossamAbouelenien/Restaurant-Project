@@ -19,5 +19,6 @@ namespace RMS.ServicesAbstraction
         public Task ToggleAvailabilityAsync(int id);
         public Task DeleteMenuItemAsync(int id);
         public Task<IEnumerable<MenuItemDTO>> GetPopularMenuItemsAsync(int limit);
+        public Task<MenuItemsStatsDTO> GetStatsAsync();
     }
 }

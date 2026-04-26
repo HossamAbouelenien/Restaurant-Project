@@ -80,12 +80,10 @@ namespace RMS.Services.MenuItemsServices
                 throw new Exception($"Invalid IngredientIds: {string.Join(",", invalidIds)}");
 
             // Image upload using IImageService
-            //var imagePath = await _imageService.UploadImageAsync(menuItemDto.Image);
             var image = await _imageService.UploadImageAsync(menuItemDto.Image);
             if (image == null)
                 throw new Exception("Image upload failed");
             var menuItem = _mapper.Map<MenuItem>(menuItemDto);
-            //menuItem.ImageUrl = imagePath;
             menuItem.ImageUrl = image.Url;
             menuItem.ImagePublicId = image.PublicId;
             menuItem.Recipes = menuItemDto.Recipes.Select(r => new Recipe
@@ -131,7 +129,6 @@ namespace RMS.Services.MenuItemsServices
             if (menuItemDto.Image != null)
             {
                 // Replace Old Image
-                //menuItem.ImageUrl = await _imageService.ReplaceImageAsync(menuItemDto.Image, menuItem.ImageUrl);
                 var image = await _imageService.ReplaceImageAsync( menuItemDto.Image,menuItem.ImagePublicId);
                 if (image != null)
                 {
@@ -206,17 +203,16 @@ namespace RMS.Services.MenuItemsServices
             {
                 _unitOfWork.GetRepository<Recipe>().Remove(recipe);
             }
-            //menuItem.IsDeleted = true;
-            //menuItem.DeletedAt = DateTime.Now;
-            // ☁️ Delete image from Cloudinary
+            
+            //Delete image from Cloudinary
             if (!string.IsNullOrWhiteSpace(menuItem.ImagePublicId))
             {
                 await _imageService.DeleteImageAsync(menuItem.ImagePublicId);
             }
 
-            // 🗑️ Soft delete menu item
+            // Soft delete menu item
             menuItem.IsDeleted = true;
-            menuItem.DeletedAt = DateTime.UtcNow;
+            menuItem.DeletedAt = DateTime.Now;
 
             await _unitOfWork.SaveChangesAsync();
         }
@@ -231,6 +227,27 @@ namespace RMS.Services.MenuItemsServices
             var items = await repo.GetAllAsync(spec);
 
             return _mapper.Map<IEnumerable<MenuItemDTO>>(items);
+        }
+
+
+        public async Task<MenuItemsStatsDTO> GetStatsAsync()
+        {
+            var repo = _unitOfWork.GetRepository<MenuItem>();
+
+            var allItems = await repo.GetAllAsync(); 
+
+            var totalItems = allItems.Count();
+
+            var availableItems = allItems.Count(x => x.IsAvailable);
+
+            var unavailableItems = allItems.Count(x => !x.IsAvailable);
+
+            return new MenuItemsStatsDTO
+            {
+                TotalItems = totalItems,
+                AvailableItems = availableItems,
+                UnavailableItems = unavailableItems
+            };
         }
     }
 }
