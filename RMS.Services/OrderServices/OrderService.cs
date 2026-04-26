@@ -818,5 +818,50 @@ namespace RMS.Services.OrderServices
                 }
             }
         }
+
+
+        public async Task<OrderDTO> MarkOrderAsPaidAsync(int orderId)
+        {
+            var orderRepo = _unitOfWork.GetRepository<Order>();
+
+            var spec = new OrderWithItemsAndPaymentAndDeliveryAndKitchenTicketsSpecification(orderId);
+            var order = await orderRepo.GetByIdAsync(spec);
+
+            if (order == null)
+                throw new Exception(SharedResourcesKeys.NotFound);
+
+            // لو already paid
+            if (order.Payment?.PaymentStatus == PaymentStatus.Paid)
+                throw new Exception("Order already paid");
+
+            // update payment
+            if (order.Payment == null)
+                throw new Exception("Payment record not found");
+
+            order.Payment.PaymentStatus = PaymentStatus.Paid;
+            order.Payment.UpdatedAt = DateTime.Now;
+
+            // optional: update order status
+            if (order.Status == OrderStatus.AwaitingPayment)
+                order.Status = OrderStatus.Received;
+
+            order.UpdatedAt = DateTime.Now;
+
+            var result = await _unitOfWork.SaveChangesAsync();
+
+            if (result <= 0)
+                throw new Exception(SharedResourcesKeys.FailedToUpdate);
+
+            var orderDto = _mapper.Map<OrderDTO>(order);
+
+            await _restaurantNotifier.SendAsync(
+                "PaymentUpdated",
+                orderDto,
+                $"cashiers_branch_{order.BranchId}",
+                $"admins"
+            );
+
+            return orderDto;
+        }
     }
 }
