@@ -86,9 +86,9 @@ namespace RMS.Services.Exceptions
         : BadRequestException(SharedResourcesKeys.DeleteReceivedOrder)
     { }
 
-
-
-
+    public sealed class TableNotFoundException(int id)
+    : NotFoundException(SharedResourcesKeys.NotFound, id)
+    { }
 
 
 
