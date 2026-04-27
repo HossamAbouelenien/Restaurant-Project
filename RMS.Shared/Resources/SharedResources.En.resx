@@ -391,7 +391,15 @@
 	<data name="TableOrderNotFound" xml:space="preserve">
   <value>Table order with ID '{0}' was not found.</value>
 </data>
-	
+	<data name="UserNotFoundId" xml:space="preserve">
+  <value>User with id {0} is not found</value>
+</data>
+	<data name="UserCreationFailed" xml:space="preserve">
+  <value>User creation failed: {0}</value>
+</data>
+	<data name="AddressNotFound" xml:space="preserve">
+  <value>Address for user with id {0} is not found</value>
+</data>
 	
 	
 	
