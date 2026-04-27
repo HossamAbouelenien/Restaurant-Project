@@ -118,6 +118,15 @@ namespace RMS.Shared.SharedResources
         public const string DeliveryAddress = "DeliveryAddress";
         public const string OrderItem = "OrderItem";
 
+        public const string InvalidPaymentMethod = "InvalidPaymentMethod";
+        public const string InsufficientStock = "InsufficientStock";
+        public const string TableRequired = "TableRequired";
+        public const string DeliveryAddressRequired = "DeliveryAddressRequired";
+        public const string OrderItemRequired = "OrderItemRequired";
+        public const string PaymentNotFound = "PaymentNotFound";
+        public const string CancelReceivedOrderOnly = "CancelReceivedOrderOnly";
+        public const string OrderItemNotFound = "OrderItemNotFound";
+        public const string IngredientNotInBranch = "IngredientNotInBranch";
 
 
         // Table

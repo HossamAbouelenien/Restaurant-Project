@@ -332,7 +332,25 @@
 <data name="NotificationNotFound" xml:space="preserve">
   <value>الإشعار رقم {0} غير موجود</value>
 </data>
-	
+
+<data name="InvalidPaymentMethod" xml:space="preserve">
+  <value>طريقة الدفع غير صالحة: {0}</value>
+</data>
+	<data name="InsufficientStock" xml:space="preserve">
+  <value>المخزون غير كافٍ. {0}</value>
+</data>
+	<data name="PaymentNotFound" xml:space="preserve">
+  <value>سجل الدفع للطلب رقم {0} غير موجود</value>
+</data>
+	<data name="CancelReceivedOrderOnly" xml:space="preserve">
+  <value>يمكن إلغاء الطلبات ذات الحالة "مستلم" فقط</value>
+</data>
+	<data name="OrderItemNotFound" xml:space="preserve">
+  <value>عنصر الطلب رقم {0} غير موجود</value>
+</data>
+	<data name="IngredientNotInBranch" xml:space="preserve">
+  <value>المكوّن رقم {0} غير متوفر في هذا الفرع</value>
+</data>
 	
 	
 	
