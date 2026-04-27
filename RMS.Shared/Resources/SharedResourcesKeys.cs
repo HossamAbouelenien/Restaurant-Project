@@ -30,12 +30,24 @@ namespace RMS.Shared.SharedResources
         public const string DeleteBranchWithActiveOrders = "DeleteBranchWithActiveOrders";
 
 
+
+        // BranchStock
+        public const string BranchStockNotFound = "BranchStockNotFound";
+
+
         // MenuItem
         public const string DeleteActiveMenuItem = "DeleteActiveMenuItem";
 
+
+
+
         // Category
 
+        public const string CategoryNotFound = "CategoryNotFound";
+        public const string CategoryAlreadyExists = "CategoryAlreadyExists";
+        public const string CategoryNameRequired = "CategoryNameRequired";
         public const string DeleteCategoryWithMenuItems = "DeleteCategoryWithMenuItems";
+
 
         // Delivery
         public const string InvalidOrderType = "InvalidOrderType";

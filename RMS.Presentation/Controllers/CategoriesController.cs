@@ -21,12 +21,14 @@ namespace RMS.Presentation.Controllers
             this._categoryService = categoryService;
         }
 
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CategoryDTO>>> GetAllCategories()
         {
             var Categories = await _categoryService.GetAllCategoriesAsync();
             return Ok(Categories);
         }
+
 
         [HttpGet("{id}")]
         public async Task<ActionResult<CategoryDTO>> GetCategoryById(int id)
@@ -35,6 +37,7 @@ namespace RMS.Presentation.Controllers
             return Ok(Category);
         }
 
+
         [HttpPost]
         public async Task<ActionResult<CategoryDTO>> AddCategory(CreateCategoryDTO DTO)
         {
@@ -42,36 +45,25 @@ namespace RMS.Presentation.Controllers
             return Ok(Category);
         }
 
+
         [HttpPut("{id}")]
         public async Task<ActionResult<CategoryDTO>> UpdateCategory(int id, UpdateCategoryDTO DTO)
         {
-            var result = await _categoryService.UpdateCategoryAsync(id, DTO);
-
-            if (result == null)
-            {
-                return NotFound(new { message = "Category not found" });
-            }
+            var result = await _categoryService.UpdateCategoryAsync(id, DTO);  
 
             return Ok(result);
         }
 
+
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteCategory(int id)
         {
-            try
-            {
+            
                 await _categoryService.DeleteCategoryAsync(id);
 
                 return NoContent();
-            }
-            catch (Exception ex)
-            {
-                if (ex.Message == "Category not found")
-                    return NotFound(new { message = ex.Message });
-
-                return BadRequest(new { message = ex.Message });
-            }
-
+            
+           
 
 
         }
