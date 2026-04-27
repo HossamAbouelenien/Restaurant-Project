@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
@@ -52,6 +53,7 @@ using RMS.ServicesAbstraction.IPaymentServices;
 using RMS.ServicesAbstraction.IUserServices;
 using RMS.Shared.Utility;
 using RMS.Web.Extensions;
+using RMS.Web.Factories;
 using Serilog;
 using Serilog.Context;
 using StackExchange.Redis;
@@ -240,10 +242,17 @@ namespace RMS.Web
             builder.Services.AddScoped<IPaymentService, PaymentService>();
             builder.Services.AddHttpClient<IPaymobService, PaymobService>();
 
-            builder.Host.UseSerilog((context, services, configuration) =>
-            {
-                configuration.ReadFrom.Configuration(context.Configuration);
-            });
+            //builder.Host.UseSerilog((context, services, configuration) =>
+            //{
+            //    configuration.ReadFrom.Configuration(context.Configuration);
+            //});
+            //builder.Host.UseSerilog((context, services, configuration) =>
+            //{
+            //    configuration
+            //        .ReadFrom.Configuration(context.Configuration)
+            //        .ReadFrom.Services(services)
+            //        .Enrich.FromLogContext();
+            //});
 
             builder.Services.Configure<PaymobSettings>(
                 builder.Configuration.GetSection("Paymob")
@@ -298,6 +307,15 @@ namespace RMS.Web
             builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
             {
                 return ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("RedisConnection")!);
+            });
+
+
+
+            builder.Services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.InvalidModelStateResponseFactory = ApiResponseFactory.GenerateApiValidationResponse;
+
+
             });
 
 
@@ -410,10 +428,10 @@ namespace RMS.Web
                 await next();
             });
 
-            app.UseSerilogRequestLogging(options =>
-            {
-                options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms";
-            });
+            //app.UseSerilogRequestLogging(options =>
+            //{
+            //    options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms";
+            //});
 
 
             app.UseAuthentication();

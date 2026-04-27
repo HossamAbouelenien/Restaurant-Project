@@ -20,6 +20,7 @@ namespace RMS.Services.Specifications.DeliverySpec
         {
             AddInclude(d => d.Order!);
             AddInclude(d => d.Order!.Branch!);
+            AddInclude(d => d.Order!.User!);
             AddInclude(d => d.Order!.OrderItems!);
             AddInclude(d => d.Driver!);
             AddInclude(d => d.DeliveryAddress);

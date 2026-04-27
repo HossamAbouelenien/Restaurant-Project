@@ -120,30 +120,18 @@
   <data name="AlreadyExists" xml:space="preserve">
     <value>موجود مسبقًا</value>
   </data>
-  <data name="DeleteBranchWithActiveOrders" xml:space="preserve">
-    <value>لا يمكن حذف الفرع مع وجود طلبات نشطة</value>
-  </data>
   <data name="DeleteCategoryWithMenuItems" xml:space="preserve">
     <value>لا يمكن حذف الفئة لأنها تحتوي على عناصر قائمة</value>
-  </data>
-  <data name="DeleteInActiveBranch" xml:space="preserve">
-    <value>لا يمكن حذف فرع غير نشط</value>
   </data>
   <data name="Invalid" xml:space="preserve">
     <value>قيمة غير صالحة</value>
   </data>
-  <data name="InvalidOrderType" xml:space="preserve">
-    <value>الطلب ليس نوع توصيل</value>
-  </data>
-  <data name="InvalidStatusValue" xml:space="preserve">
-    <value>قيمة الحالة غير صالحة</value>
-  </data>
+
+
   <data name="NotFound" xml:space="preserve">
     <value>غير متوفر</value>
   </data>
-  <data name="OrderAssignedToDelivery" xml:space="preserve">
-    <value>تم تعيين الطلب بالفعل</value>
-  </data>
+
   <data name="OrderAssignedToYou" xml:space="preserve">
     <value>تم تعيين توصيل جديد لك!</value>
   </data>
@@ -153,9 +141,7 @@
   <data name="Unauthorized" xml:space="preserve">
     <value>غير مصرح به</value>
   </data>
-  <data name="InvalidStatusTransition" xml:space="preserve">
-    <value>انتقال حالة غير صالح</value>
-  </data>
+
   <data name="EmailIsNotConfirmed" xml:space="preserve">
     <value>البريد الإلكتروني غير مؤكد</value>
   </data>
@@ -176,9 +162,6 @@
   </data>
   <data name="MenuItemIngredient" xml:space="preserve">
     <value>يجب أن يحتوي عنصر القائمة على مكون واحد على الأقل</value>
-  </data>
-  <data name="DuplicateIngredient" xml:space="preserve">
-    <value>المكونات المكررة غير مسموح بها</value>
   </data>
   <data name="OrderAlreadyPaid" xml:space="preserve">
     <value>تم دفع الطلب بالفعل</value>
@@ -240,4 +223,533 @@
   <data name="OrderItem" xml:space="preserve">
     <value>يجب أن يحتوي الطلب على عنصر واحد على الأقل</value>
   </data>
+	<data name="BasketNotFound" xml:space="preserve">
+  <value>السلة رقم {0} غير موجودة</value>
+</data>
+	<data name="BasketOperationFailed" xml:space="preserve">
+  <value>فشلت العملية على السلة رقم {0}</value>
+</data>
+
+	<data name="BranchNotFound" xml:space="preserve">
+  <value>الفرع رقم {0} غير موجود</value>
+</data>
+	<data name="DeleteInActiveBranch" xml:space="preserve">
+  <value>لا يمكن حذف الفرع رقم {0} لأنه غير نشط</value>
+</data>
+	<data name="DeleteBranchWithActiveOrders" xml:space="preserve">
+  <value>لا يمكن حذف الفرع رقم {0} لوجود طلبات نشطة</value>
+</data>
+
+	<data name="BranchStockNotFound" xml:space="preserve">
+  <value>مخزون الفرع رقم {0} غير موجود</value>
+</data>
+
+	<data name="CategoryNotFound" xml:space="preserve">
+  <value>الصنف رقم {0} غير موجود</value>
+</data>
+	<data name="CategoryAlreadyExists" xml:space="preserve">
+  <value>الصنف "{0}" موجود مسبقًا</value>
+</data>
+	<data name="CategoryNameRequired" xml:space="preserve">
+  <value>اسم الصنف مطلوب</value>
+</data>
+	<data name="DeleteCategoryWithMenuItems" xml:space="preserve">
+  <value>لا يمكن حذف الصنف رقم {0} لأنه يحتوي على عناصر قائمة</value>
+</data>
+
+	<data name="DeliveryNotFound" xml:space="preserve">
+  <value>التوصيل رقم {0} غير موجود</value>
+</data>
+	<data name="OrderNotFound" xml:space="preserve">
+  <value>الطلب رقم {0} غير موجود</value>
+</data>
+	<data name="DriverNotFound" xml:space="preserve">
+  <value>السائق رقم {0} غير موجود</value>
+</data>
+	<data name="InvalidDriverRole" xml:space="preserve">
+  <value>المستخدم رقم {0} ليس سائقاً</value>
+</data>
+	<data name="UnauthorizedDriver" xml:space="preserve">
+  <value>غير مصرح لك بتعديل هذا التوصيل</value>
+</data>
+	<data name="InvalidOrderType" xml:space="preserve">
+  <value>الطلب رقم {0} ليس طلب توصيل</value>
+</data>
+	<data name="OrderAssignedToDelivery" xml:space="preserve">
+  <value>الطلب رقم {0} تم تعيينه بالفعل لسائق</value>
+</data>
+	<data name="InvalidStatusValue" xml:space="preserve">
+  <value>قيمة الحالة "{0}" غير صالحة</value>
+</data>
+	<data name="InvalidStatusTransition" xml:space="preserve">
+  <value>لا يمكن الانتقال من حالة "{0}" إلى حالة "{1}"</value>
+</data>
+	<data name="OrderIsNotReadyYet" xml:space="preserve">
+  <value>الطلب رقم {0} ليس جاهزاً بعد</value>
+</data>
+
+<data name="EmailNotConfirmed" xml:space="preserve">
+  <value>البريد الإلكتروني "{0}" غير مؤكد</value>
+</data>
+	<data name="EmailAlreadyExists" xml:space="preserve">
+  <value>البريد الإلكتروني "{0}" مسجل مسبقاً</value>
+</data>
+	<data name="RegistrationFailed" xml:space="preserve">
+  <value>فشل تسجيل المستخدم: {0}</value>
+</data>
+	<data name="AuthError" xml:space="preserve">
+  <value>حدث خطأ أثناء المصادقة</value>
+</data>
+	<data name="IngredientNotFound" xml:space="preserve">
+  <value>المكون رقم {0} غير موجود</value>
+</data>
+	<data name="IngredientAlreadyExists" xml:space="preserve">
+  <value>المكون "{0}" موجود مسبقاً</value>
+</data>
+	<data name="IngredientNameRequired" xml:space="preserve">
+  <value>اسم المكون مطلوب</value>
+</data>
+	<data name="KitchenTicketNotFound" xml:space="preserve">
+  <value>تذكرة المطبخ رقم {0} غير موجودة</value>
+</data>
+
+	<data name="MenuItemNotFound" xml:space="preserve">
+  <value>عنصر القائمة رقم {0} غير موجود</value>
+</data>
+	<data name="MenuItemNoIngredients" xml:space="preserve">
+  <value>يجب إضافة مكون واحد على الأقل لعنصر القائمة</value>
+</data>
+	<data name="InvalidIngredientIds" xml:space="preserve">
+  <value>معرفات المكونات التالية غير صالحة: {0}</value>
+</data>
+	<data name="ImageUploadFailed" xml:space="preserve">
+  <value>فشل رفع الصورة</value>
+</data>
+	<data name="DuplicateIngredient" xml:space="preserve">
+  <value>لا يمكن إضافة نفس المكون أكثر من مرة</value>
+</data>
+
+<data name="NotificationNotFound" xml:space="preserve">
+  <value>الإشعار رقم {0} غير موجود</value>
+</data>
+
+<data name="InvalidPaymentMethod" xml:space="preserve">
+  <value>طريقة الدفع غير صالحة: {0}</value>
+</data>
+	<data name="InsufficientStock" xml:space="preserve">
+  <value>المخزون غير كافٍ. {0}</value>
+</data>
+	<data name="PaymentNotFound" xml:space="preserve">
+  <value>سجل الدفع للطلب رقم {0} غير موجود</value>
+</data>
+	<data name="CancelReceivedOrderOnly" xml:space="preserve">
+  <value>يمكن إلغاء الطلبات ذات الحالة "مستلم" فقط</value>
+</data>
+	<data name="OrderItemNotFound" xml:space="preserve">
+  <value>عنصر الطلب رقم {0} غير موجود</value>
+</data>
+	<data name="IngredientNotInBranch" xml:space="preserve">
+  <value>المكوّن رقم {0} غير متوفر في هذا الفرع</value>
+</data>
+<data name="UnauthorizedOrder" xml:space="preserve">
+  <value>غير مصرح لك بالدفع لهذا الطلب</value>
+</data>
+	<data name="RecipeNotFound" xml:space="preserve">
+  <value>الوصفة رقم {0} غير موجودة</value>
+</data>
+	<data name="RecipeAlreadyExists" xml:space="preserve">
+  <value>الوصفة لعنصر القائمة رقم {0} والمكون رقم {1} موجودة مسبقاً</value>
+</data>
+	<data name="RecipeAddFailed" xml:space="preserve">
+  <value>فشل إضافة الوصفة</value>
+</data>
+	<data name="RecipeUpdateFailed" xml:space="preserve">
+  <value>فشل تحديث الوصفة رقم {0}</value>
+</data>
+	<data name="RecipeDeleteFailed" xml:space="preserve">
+  <value>فشل حذف الوصفة رقم {0}</value>
+</data>
+<data name="FailedToRetrieveOrders" xml:space="preserve">
+  <value>فشل في استرداد بيانات الطلبات.</value>
+</data>
+	<data name="FailedToRetrieveStock" xml:space="preserve">
+  <value>فشل في استرداد بيانات المخزون.</value>
+</data>
+	<data name="InvalidTopValue" xml:space="preserve">
+  <value>يجب أن تكون قيمة Top أكبر من صفر.</value>
+</data>
+	<data name="TableNumberRequired" xml:space="preserve">
+  <value>رقم الطاولة مطلوب.</value>
+</data>
+	<data name="TableNumberAlreadyExists" xml:space="preserve">
+  <value>رقم الطاولة '{0}' موجود بالفعل في هذا الفرع.</value>
+</data>
+	<data name="TableOrderNotFound" xml:space="preserve">
+  <value>طلب الطاولة بالمعرف '{0}' غير موجود.</value>
+</data>
+	<data name="UserNotFoundId" xml:space="preserve">
+  <value>المستخدم رقم {0} غير موجود</value>
+</data>
+	<data name="UserCreationFailed" xml:space="preserve">
+  <value>فشل إنشاء المستخدم: {0}</value>
+</data>
+	<data name="AddressNotFound" xml:space="preserve">
+  <value>العنوان الخاص بالمستخدم رقم {0} غير موجود</value>
+</data>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 </root>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

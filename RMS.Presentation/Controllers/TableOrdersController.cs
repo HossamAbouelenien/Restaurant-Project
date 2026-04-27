@@ -21,18 +21,23 @@ namespace RMS.Presentation.Controllers
             _tableService = tableService;
         }
 
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TableOrderDTO>>> GetAllTableOrders([FromQuery] TableOrderQueryParams queryParams)
         {
             var tableOrders = await _tableService.GetAllTableOrdersAsync(queryParams);
             return Ok(tableOrders);
         }
+
+
         [HttpPatch("{id}/complete")]
         public async Task<ActionResult<TableOrderDTO>> CompleteTableOrder(int id)
         {
             var result = await _tableService.CompleteTableOrderAsync(id);
             return Ok(result);
         }
+
+
     }
 
 }

@@ -2,6 +2,7 @@
 using RMS.Domain.Contracts;
 using RMS.Domain.Entities;
 using RMS.Domain.Enums;
+using RMS.Services.Exceptions;
 using RMS.Services.Specifications.BranchStockSpec;
 using RMS.Services.Specifications.KitchenTicketSpec;
 using RMS.Services.Specifications.StockSpec;
@@ -30,6 +31,8 @@ namespace RMS.Services.KitchenServices
             _restaurantNotifier = restaurantNotifier;
         }
 
+
+
         public async Task<KitchenBoardDto> GetAllKitchenTicketsGroupedByStatusForCurrentBranchAsync(KitchenTicketQueryParams queryParams)
         {
             var repo = _unitOfWork.GetRepository<KitchenTicket>();
@@ -47,14 +50,25 @@ namespace RMS.Services.KitchenServices
             };
         }
 
+
+
+
         public async Task<KitchenTicketDetailsDto> GetSingleKitchenTicketWithsOrderItemsAsync(int id)
         {
                 var Repo = _unitOfWork.GetRepository<KitchenTicket>();
                 var Spec = new KitchenTicketsGroupedByStatusForCurrentBranchSpecification(id);
                 var kitchenTicket = await Repo.GetByIdAsync(Spec);
+
+                if (kitchenTicket is null)
+                {
+                     throw new KitchenTicketNotFoundException(id);
+                } 
+
                 var DataToReturn = _mapper.Map<KitchenTicketDetailsDto>(kitchenTicket);
                 return DataToReturn;
         }
+
+
 
 
         public async Task<List<ActivePendingStationsDTOs>> GetListOfActiveStationsWithPendingCountAsync(int branchId)
@@ -75,6 +89,8 @@ namespace RMS.Services.KitchenServices
         }
 
 
+
+
         public async Task<KitchenTicketStatusDto> UpdateTicketStatusAsync(int ticketId, UpdateTicketStatusRequestDto dto)
         {
             var repo = _unitOfWork.GetRepository<KitchenTicket>();
@@ -83,30 +99,44 @@ namespace RMS.Services.KitchenServices
             var ticket = await repo.GetByIdAsync(spec);
 
             if (ticket == null)
-                throw new Exception(SharedResourcesKeys.NotFound);
+                throw new KitchenTicketNotFoundException(ticketId);
 
-           
+
             if (dto.Status == TicketStatus.Preparing)
             {
+
                 if (ticket.Status != TicketStatus.Pending)
-                    throw new Exception(SharedResourcesKeys.InvalidStatusTransition);
+                {
+                    throw new InvalidStatusTransitionException(
+                        ticket.Status.ToString(),
+                        TicketStatus.Preparing.ToString());
+                }
+                  
 
                 ticket.Status = TicketStatus.Preparing;
                 ticket.StartedAt = DateTime.UtcNow;
+
             }
+
             else if (dto.Status == TicketStatus.Done)
             {
                 if (ticket.Status != TicketStatus.Preparing)
-                    throw new Exception(SharedResourcesKeys.InvalidStatusTransition);
+                {
+                    throw new InvalidStatusTransitionException(
+                        ticket.Status.ToString(),
+                        TicketStatus.Done.ToString());
+                }
+                   
 
                 ticket.Status = TicketStatus.Done;
                 ticket.CompletedAt = DateTime.UtcNow;
 
                 //await DecrementStock(ticket);
             }
+
             else
             {
-                throw new Exception(SharedResourcesKeys.InvalidStatusValue);
+                throw new InvalidStatusValueException(dto.Status.ToString());
             }
 
            
@@ -134,6 +164,9 @@ namespace RMS.Services.KitchenServices
             return dtoResult;
         }
 
+
+
+
         public async Task<bool> UpdateCofirmServeredColumn(int id)
         {
             var repo = _unitOfWork.GetRepository<KitchenTicket>();
@@ -141,11 +174,15 @@ namespace RMS.Services.KitchenServices
             var kitchenTicket = await repo.GetByIdAsync(spec);
 
             if (kitchenTicket == null)
-                throw new Exception(SharedResourcesKeys.NotFound);
+            {
+                throw new KitchenTicketNotFoundException(id);
+            }
+                
 
             kitchenTicket.ConfirmedServed = true;
 
             await _unitOfWork.SaveChangesAsync();
+
             await _restaurantNotifier.SendAsync(
                      "CofirmServeredUpdated",
                      kitchenTicket,
@@ -155,6 +192,9 @@ namespace RMS.Services.KitchenServices
             return true;
 
         }
+
+
+
 
         private async Task UpdateOrderStatus(int orderId)
         {
@@ -166,7 +206,10 @@ namespace RMS.Services.KitchenServices
             var order = await orderRepo.GetByIdAsync(orderId);
 
             if (order == null)
-                throw new Exception(SharedResourcesKeys.NotFound);
+            {
+                throw new OrderNotFoundException(orderId);
+            }
+              
 
             if (tickets.All(t => t.Status == TicketStatus.Done))
             {
@@ -246,5 +289,65 @@ namespace RMS.Services.KitchenServices
         //}
 
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

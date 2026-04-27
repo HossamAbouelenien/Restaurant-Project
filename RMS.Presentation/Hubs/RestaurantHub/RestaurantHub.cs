@@ -19,11 +19,8 @@ namespace RMS.Presentation.Hubs.RestaurantHub
             var userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
 
-            if (string.IsNullOrEmpty(branchId))
-            {
-                await base.OnConnectedAsync();
-                return;
-            }
+            
+
 
             if (user!.IsInRole(SD.Role_Admin))
             {
@@ -32,7 +29,8 @@ namespace RMS.Presentation.Hubs.RestaurantHub
 
             if (user.IsInRole(SD.Role_Chef))
             {
-                await Groups.AddToGroupAsync(
+                if (!string.IsNullOrEmpty(branchId))
+                    await Groups.AddToGroupAsync(
                     Context.ConnectionId,
                     $"kitchen_branch_{branchId}"
                 );
@@ -40,7 +38,8 @@ namespace RMS.Presentation.Hubs.RestaurantHub
 
             if (user.IsInRole(SD.Role_Cashier))
             {
-                await Groups.AddToGroupAsync(
+                if (!string.IsNullOrEmpty(branchId))
+                    await Groups.AddToGroupAsync(
                     Context.ConnectionId,
                     $"cashiers_branch_{branchId}"
                 );
@@ -48,7 +47,8 @@ namespace RMS.Presentation.Hubs.RestaurantHub
 
             if (user.IsInRole(SD.Role_Waiter))
             {
-                await Groups.AddToGroupAsync(
+                if (!string.IsNullOrEmpty(branchId))
+                    await Groups.AddToGroupAsync(
                     Context.ConnectionId,
                     $"waiters_branch_{branchId}"
                 );

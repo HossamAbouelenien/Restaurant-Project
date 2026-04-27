@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RMS.Domain.Entities;
 using RMS.ServicesAbstraction;
 using RMS.ServicesAbstraction.IUserServices;
 using RMS.Shared;
+using RMS.Shared.DTOs.AddressDTOs;
 using RMS.Shared.DTOs.UserDTOs;
 using RMS.Shared.QueryParams;
+using System.Security.Claims;
 
 namespace RMS.Presentation.Controllers
 {
@@ -18,12 +21,15 @@ namespace RMS.Presentation.Controllers
         {
             _userService = userService;
         }
+
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GetUserDTO>>> GetAllUserWithBranchAsync([FromQuery] UserQueryParams queryParams)
         {
             var Users = await _userService.GetAllUserWithBranchAsync(queryParams);
             return Ok(Users);
         }
+
 
         [HttpGet("{id}")]
         [ActionName("GetUserDetails")]
@@ -34,6 +40,7 @@ namespace RMS.Presentation.Controllers
         }
 
 
+
         [HttpPost]
         public async Task<ActionResult<UserDetailsDTO>> AddUserAsync(CreateUserDto createUserDto)
         {
@@ -41,6 +48,8 @@ namespace RMS.Presentation.Controllers
 
             return CreatedAtAction("GetUserDetails", new { id = user.Id }, user);
         }
+
+
 
         [HttpPut("{id}")]
         public async Task<ActionResult<UserDetailsDTO>> UpdateUserAsync(string id, UpdateUserDto updateUserDto)
@@ -52,12 +61,16 @@ namespace RMS.Presentation.Controllers
             return Ok(user);
         }
 
+
+
         [HttpPatch("{id}/toggle-status")]
         public async Task<ActionResult> ToggleUserStatus(string id)
         {
             var result = await _userService.ToggleUserStatusAsync(id);
             return Ok(result);
         }
+
+
 
         [HttpGet("Roles")]
         public async Task<ActionResult<List<string>>> GetRolesAsync()
@@ -66,6 +79,8 @@ namespace RMS.Presentation.Controllers
             return Ok(roles);
    
         }
+
+
 
         [HttpGet("inactive")]
         public async Task<ActionResult<PaginatedResult<GetUserDTO>>> GetInactiveUsers([FromQuery] UserQueryParams queryParams)
@@ -83,12 +98,14 @@ namespace RMS.Presentation.Controllers
             return Ok(user);
         }
 
+
         [HttpGet("GetAllCustomerUserAysnc")]
         public async Task<ActionResult<PaginatedResult<GetCustomerDTO>>> GetAllCustomerUserAysnc([FromQuery]CustomerQueryParams queryParams)
         {
             var Users = await _userService.GetAllCustomerUserAysnc(queryParams);
             return Ok(Users);
         }
+
 
         [HttpPut("{id}/address")]
         public async Task<ActionResult<GetCustomerDTO>> UpdateCustomerAddress(string id, UpdateCustomerAddressDTO updateCustomerAddressDTO)
@@ -98,5 +115,65 @@ namespace RMS.Presentation.Controllers
         }
 
 
+        
+        [HttpPut("{userId}/addresses")]
+        public async Task<IActionResult> UpdateAddress(
+            [FromRoute] string userId,
+            [FromBody] UpdateAddressDto dto)
+        {
+            
+
+           
+                await _userService.UpdateAddressAsync(userId, dto);
+
+                return Ok(new
+                {
+                    message = "Address updated successfully"
+                });
+            
+           
+        }
+
+        
+        [HttpDelete("{userId}/addresses")]
+        public async Task<IActionResult> DeleteAddress(
+            [FromRoute] string userId,
+            [FromBody] DeleteAddressDto dto)
+        {
+            
+
+           
+                await _userService.DeleteAddressAsync(userId, dto);
+
+                return Ok(new
+                {
+                    message = "Address deleted successfully"
+                });
+            
+           
+        }
+
+        //[Authorize]
+        [HttpGet("my-addresses")]
+        public async Task<IActionResult> GetMyAddresses([FromQuery] AddressQueryParams queryParams)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            queryParams.UserId = userId;
+
+            var result = await _userService.GetUserAddressesAsync(queryParams);
+
+            return Ok(result);
+        }
+
+
+
+
     }    
+
+
+
 }

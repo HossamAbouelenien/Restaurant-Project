@@ -50,30 +50,21 @@ namespace RMS.Presentation.Controllers
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
-            try
-            {
+           
                 var result = await _menuItemService.CreateMenuItemAsync(dto);
                 return CreatedAtAction(nameof(GetMenuItemById), new { id = result.Id }, result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            
+           
         }
 
         [HttpPut("{id}")]
         public async Task<ActionResult<MenuItemDetailsDTO>> UpdateMenuItem(int id, [FromForm] UpdateMenuItemDTO dto)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
-            try
-            {
+           
                 var result = await _menuItemService.UpdateMenuItemAsync(id, dto);
                 return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            
+           
         }
 
 
@@ -87,21 +78,16 @@ namespace RMS.Presentation.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteMenuItem(int id)
         {
-            try
-            {
+           
                 await _menuItemService.DeleteMenuItemAsync(id);
                 return Ok();
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+          
         }
 
         [HttpGet("popular")]
-        public async Task<IActionResult> GetPopular()
+        public async Task<IActionResult> GetPopular([FromQuery] int? branchId)
         {
-            var result = await _menuItemService.GetPopularMenuItemsAsync(4);
+            var result = await _menuItemService.GetPopularMenuItemsAsync(4, branchId);
             return Ok(result);
         }
 
@@ -112,4 +98,25 @@ namespace RMS.Presentation.Controllers
             return Ok(stats);
         }
     }
+
+
+
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

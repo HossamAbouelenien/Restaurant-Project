@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using RMS.Services.Exceptions;
 using RMS.ServicesAbstraction;
 using RMS.ServicesAbstraction.IDeliveryServices;
 using RMS.Shared;
@@ -28,12 +29,14 @@ namespace RMS.Presentation.Controllers
             _deliveryService = deliveryService;
         }
 
+
         [HttpGet("GetAll")]
         public async Task<ActionResult<PaginatedResult<DeliveryDetailsDto>>> GetAllDeliveries([FromQuery] DeliveryQueryParams queryParams)
         {
             var deliveries = await _deliveryService.GetAllDeliveriesAsync(queryParams);
             return Ok(deliveries);
         }
+
 
         [HttpGet("OwnAssignedDeliveries")]
         public async Task<ActionResult<IEnumerable<DeliveryDetailsDto>>> GetOwnAssignedDeliveriesAsync()
@@ -43,16 +46,15 @@ namespace RMS.Presentation.Controllers
 
         }
 
+
         [HttpGet("DeliveryById")]
         public async Task<ActionResult<DeliveryDetailsDto>> GetDeliveryByIdAsync([FromQuery] int id)
         {
             var delivery = await _deliveryService.GetDeliveryByIdAsync(id);
-            if (delivery == null)
-            {
-                return NotFound($"Delivery with ID {id} not found.");
-            }
             return Ok(delivery);
         }
+
+
 
         [HttpPost("assign")]
         public async Task<ActionResult<DeliveryDetailsDto>> AssignDelivery([FromBody] AssignDeliveryDto dto)
@@ -71,13 +73,16 @@ namespace RMS.Presentation.Controllers
          {
                
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
              if (userId == null)
-                  return Unauthorized();
-                
-             var isAdmin = User.IsInRole(SD.Role_Admin);
+                throw new UnauthorizedDriverException();
+
+            var isAdmin = User.IsInRole(SD.Role_Admin);
              var result = await _deliveryService.UpdateDeliveryStatusAsync(id, dto,userId,isAdmin );    
              return Ok(result);
          }
+
+
 
         [HttpGet("unassigned")]
         public async Task<IActionResult> GetUnAssignedDeliveries()
@@ -87,12 +92,16 @@ namespace RMS.Presentation.Controllers
             return Ok(result);
         }
 
+
+
         [HttpGet("available-drivers")]
         public async Task<ActionResult<PaginatedResult<AvailableDriverDto>>> GetAvailableDrivers([FromQuery] AvailableDriversQueryParams query)
         {
             var result = await _deliveryService.GetAvailableDriversAsync(query);
             return Ok(result);
         }
+
+
     }
 
 }

@@ -219,6 +219,7 @@ namespace RMS.Persistence.Data.DataSeed
                     await _roleManager.CreateAsync(new IdentityRole(SD.Role_Driver));
                     await _roleManager.CreateAsync(new IdentityRole(SD.Role_Chef));
                     await _roleManager.CreateAsync(new IdentityRole(SD.Role_Admin));
+                    await _roleManager.CreateAsync(new IdentityRole(SD.Role_Cashier));
                     customerRole = await _roleManager.GetRoleIdAsync(new IdentityRole(SD.Role_Customer));
                     adminRole = await _roleManager.GetRoleIdAsync(new IdentityRole(SD.Role_Admin));
                 }

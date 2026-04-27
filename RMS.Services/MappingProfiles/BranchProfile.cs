@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using RMS.Domain.Entities;
 using RMS.Shared.DTOs.BranchDTOs;
+using RMS.Shared.DTOs.BranchStockDTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,7 +52,12 @@ namespace RMS.Services.MappingProfiles
              .ForMember(dest => dest.Note, opt => opt.MapFrom(src => src.Address.Note))
              .ForMember(dest => dest.SpecialMark, opt => opt.MapFrom(src => src.Address.SpecialMark));
 
-            
+
+            CreateMap<BranchStock, BranchStockDTO>()
+                .ForMember(dest => dest.IngredientName, opt => opt.MapFrom(src => src.Ingredient.Name))
+                .ForMember(dest => dest.BranchName, opt => opt.MapFrom(src => src.Branch.Name));
+
+
         }
 
     }

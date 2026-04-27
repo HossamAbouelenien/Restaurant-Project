@@ -120,30 +120,19 @@
   <data name="AlreadyExists" xml:space="preserve">
     <value>Already Exists</value>
   </data>
-  <data name="DeleteBranchWithActiveOrders" xml:space="preserve">
-    <value>Cannot delete branch with active orders</value>
-  </data>
+ 
   <data name="DeleteCategoryWithMenuItems" xml:space="preserve">
     <value>Category cannot be deleted because it has menu items</value>
   </data>
-  <data name="DeleteInActiveBranch" xml:space="preserve">
-    <value>Can't delete an inactive branch</value>
-  </data>
+
   <data name="Invalid" xml:space="preserve">
     <value>Invalid</value>
   </data>
-  <data name="InvalidOrderType" xml:space="preserve">
-    <value>Order is not a delivery type</value>
-  </data>
-  <data name="InvalidStatusValue" xml:space="preserve">
-    <value>Invalid status value</value>
-  </data>
+ 
   <data name="NotFound" xml:space="preserve">
     <value>Not Found</value>
   </data>
-  <data name="OrderAssignedToDelivery" xml:space="preserve">
-    <value>Order already assigned</value>
-  </data>
+
   <data name="OrderAssignedToYou" xml:space="preserve">
     <value>New Delivery Has Assigned To You !</value>
   </data>
@@ -153,9 +142,7 @@
   <data name="Unauthorized" xml:space="preserve">
     <value>Unauthorized</value>
   </data>
-  <data name="InvalidStatusTransition" xml:space="preserve">
-    <value>Invalid status transition</value>
-  </data>
+ 
   <data name="EmailIsNotConfirmed" xml:space="preserve">
     <value>Email is not confirmed</value>
   </data>
@@ -176,9 +163,6 @@
   </data>
   <data name="MenuItemIngredient" xml:space="preserve">
     <value>MenuItem must have at least one ingredient</value>
-  </data>
-  <data name="DuplicateIngredient" xml:space="preserve">
-    <value>Duplicate ingredients not allowed</value>
   </data>
   <data name="OrderAlreadyPaid" xml:space="preserve">
     <value>Order already paid</value>
@@ -240,4 +224,518 @@
   <data name="OrderItem" xml:space="preserve">
     <value>Order must have at least one item</value>
   </data>
+
+  <data name="BasketNotFound" xml:space="preserve">
+     <value>Basket with id {0} is not found</value>
+  </data>
+  <data name="BasketOperationFailed" xml:space="preserve">
+    <value>Operation failed for basket with id {0}</value>
+  </data>
+
+	<data name="BranchNotFound" xml:space="preserve">
+  <value>Branch with id {0} is not found</value>
+</data>
+	<data name="DeleteInActiveBranch" xml:space="preserve">
+  <value>Branch with id {0} cannot be deleted because it is inactive</value>
+</data>
+	<data name="DeleteBranchWithActiveOrders" xml:space="preserve">
+  <value>Branch with id {0} cannot be deleted because it has active orders</value>
+</data>
+
+	<data name="BranchStockNotFound" xml:space="preserve">
+  <value>Branch stock with id {0} is not found</value>
+</data>
+
+	<data name="CategoryNotFound" xml:space="preserve">
+  <value>Category with id {0} is not found</value>
+</data>
+	<data name="CategoryAlreadyExists" xml:space="preserve">
+  <value>Category "{0}" already exists</value>
+</data>
+	<data name="CategoryNameRequired" xml:space="preserve">
+  <value>Category name is required</value>
+</data>
+	<data name="DeleteCategoryWithMenuItems" xml:space="preserve">
+  <value>Category with id {0} cannot be deleted because it has menu items</value>
+</data>
+
+	<data name="DeliveryNotFound" xml:space="preserve">
+  <value>Delivery with id {0} is not found</value>
+</data>
+	<data name="OrderNotFound" xml:space="preserve">
+  <value>Order with id {0} is not found</value>
+</data>
+	<data name="DriverNotFound" xml:space="preserve">
+  <value>Driver with id {0} is not found</value>
+</data>
+	<data name="InvalidDriverRole" xml:space="preserve">
+  <value>User with id {0} is not a driver</value>
+</data>
+	<data name="UnauthorizedDriver" xml:space="preserve">
+  <value>You are not authorized to update this delivery</value>
+</data>
+	<data name="InvalidOrderType" xml:space="preserve">
+  <value>Order with id {0} is not a delivery order</value>
+</data>
+	<data name="OrderAssignedToDelivery" xml:space="preserve">
+  <value>Order with id {0} is already assigned to a driver</value>
+</data>
+	<data name="InvalidStatusValue" xml:space="preserve">
+  <value>Status value "{0}" is not valid</value>
+</data>
+	<data name="InvalidStatusTransition" xml:space="preserve">
+  <value>Cannot transition from "{0}" to "{1}"</value>
+</data>
+	<data name="OrderIsNotReadyYet" xml:space="preserve">
+  <value>Order with id {0} is not ready yet</value>
+</data>
+
+	<data name="EmailNotConfirmed" xml:space="preserve">
+  <value>Email "{0}" is not confirmed</value>
+</data>
+	<data name="EmailAlreadyExists" xml:space="preserve">
+  <value>Email "{0}" is already registered</value>
+</data>
+	<data name="RegistrationFailed" xml:space="preserve">
+  <value>Registration failed: {0}</value>
+</data>
+	<data name="AuthError" xml:space="preserve">
+  <value>An error occurred during authentication</value>
+</data>
+
+	<data name="IngredientNotFound" xml:space="preserve">
+  <value>Ingredient with id {0} is not found</value>
+</data>
+	<data name="IngredientAlreadyExists" xml:space="preserve">
+  <value>Ingredient "{0}" already exists</value>
+</data>
+	<data name="IngredientNameRequired" xml:space="preserve">
+  <value>Ingredient name is required</value>
+</data>
+	<data name="KitchenTicketNotFound" xml:space="preserve">
+  <value>Kitchen ticket with id {0} is not found</value>
+</data>
+
+	<data name="MenuItemNotFound" xml:space="preserve">
+  <value>Menu item with id {0} is not found</value>
+</data>
+	<data name="MenuItemNoIngredients" xml:space="preserve">
+  <value>At least one ingredient is required for a menu item</value>
+</data>
+	<data name="InvalidIngredientIds" xml:space="preserve">
+  <value>The following ingredient ids are invalid: {0}</value>
+</data>
+	<data name="ImageUploadFailed" xml:space="preserve">
+  <value>Image upload failed</value>
+</data>
+	<data name="DuplicateIngredient" xml:space="preserve">
+  <value>Duplicate ingredients are not allowed</value>
+</data>
+	
+<data name="NotificationNotFound" xml:space="preserve">
+  <value>Notification with id {0} is not found</value>
+</data>
+
+<data name="InvalidPaymentMethod" xml:space="preserve">
+  <value>Invalid payment method: {0}</value>
+</data>
+	<data name="InsufficientStock" xml:space="preserve">
+  <value>Insufficient stock. {0}</value>
+</data>
+	<data name="PaymentNotFound" xml:space="preserve">
+  <value>Payment record for order {0} is not found</value>
+</data>
+	<data name="CancelReceivedOrderOnly" xml:space="preserve">
+  <value>Only orders with status 'Received' can be cancelled</value>
+</data>
+	<data name="OrderItemNotFound" xml:space="preserve">
+  <value>Order item with id {0} is not found</value>
+</data>
+	<data name="IngredientNotInBranch" xml:space="preserve">
+  <value>Ingredient with id {0} is not available in this branch</value>
+</data>
+	<data name="UnauthorizedOrder" xml:space="preserve">
+  <value>You are not authorized to pay for this order</value>
+</data>
+<data name="RecipeNotFound" xml:space="preserve">
+  <value>Recipe with id {0} was not found</value>
+</data>
+	<data name="RecipeAlreadyExists" xml:space="preserve">
+  <value>A recipe for MenuItem {0} and Ingredient {1} already exists</value>
+</data>
+	<data name="RecipeAddFailed" xml:space="preserve">
+  <value>Failed to add the recipe</value>
+</data>
+	<data name="RecipeUpdateFailed" xml:space="preserve">
+  <value>Failed to update recipe with id {0}</value>
+</data>
+	<data name="RecipeDeleteFailed" xml:space="preserve">
+  <value>Failed to delete recipe with id {0}</value>
+</data>
+
+<data name="FailedToRetrieveOrders" xml:space="preserve">
+  <value>Failed to retrieve orders data.</value>
+</data>
+	<data name="FailedToRetrieveStock" xml:space="preserve">
+  <value>Failed to retrieve stock data.</value>
+</data>
+	<data name="InvalidTopValue" xml:space="preserve">
+  <value>Top value must be greater than zero.</value>
+</data>
+	<data name="TableNumberRequired" xml:space="preserve">
+  <value>Table number is required.</value>
+</data>
+	<data name="TableNumberAlreadyExists" xml:space="preserve">
+  <value>Table number '{0}' already exists in this branch.</value>
+</data>
+	<data name="TableOrderNotFound" xml:space="preserve">
+  <value>Table order with ID '{0}' was not found.</value>
+</data>
+	<data name="UserNotFoundId" xml:space="preserve">
+  <value>User with id {0} is not found</value>
+</data>
+	<data name="UserCreationFailed" xml:space="preserve">
+  <value>User creation failed: {0}</value>
+</data>
+	<data name="AddressNotFound" xml:space="preserve">
+  <value>Address for user with id {0} is not found</value>
+</data>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 </root>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

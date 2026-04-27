@@ -36,6 +36,18 @@ namespace RMS.Presentation.Hubs.Notification
                 }
             }
 
+            if (user.IsInRole(SD.Role_Customer))
+            {
+
+                if (!string.IsNullOrEmpty(userId))
+                {
+                    await Groups.AddToGroupAsync(
+                        Context.ConnectionId,
+                        $"customers_id_{userId}"
+                    );
+                }
+            }
+
             await base.OnConnectedAsync();
         }
     }

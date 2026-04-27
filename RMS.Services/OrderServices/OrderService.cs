@@ -2,6 +2,7 @@
 using RMS.Domain.Contracts;
 using RMS.Domain.Entities;
 using RMS.Domain.Enums;
+using RMS.Services.Exceptions;
 using RMS.Services.Specifications.BranchStockSpec;
 using RMS.Services.Specifications.KitchenTicketSpec;
 using RMS.Services.Specifications.MenuItemSpec;
@@ -40,38 +41,66 @@ namespace RMS.Services.OrderServices
             _notificationService = notificationService;
             _restaurantNotifier = restaurantNotifier;
         }
+
+
         public async Task<OrderDTO> CreateOrderAsync(CreateOrderDTO orderDto)
         {
             // Parse OrderType
+
             if (!Enum.TryParse<OrderType>(orderDto.OrderType, ignoreCase: true, out var orderType))
-                throw new Exception($"Invalid OrderType: {orderDto.OrderType}");
+            {
+                throw new InvalidOrderTypeException(orderDto.OrderType);
+            }
+                
+
             // Parse PaymentMethod
+
             if (!Enum.TryParse<PaymentMethod>(orderDto.PaymentMethod, ignoreCase: true, out var paymentMethod))
-                throw new Exception($"Invalid PaymentMethod: {orderDto.PaymentMethod}");
+            {
+                throw new InvalidPaymentMethodException(orderDto.PaymentMethod);
+            }
+                
+
+
             var Repo = _unitOfWork.GetRepository<Order>();
             var ItemRepo = _unitOfWork.GetRepository<MenuItem>();
             var orderItems = new List<CreateOrderItemDTO>();
+
             // Validate OrderType-specific fields
+
             if (orderType == OrderType.DineIn && !orderDto.TableId.HasValue)
-                throw new Exception(SharedResourcesKeys.TableID);
+            {
+                throw new TableRequiredException();
+
+            }
 
             if (orderType == OrderType.Delivery && orderDto.DeliveryAddress is null)
-                throw new Exception(SharedResourcesKeys.DeliveryAddress);
+            {
+                throw new DeliveryAddressRequiredException(); 
+
+            }
 
             // Validate Items
             if (orderDto.Items == null || !orderDto.Items.Any())
-                throw new Exception(SharedResourcesKeys.OrderItem);
+            {
+                throw new OrderItemRequiredException();
+            }
+                
 
             var duplicateItems = orderDto.Items.GroupBy(i => i.MenuItemId).Where(g => g.Count() > 1);
             if (duplicateItems.Any())
-                throw new Exception(SharedResourcesKeys.DuplicateMenuItems);
+            {
+                throw new DuplicateMenuItemsException();
+            }
+                
 
             // Validate branch and customer existence
+
             var branchExists = await _unitOfWork.GetRepository<Branch>().GetByIdAsync(orderDto.BranchId) != null;
             var UserSpec = new UserSpecification(orderDto.UserId!);
             var customerExists = await _unitOfWork.GetRepository<User>().GetByIdAsync(UserSpec) != null;
-            if (!branchExists) throw new Exception(SharedResourcesKeys.NotFound);
-            if (!customerExists) throw new Exception(SharedResourcesKeys.NotFound);
+            if (!branchExists) throw new BranchNotFoundException(orderDto.BranchId);
+            if (!customerExists) throw new UserNotFoundException(orderDto.UserId!);
 
             var ingredientConsumption = new Dictionary<int, decimal>();
 
@@ -79,7 +108,7 @@ namespace RMS.Services.OrderServices
             foreach (var item in orderDto.Items)
             {
                 var menuItemSpec = new MenuItemWithBranchStockSpecification(item.MenuItemId);
-                var menuItem = await ItemRepo.GetByIdAsync(menuItemSpec) ?? throw new Exception(SharedResourcesKeys.NotFound);
+                var menuItem = await ItemRepo.GetByIdAsync(menuItemSpec) ?? throw new MenuItemNotFoundException(item.MenuItemId);
 
 
                 foreach (var recipe in menuItem.Recipes)
@@ -91,21 +120,29 @@ namespace RMS.Services.OrderServices
                         ingredientConsumption[recipe.IngredientId] += totalRequired;
                     else
                         ingredientConsumption[recipe.IngredientId] = totalRequired;
+
                 }
+
                 orderItems.Add(new CreateOrderItemDTO { MenuItemId = menuItem.Id, Quantity = item.Quantity, UnitPrice = menuItem.Price, Notes = item.Notes });
+
             }
+
             foreach (var (ingredientId, totalRequired) in ingredientConsumption)
             {
                 var ingredientName = await _unitOfWork.GetRepository<Ingredient>().GetByIdAsync(ingredientId) is Ingredient ingredient
                     ? ingredient.Name
                     : "Unknown";
+
                 var StockSpec = new BranchStockWithBranchAndIngredient(orderDto.BranchId, ingredientId);
                 var stock = await _unitOfWork.GetRepository<BranchStock>().GetAllAsync(StockSpec);
 
                 var stockItem = stock.FirstOrDefault();
 
                 if (stockItem == null)
-                    throw new Exception($"Ingredient ID {ingredientId} not found in branch");
+                {
+                    throw new IngredientNotInBranchException(ingredientId);
+                }
+                  
 
                 if (stockItem.QuantityAvailable < totalRequired)
                 {
@@ -116,7 +153,7 @@ namespace RMS.Services.OrderServices
                     {
                         var menuItemSpec = new MenuItemWithBranchStockSpecification(item.MenuItemId);
                         var menuItem = await ItemRepo.GetByIdAsync(menuItemSpec)
-                            ?? throw new Exception(SharedResourcesKeys.NotFound);
+                            ?? throw new MenuItemNotFoundException(item.MenuItemId);
 
                         // For this menu item, find the recipe that uses the limiting ingredient and calculate how many can be made
                         var limitingIngredient = menuItem.Recipes
@@ -139,8 +176,11 @@ namespace RMS.Services.OrderServices
                         ErrorMessage += $"You can only order {limitingIngredient.MaxPossible} of {menuItem.Name} " +
                                         $"because '{limitingIngredient.IngredientName}' is insufficient.\n";
                     }
-                    throw new Exception($"{ErrorMessage}");
+
+                    throw new InsufficientStockException(ErrorMessage);
+
                 }
+
 
                 stockItem.QuantityAvailable -= totalRequired;
 
@@ -189,11 +229,11 @@ namespace RMS.Services.OrderServices
                 // Validate Table belongs to same Branch
                 var table = await _unitOfWork.GetRepository<Table>().GetByIdAsync(orderDto.TableId!.Value);
                 if (table is null)
-                    throw new Exception(SharedResourcesKeys.NotFound);
+                    throw new TableNotFoundException(orderDto.TableId.Value);
                 if (table.BranchId != orderDto.BranchId)
-                    throw new Exception(SharedResourcesKeys.TableNotInBranch);
+                    throw new TableNotInBranchException();
                 if (table.IsOccupied)
-                    throw new Exception(SharedResourcesKeys.AlreadyOccupiedTable);
+                    throw new TableAlreadyOccupiedOrderException();
 
                 // Create TableOrder (SeatedAt = CreatedAt handled by EF)
                 order.TableOrder = new TableOrder
@@ -218,7 +258,9 @@ namespace RMS.Services.OrderServices
 
             /////////////////////////////////////////////////////////////////////////////////
             await Repo.AddAsync(order);
+
             var result = await _unitOfWork.SaveChangesAsync();
+
             if (result > 0)
             {
                 var categories = new HashSet<string>();
@@ -226,7 +268,8 @@ namespace RMS.Services.OrderServices
                 foreach (var item in order.OrderItems)
                 {
                     var menuItemSpec = new MenuItemWithBranchStockSpecification(item.MenuItemId);
-                    var menuItem = await ItemRepo.GetByIdAsync(menuItemSpec) ?? throw new Exception(SharedResourcesKeys.NotFound);
+                    var menuItem = await ItemRepo.GetByIdAsync(menuItemSpec) ?? throw new MenuItemNotFoundException(item.MenuItemId);
+
                     if (categories.Add(menuItem.Category!.Name))
                     {
                         var KichenTicketRepo = _unitOfWork.GetRepository<KitchenTicket>();
@@ -236,12 +279,17 @@ namespace RMS.Services.OrderServices
                             Station = menuItem.Category.Name
                         });
                     }
+
                 }
+
                 await _unitOfWork.SaveChangesAsync();
+
                 var Spec = new OrderWithItemsAndPaymentAndDeliveryAndKitchenTicketsSpecification(order.Id);
-                order = await Repo.GetByIdAsync(Spec) ?? throw new Exception(SharedResourcesKeys.FailedRetrieveCreatedOrder);
+                order = await Repo.GetByIdAsync(Spec) ?? throw new FailedRetrieveCreatedOrderException();
+
                 var orderToReturn = _mapper.Map<OrderDTO>(order);
                 var orderData = _mapper.Map<OrderDetailsDTO>(order);
+
                 await _restaurantNotifier.SendAsync(
                          "OrderCreated",
                          orderData,
@@ -255,8 +303,10 @@ namespace RMS.Services.OrderServices
                 return orderToReturn;
             }
 
-            throw new Exception(SharedResourcesKeys.Failed);
+            throw new FailedRetrieveCreatedOrderException();
         }
+
+
 
         public async Task<PaginatedResult<OrderDTO>> GetAllOrdersAsync(OrderQueryParams queryParams)
         {
@@ -271,17 +321,22 @@ namespace RMS.Services.OrderServices
             return paginatedResult;
         }
 
+
+
         public async Task<OrderDetailsDTO> GetOrderByIdAsync(int id)
 
         {
             var repo = _unitOfWork.GetRepository<Order>();
             var spec = new OrderWithItemsAndPaymentAndDeliveryAndKitchenTicketsSpecification(id);
-            var order = await repo.GetByIdAsync(spec) ?? throw new Exception(SharedResourcesKeys.NotFound);
-            if (order == null) throw new Exception(SharedResourcesKeys.NotFound);
+            var order = await repo.GetByIdAsync(spec) ?? throw new OrderNotFoundException(id); ;
+            if (order == null) throw new OrderNotFoundException(id); 
             var orderDetailsDto = _mapper.Map<OrderDetailsDTO>(order);
 
             return orderDetailsDto;
         }
+
+
+
 
         public async Task<PaginatedResult<OrderDTO>> GetCustomerOrdersHistoryAsync(OrderQueryParams queryParams, string customerId)
         {
@@ -296,6 +351,9 @@ namespace RMS.Services.OrderServices
             return paginatedResult;
         }
 
+
+
+
         public async Task<PaginatedResult<MyDeliveryActiveCustomersDTO>> GetCustomerOrdersActiveAsync(OrderQueryParams queryParams, string customerId)
         {
             var repo = _unitOfWork.GetRepository<Order>();
@@ -309,12 +367,17 @@ namespace RMS.Services.OrderServices
             return paginatedResult;
         }
 
+
+
+
         public async Task<OrderDTO> UpdateOrderStatusAsync(int orderId, string newStatus)
         {
             var orderRepo = _unitOfWork.GetRepository<Order>();
             var orderSpec = new OrderWithTableOrderAndBranchAndCustomerAndOrderItemsSpecification(orderId);
             var orderToUpdate = await orderRepo.GetByIdAsync(orderSpec);
-            if (orderToUpdate == null) throw new Exception(SharedResourcesKeys.NotFound);
+
+            if (orderToUpdate == null) throw new OrderNotFoundException(orderId);
+
             if (Enum.TryParse(typeof(OrderStatus), newStatus, true, out var parsedStatus))
             {
                 switch (orderToUpdate.Status)
@@ -323,26 +386,33 @@ namespace RMS.Services.OrderServices
                         if (parsedStatus is OrderStatus.Preparing or OrderStatus.Cancelled)
                             orderToUpdate.Status = (OrderStatus)parsedStatus;
                         else
-                            throw new Exception(SharedResourcesKeys.InvalidStatusTransition);
+                            throw new InvalidStatusTransitionOrderException(orderToUpdate.Status.ToString(), newStatus);
                         break;
+
                     case OrderStatus.Preparing:
                         if (parsedStatus is OrderStatus.Ready)
                             orderToUpdate.Status = (OrderStatus)parsedStatus;
                         else
-                            throw new Exception(SharedResourcesKeys.InvalidStatusTransition);
+                            throw new InvalidStatusTransitionOrderException(orderToUpdate.Status.ToString(), newStatus);
                         break;
+
                     case OrderStatus.Ready:
                         if (parsedStatus is OrderStatus.Delivered)
                             orderToUpdate.Status = (OrderStatus)parsedStatus;
                         else
-                            throw new Exception(SharedResourcesKeys.InvalidStatusTransition);
+                            throw new InvalidStatusTransitionOrderException(orderToUpdate.Status.ToString(), newStatus);
                         break;
+
                     case OrderStatus.Delivered:
                     case OrderStatus.Cancelled:
-                        throw new Exception(SharedResourcesKeys.InvalidStatusTransition);
+                        throw new InvalidStatusTransitionOrderException(orderToUpdate.Status.ToString(), newStatus);
+
                     default:
-                        throw new Exception(SharedResourcesKeys.InvalidStatusValue);
+                        throw new InvalidStatusValueOrderException(newStatus);
+
                 }
+
+
                 // If order is being marked as Delivered, set DeliveryStatus to Delivered if it's a Delivery order
                 if (orderToUpdate.Status == OrderStatus.Delivered && orderToUpdate.OrderType == OrderType.Delivery)
                 {
@@ -360,6 +430,8 @@ namespace RMS.Services.OrderServices
                         }
                     }
                 }
+
+
                 // If order is being cancelled, release reserved stock and free up table if DineIn
                 if (orderToUpdate.Status == OrderStatus.Cancelled)
                 {
@@ -410,18 +482,25 @@ namespace RMS.Services.OrderServices
             }
             else
             {
-                throw new Exception(SharedResourcesKeys.InvalidStatusValue);
+
+                throw new InvalidStatusValueOrderException(newStatus);
+
             }
+
+
             orderToUpdate.UpdatedAt = DateTime.Now;
             var updatedResult = await _unitOfWork.SaveChangesAsync();
             if (updatedResult > 0)
             {
                 //return _mapper.Map<OrderDTO>(orderToUpdate);
                 var Spec = new OrderWithItemsAndPaymentAndDeliveryAndKitchenTicketsSpecification(orderId);
-                var order = await orderRepo.GetByIdAsync(Spec) ?? throw new Exception(SharedResourcesKeys.FailedRetrieveCreatedOrder);
+                var order = await orderRepo.GetByIdAsync(Spec) ?? throw new FailedRetrieveCreatedOrderException(); 
+
                 var orderToReturn = _mapper.Map<OrderDTO>(order);
                 var orderData = _mapper.Map<OrderDetailsDTO>(order);
+
                 string EventName = orderToUpdate.Status == OrderStatus.Cancelled ? "OrderCancelled" : "OrderUpdated";
+
                 await _restaurantNotifier.SendAsync(
                          EventName,
                          orderData,
@@ -433,32 +512,41 @@ namespace RMS.Services.OrderServices
                         );
 
                 return orderToReturn;
+
             }
             else
             {
-                throw new Exception(SharedResourcesKeys.FailedToUpdate);
+
+                throw new FailedUpdatingStatusException();
+
             }
+
+
         }
 
         public async Task<AddedItemsDTO> AddItemsToOrderAsync(int orderId, List<CreateOrderItemDTO> items)
         {
             var orderRepo = _unitOfWork.GetRepository<Order>();
             var orderSpec = new OrderWithTableOrderAndBranchAndCustomerAndOrderItemsSpecification(orderId);
+
             var order = await orderRepo.GetByIdAsync(orderSpec);
-            if (order == null) throw new Exception(SharedResourcesKeys.NotFound);
+            if (order == null) throw new OrderNotFoundException(orderId);
+
             if (order.Status != OrderStatus.Received)
-                throw new Exception(SharedResourcesKeys.InvalidStatusValue);
+                throw new InvalidStatusTransitionOrderException(order.Status.ToString(), "AddItems");
+
 
             var ItemRepo = _unitOfWork.GetRepository<MenuItem>();
-
 
             var OldIngredientConsumption = new Dictionary<int, decimal>();
             var NewIngredientConsumption = new Dictionary<int, decimal>();
 
+
             foreach (var item in order.OrderItems)
             {
                 var menuItemSpec = new MenuItemWithBranchStockSpecification(item.MenuItemId);
-                var menuItem = await ItemRepo.GetByIdAsync(menuItemSpec) ?? throw new Exception(SharedResourcesKeys.NotFound);
+                var menuItem = await ItemRepo.GetByIdAsync(menuItemSpec) ?? throw new MenuItemNotFoundException(item.MenuItemId);
+
                 foreach (var recipe in menuItem.Recipes)
                 {
                     var totalRequired = recipe.QuantityRequired * item.Quantity;
@@ -469,10 +557,12 @@ namespace RMS.Services.OrderServices
                         OldIngredientConsumption[recipe.IngredientId] = totalRequired;
                 }
             }
+
             foreach (var item in items)
             {
                 var menuItemSpec = new MenuItemWithBranchStockSpecification(item.MenuItemId);
-                var menuItem = await ItemRepo.GetByIdAsync(menuItemSpec) ?? throw new Exception(SharedResourcesKeys.NotFound);
+                var menuItem = await ItemRepo.GetByIdAsync(menuItemSpec) ?? throw new MenuItemNotFoundException(item.MenuItemId);
+
                 foreach (var recipe in menuItem.Recipes)
                 {
                     var totalRequired = recipe.QuantityRequired * item.Quantity;
@@ -491,7 +581,7 @@ namespace RMS.Services.OrderServices
                 var stock = await _unitOfWork.GetRepository<BranchStock>().GetAllAsync(StockSpec);
                 var stockItem = stock.FirstOrDefault();
                 if (stockItem == null)
-                    throw new Exception($"Ingredient ID {ingredientId} not found in branch");
+                    throw new IngredientNotInBranchException(ingredientId);
 
                 var remainingStock = stockItem.QuantityAvailable - OldIngredientConsumption.GetValueOrDefault(ingredientId, 0);
                 stockItem.QuantityAvailable -= totalRequired;
@@ -504,7 +594,7 @@ namespace RMS.Services.OrderServices
                     {
                         var menuItemSpec = new MenuItemWithBranchStockSpecification(item.MenuItemId);
                         var menuItem = await ItemRepo.GetByIdAsync(menuItemSpec)
-                            ?? throw new Exception(SharedResourcesKeys.NotFound);
+                            ?? throw new MenuItemNotFoundException(item.MenuItemId);
 
                         // For this menu item, find the recipe that uses the limiting ingredient and calculate how many can be made
                         var limitingIngredient = menuItem.Recipes
@@ -527,23 +617,29 @@ namespace RMS.Services.OrderServices
                         ErrorMessage += $"You can only order {limitingIngredient.MaxPossible} of {menuItem.Name} " +
                                         $"because '{limitingIngredient.IngredientName}' is insufficient.\n";
                     }
-                    throw new Exception($"{ErrorMessage}");
+
+                    throw new InsufficientStockException(ErrorMessage);
+
                 }
+
+
             }
+
 
             var categories = new HashSet<string>();
 
             foreach (var item in order.OrderItems)
             {
                 var menuItemSpec = new MenuItemWithBranchStockSpecification(item.MenuItemId);
-                var menuItem = await ItemRepo.GetByIdAsync(menuItemSpec) ?? throw new Exception(SharedResourcesKeys.NotFound);
+                var menuItem = await ItemRepo.GetByIdAsync(menuItemSpec) ?? throw new MenuItemNotFoundException(item.MenuItemId);
                 categories.Add(menuItem.Category!.Name);
             }
 
             foreach (var item in items)
             {
                 var menuItemSpec = new MenuItemWithBranchStockSpecification(item.MenuItemId);
-                var menuItem = await ItemRepo.GetByIdAsync(menuItemSpec) ?? throw new Exception(SharedResourcesKeys.NotFound);
+                var menuItem = await ItemRepo.GetByIdAsync(menuItemSpec) ?? throw new MenuItemNotFoundException(item.MenuItemId);
+
                 // check if item already exists in order, if so, update quantity and unit price
                 var existingItem = order.OrderItems.FirstOrDefault(oi => oi.MenuItemId == item.MenuItemId);
                 item.UnitPrice = menuItem.Price;
@@ -571,6 +667,7 @@ namespace RMS.Services.OrderServices
             };
 
             var result = await _unitOfWork.SaveChangesAsync();
+
             if (result > 0)
             {
 
@@ -578,7 +675,7 @@ namespace RMS.Services.OrderServices
                 foreach (var item in items)
                 {
                     var menuItemSpec = new MenuItemWithBranchStockSpecification(item.MenuItemId);
-                    var menuItem = await ItemRepo.GetByIdAsync(menuItemSpec) ?? throw new Exception(SharedResourcesKeys.NotFound);
+                    var menuItem = await ItemRepo.GetByIdAsync(menuItemSpec) ?? throw new MenuItemNotFoundException(item.MenuItemId);
                     if (categories.Add(menuItem.Category!.Name))
                     {
                         var kitchenTicketRepo = _unitOfWork.GetRepository<KitchenTicket>();
@@ -589,9 +686,12 @@ namespace RMS.Services.OrderServices
                         });
                     }
                 }
+
                 await _unitOfWork.SaveChangesAsync();
+
                 var Spec = new OrderWithItemsAndPaymentAndDeliveryAndKitchenTicketsSpecification(order.Id);
-                order = await orderRepo.GetByIdAsync(Spec) ?? throw new Exception(SharedResourcesKeys.FailedRetrieveCreatedOrder);
+                order = await orderRepo.GetByIdAsync(Spec) ?? throw new FailedRetrieveCreatedOrderException();
+
                 var orderData = _mapper.Map<OrderDetailsDTO>(order);
                 await _restaurantNotifier.SendAsync(
                          "OrderUpdated",
@@ -608,9 +708,16 @@ namespace RMS.Services.OrderServices
             }
             else
             {
-                throw new Exception(SharedResourcesKeys.FailedAddingOrder);
+
+                throw new FailedRetrieveCreatedOrderException();
+
             }
+
         }
+
+
+
+
 
         public async Task<OrderDTO> RemoveItemsFromOrderAsync(int orderId, int itemId)
         {
@@ -620,24 +727,28 @@ namespace RMS.Services.OrderServices
 
             var menuItemRepo = _unitOfWork.GetRepository<MenuItem>();
 
-            if (order is null) throw new Exception(SharedResourcesKeys.NotFound);
-            if (order.Status != OrderStatus.Received) throw new Exception(SharedResourcesKeys.DeleteReceivedOrder);
+            if (order is null) throw new OrderNotFoundException(orderId);
+            if (order.Status != OrderStatus.Received) throw new DeleteReceivedOrderException();
 
             var orderItemSpec = new OrderItemWithCategorySpecification(itemId);
             var orderItemRepo = _unitOfWork.GetRepository<OrderItem>();
             var orderItem = await orderItemRepo.GetByIdAsync(orderItemSpec);
 
-            if (orderItem is null || orderItem.OrderId != orderId) throw new Exception(SharedResourcesKeys.NotFound);
+            if (orderItem is null || orderItem.OrderId != orderId) throw new OrderItemNotFoundException(itemId);
+
             order.OrderItems.Remove(orderItem);
-            if (!order.OrderItems.Any()) throw new Exception(SharedResourcesKeys.RemoveAllOrderItems);
+
+            if (!order.OrderItems.Any()) throw new RemoveAllOrderItemsException();
+
             var newCategories = new HashSet<string>();
 
             foreach (var item in order.OrderItems)
             {
                 var menuItemSpec = new MenuItemWithBranchStockSpecification(item.MenuItemId);
-                var menuItem = await menuItemRepo.GetByIdAsync(menuItemSpec) ?? throw new Exception(SharedResourcesKeys.NotFound);
+                var menuItem = await menuItemRepo.GetByIdAsync(menuItemSpec) ?? throw new MenuItemNotFoundException(item.MenuItemId);
                 newCategories.Add(menuItem.Category!.Name);
             }
+
             if (!newCategories.Contains(orderItem.MenuItem!.Category!.Name))
             {
                 var kitchenTicketRepo = _unitOfWork.GetRepository<KitchenTicket>();
@@ -656,16 +767,21 @@ namespace RMS.Services.OrderServices
             var removedItems = new List<OrderItem> { orderItem };
             NewIngredientConsumption = await CalculateIngredientConsumptionAsync(removedItems, order.BranchId);
             await RevertStockForCancelledOrderAsync (NewIngredientConsumption, order.BranchId);
+
             order.TotalAmount -= orderItem.Quantity * orderItem.UnitPrice;
             order.UpdatedAt = DateTime.Now;
+
             var result = await _unitOfWork.SaveChangesAsync();
+
             if (result > 0)
             //return _mapper.Map<OrderDTO>(order);
             {
                 var Spec = new OrderWithItemsAndPaymentAndDeliveryAndKitchenTicketsSpecification(orderId);
-                var theorder = await repo.GetByIdAsync(Spec) ?? throw new Exception(SharedResourcesKeys.FailedRetrieveCreatedOrder);
+                var theorder = await repo.GetByIdAsync(Spec) ?? throw new FailedRetrieveCreatedOrderException();
+
                 var orderToReturn = _mapper.Map<OrderDTO>(theorder);
                 var orderData = _mapper.Map<OrderDetailsDTO>(theorder);
+
                 await _restaurantNotifier.SendAsync(
                          "OrderUpdated",
                          orderData,
@@ -681,7 +797,7 @@ namespace RMS.Services.OrderServices
             }
 
             else
-                throw new Exception(SharedResourcesKeys.FailedToDelete);
+                throw new FailedRetrieveCreatedOrderException();
         }
 
         public async Task CancelOrderAsync(int orderId)
@@ -691,8 +807,9 @@ namespace RMS.Services.OrderServices
             var orderRepo = _unitOfWork.GetRepository<Order>();
             var orderSpec = new OrderWithTableOrderAndBranchAndCustomerAndOrderItemsSpecification(orderId);
             var orderToCancel = await orderRepo.GetByIdAsync(orderSpec);
-            if (orderToCancel == null) throw new Exception(SharedResourcesKeys.NotFound);
-            if (orderToCancel.Status != OrderStatus.Received) throw new Exception(SharedResourcesKeys.FailedAddingOrder);
+
+            if (orderToCancel == null) throw new OrderNotFoundException(orderId);
+            if (orderToCancel.Status != OrderStatus.Received) throw new CancelReceivedOrderOnlyException();
             // when cancelling an order, we need to:
             // 1. Set order status to Cancelled
             orderToCancel.Status = OrderStatus.Cancelled;
@@ -741,7 +858,7 @@ namespace RMS.Services.OrderServices
             var updatedResult = await _unitOfWork.SaveChangesAsync();
 
             if (!(updatedResult > 0))
-                throw new Exception(SharedResourcesKeys.FailedUpdatingStatus);
+                throw new FailedUpdatingStatusException();
 
             var orderData = _mapper.Map<OrderDTO>(orderToCancel);
             await _restaurantNotifier.SendAsync(
@@ -764,7 +881,8 @@ namespace RMS.Services.OrderServices
             foreach (var item in orderItems)
             {
                 var menuItemSpec = new MenuItemWithBranchStockSpecification(item.MenuItemId);
-                var menuItem = await menuItemRepo.GetByIdAsync(menuItemSpec) ?? throw new Exception(SharedResourcesKeys.NotFound);
+                var menuItem = await menuItemRepo.GetByIdAsync(menuItemSpec) ?? throw new MenuItemNotFoundException(item.MenuItemId);
+
                 foreach (var recipe in menuItem.Recipes)
                 {
                     var totalRequired = recipe.QuantityRequired * item.Quantity;
@@ -817,6 +935,52 @@ namespace RMS.Services.OrderServices
                     }
                 }
             }
+        }
+
+
+        public async Task<OrderDTO> MarkOrderAsPaidAsync(int orderId)
+        {
+            var orderRepo = _unitOfWork.GetRepository<Order>();
+
+            var spec = new OrderWithItemsAndPaymentAndDeliveryAndKitchenTicketsSpecification(orderId);
+            var order = await orderRepo.GetByIdAsync(spec);
+
+            if (order == null)
+                throw new OrderNotFoundException(orderId);
+
+
+            // لو already paid
+            if (order.Payment?.PaymentStatus == PaymentStatus.Paid)
+                throw new OrderAlreadyPaidException(orderId);
+
+            // update payment
+            if (order.Payment == null)
+                throw new PaymentNotFoundException(orderId);
+
+            order.Payment.PaymentStatus = PaymentStatus.Paid;
+            order.Payment.UpdatedAt = DateTime.Now;
+
+            // optional: update order status
+            if (order.Status == OrderStatus.AwaitingPayment)
+                order.Status = OrderStatus.Received;
+
+            order.UpdatedAt = DateTime.Now;
+
+            var result = await _unitOfWork.SaveChangesAsync();
+
+            if (result <= 0)
+                throw new FailedUpdatingStatusException();
+
+            var orderDto = _mapper.Map<OrderDTO>(order);
+
+            await _restaurantNotifier.SendAsync(
+                "PaymentUpdated",
+                orderDto,
+                $"cashiers_branch_{order.BranchId}",
+                $"admins"
+            );
+
+            return orderDto;
         }
     }
 }

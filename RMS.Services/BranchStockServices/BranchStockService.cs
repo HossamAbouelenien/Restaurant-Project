@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using RMS.Domain.Contracts;
 using RMS.Domain.Entities;
+using RMS.Services.Exceptions;
 using RMS.Services.Specifications;
 using RMS.Services.Specifications.BranchStockSpec;
 using RMS.ServicesAbstraction;
@@ -28,6 +29,8 @@ namespace RMS.Services.BranchStockServices
             _mapper = mapper;
             _restaurantNotifier = restaurantNotifier;
         }
+
+
         public async Task<IEnumerable<BranchStockDTO>> GetAllBranchStockAsync(BrandStockQueryParams queryParams)
         {
             var Repo = _unitOfWork.GetRepository<BranchStock>();
@@ -37,20 +40,34 @@ namespace RMS.Services.BranchStockServices
             return DataToReturn;
         }
 
+
+
         public async Task<BranchStockDTO> GetBranchStockAsync(int id)
         {
             var Repo = _unitOfWork.GetRepository<BranchStock>();
             var Spec = new BranchStockWithBranchAndIngredient(id);
             var BranchStock = await Repo.GetByIdAsync(Spec);
+
+            if(BranchStock is null)
+            {
+                throw new BranchStockNotFoundException(id);
+            }
+
             var DataToReturn = _mapper.Map<BranchStockDTO>(BranchStock);
             return DataToReturn;
         }
+
 
         public async Task<BranchStockDTO> UpdateBranchStockAsync(int id, UpdateBranchStockDTO UpdateBranchStock)
         {
             var Repo = _unitOfWork.GetRepository<BranchStock>();
             var Spec = new BranchStockWithBranchAndIngredient(id);
             var BranchStock = await Repo.GetByIdAsync(Spec);
+
+            if(BranchStock is null)
+            {
+                throw new BranchStockNotFoundException(id);
+            }
 
             _mapper.Map(UpdateBranchStock, BranchStock);
 
@@ -70,6 +87,9 @@ namespace RMS.Services.BranchStockServices
 
             return DataToReturn;
         }
+
+
+
     }
 }
 

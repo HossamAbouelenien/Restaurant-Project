@@ -19,12 +19,16 @@ namespace RMS.Presentation.Controllers
         {
             _reportService = reportService;
         }
+
+
         [HttpGet("dashboard")]
         public async Task <IActionResult> GetReport()
         {
             var reportData = await _reportService.GetDashboardAsync();
             return Ok(reportData);
         }
+
+
 
         [HttpGet("revenue")]
         public async Task<IActionResult> GetRevenue(
@@ -36,18 +40,26 @@ namespace RMS.Presentation.Controllers
             return Ok(result);
         }
 
+
+
         [HttpGet("orders-by-type")]
         public async Task<IActionResult> GetOrdersByType()
         {
             var result = await _reportService.GetOrdersByTypeAsync();
             return Ok(result);
         }
+
+
+
         [HttpGet("top-items")]
         public async Task<IActionResult> GetTopItems([FromQuery] int top = 5)
         {
             var result = await _reportService.GetTopItemsAsync(top);
             return Ok(result);
         }
+
+
+
         [HttpGet("inventory-usage")]
         public async Task<IActionResult> GetInventoryUsage()
         {
@@ -56,5 +68,37 @@ namespace RMS.Presentation.Controllers
         }
 
 
+
+
     }
+
+
+
+
+
+
+
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

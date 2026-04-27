@@ -21,12 +21,18 @@ namespace RMS.Presentation.Controllers
         {
             _branchService = branchService;
         }
+
+
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<BranchDTO>>> GetAllBranches()
         {
             var BranchStocks = await _branchService.GetAllBranchesAsync();
             return Ok(BranchStocks);
         }
+
+
+
         [HttpGet("GetAllBranchesWithTables")]
         public async Task<ActionResult<PaginatedResult<GetBranchDTO>>> GetAllBranchesWithOrdersAndTablesAsync([FromQuery] BranchQueryParams param)
         {
@@ -42,12 +48,18 @@ namespace RMS.Presentation.Controllers
             return Ok(result);
         }
 
+
+
         [HttpPut("{id}")]
         public async Task<ActionResult<UpdateBranchDTO>> UpdateBranch(int id, UpdateBranchDTO updateBranch)
         {
             var Branch = await _branchService.UpdateBranchAsync(id, updateBranch);
             return Ok(Branch);
         }
+
+
+
+
         [HttpPost]
         public async Task<ActionResult<CreateBranchDTO>> CreateBranch(CreateBranchDTO BranchDTO)
         {
@@ -55,17 +67,26 @@ namespace RMS.Presentation.Controllers
              return Ok(Branch);
         }
 
+
+
+
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteBranch(int id)
         {
             await _branchService.DeleteBranchAsync(id);
             return Ok();
         }
+
+
+
         [HttpPatch("{id}/toggle-status")]
         public async Task<ActionResult> ToggleBranchStatus(int id)
         {
             await _branchService.ToggleBranchStatusAsync(id);
             return Ok();
         }
+
+
+
     }
 }
