@@ -90,10 +90,27 @@ namespace RMS.Services.Exceptions
     : NotFoundException(SharedResourcesKeys.NotFound, id)
     { }
 
+    public sealed class UnauthorizedOrderException()
+    : BadRequestException(SharedResourcesKeys.UnauthorizedOrder)
+    { }
+
+
 
 
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

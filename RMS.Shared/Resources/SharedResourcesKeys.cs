@@ -102,9 +102,14 @@ namespace RMS.Shared.SharedResources
         public const string MenuItemIngredient = "MenuItemIngredient";
         public const string DuplicateIngredient = "DuplicateIngredient";
 
+
+
         // Payment
 
         public const string OrderAlreadyPaid = "OrderAlreadyPaid";
+        public const string UnauthorizedOrder = "UnauthorizedOrder";
+
+
 
         // Order
         public const string FailedOrders = "FailedOrders";

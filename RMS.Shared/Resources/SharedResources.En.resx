@@ -354,7 +354,9 @@
 	<data name="IngredientNotInBranch" xml:space="preserve">
   <value>Ingredient with id {0} is not available in this branch</value>
 </data>
-	
+	<data name="UnauthorizedOrder" xml:space="preserve">
+  <value>You are not authorized to pay for this order</value>
+</data>
 	
 	
 	
