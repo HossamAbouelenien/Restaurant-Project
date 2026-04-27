@@ -260,6 +260,27 @@
 	<data name="BranchStockNotFound" xml:space="preserve">
   <value>Branch stock with id {0} is not found</value>
 </data>
+
+	<data name="CategoryNotFound" xml:space="preserve">
+  <value>Category with id {0} is not found</value>
+</data>
+	<data name="CategoryAlreadyExists" xml:space="preserve">
+  <value>Category "{0}" already exists</value>
+</data>
+	<data name="CategoryNameRequired" xml:space="preserve">
+  <value>Category name is required</value>
+</data>
+	<data name="DeleteCategoryWithMenuItems" xml:space="preserve">
+  <value>Category with id {0} cannot be deleted because it has menu items</value>
+</data>
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	

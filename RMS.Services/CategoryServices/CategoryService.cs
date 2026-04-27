@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using RMS.Domain.Contracts;
 using RMS.Domain.Entities;
+using RMS.Services.Exceptions;
 using RMS.Services.Specifications.CategorySpec;
 using RMS.ServicesAbstraction.ICategoriesService;
 using RMS.Shared.DTOs.CategoryDTOs;
@@ -24,6 +25,8 @@ namespace RMS.Services.CategoryServices
             this._mapper = mapper;
         }
     
+
+
         public async Task<IEnumerable<CategoryDTO>> GetAllCategoriesAsync()
         {
 
@@ -35,11 +38,20 @@ namespace RMS.Services.CategoryServices
 
         }
 
+
+
+
         public async Task<CategoryDTO?> GetCategoryByIdAsync(int id)
         {
 
             var Spec = new GetCategoryByIDWithIncludingMenutItems(id);
             var Category = await _unitOfWork.GetRepository<Category>().GetByIdAsync(Spec);
+
+            if(Category is null)
+            {
+                throw new CategoryNotFoundException(id);
+            }
+
             var result = _mapper.Map<CategoryDTO>(Category);
 
             return result;
@@ -47,12 +59,15 @@ namespace RMS.Services.CategoryServices
         }
 
 
+
+
+
         public async Task<CategoryDTO> AddCategoryAsync(CreateCategoryDTO DTO)
         {
 
             if(string.IsNullOrEmpty(DTO.Name))
             {
-                throw new Exception(SharedResourcesKeys.Required);
+                throw new CategoryNameRequiredException();
             }
 
             var repository = _unitOfWork.GetRepository<Category>();
@@ -61,7 +76,7 @@ namespace RMS.Services.CategoryServices
 
             if (ExitingCategories.Any(C => C.Name.ToLower() == DTO.Name.ToLower()))
             {
-                throw new Exception(SharedResourcesKeys.AlreadyExists);
+                throw new CategoryAlreadyExistsException(DTO.Name);
             }
 
             var Category = _mapper.Map<Category>(DTO);
@@ -85,7 +100,7 @@ namespace RMS.Services.CategoryServices
 
             if(Category == null || Category.IsDeleted)
             {
-                throw new Exception(SharedResourcesKeys.NotFound);
+                throw new CategoryNotFoundException(id);
             }
 
             _mapper.Map(DTO,Category);
@@ -111,12 +126,12 @@ namespace RMS.Services.CategoryServices
 
             if(Category == null || Category.IsDeleted)
             {
-                throw new Exception(SharedResourcesKeys.NotFound);
+                throw new CategoryNotFoundException(id);
             }
 
             if (Category.MenuItems.Any())
             {
-                throw new Exception(SharedResourcesKeys.DeleteCategoryWithMenuItems);
+                throw new CategoryHasMenuItemsException(id);
             }
 
             Category.IsDeleted = true;
