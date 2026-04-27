@@ -372,8 +372,16 @@
 	<data name="RecipeDeleteFailed" xml:space="preserve">
   <value>Failed to delete recipe with id {0}</value>
 </data>
-	
-	
+
+<data name="FailedToRetrieveOrders" xml:space="preserve">
+  <value>Failed to retrieve orders data.</value>
+</data>
+	<data name="FailedToRetrieveStock" xml:space="preserve">
+  <value>Failed to retrieve stock data.</value>
+</data>
+	<data name="InvalidTopValue" xml:space="preserve">
+  <value>Top value must be greater than zero.</value>
+</data>
 	
 	
 	

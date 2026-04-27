@@ -1,6 +1,7 @@
 ﻿using RMS.Domain.Contracts;
 using RMS.Domain.Entities;
 using RMS.Domain.Enums;
+using RMS.Services.Exceptions;
 using RMS.Services.Specifications.ReportSpec;
 using RMS.ServicesAbstraction;
 using RMS.Shared.DTOs.ReportsDTOs;
@@ -30,7 +31,7 @@ namespace RMS.Services.ReportServices
             var orders = await _unitOfWork.GetRepository<Order>().GetAllAsync();
 
             if (orders == null)
-                throw new Exception(SharedResourcesKeys.FailedOrders);
+                throw new FailedToRetrieveOrdersException();
 
             var todayOrders = orders
                 .Where(o => !o.IsDeleted &&
@@ -38,11 +39,14 @@ namespace RMS.Services.ReportServices
                             o.CreatedAt < tomorrow &&
                             o.Status != OrderStatus.Cancelled)
                 .ToList();
+
+
             var branchStocks = await _unitOfWork
                 .GetRepository<BranchStock>() 
                 .GetAllAsync();
+
             if (branchStocks == null)
-                throw new Exception(SharedResourcesKeys.Failed);
+                throw new FailedToRetrieveStockException();
 
             var lowStockCount = branchStocks
                 .Count(bs => bs.QuantityAvailable < bs.LowThreshold);
@@ -58,12 +62,19 @@ namespace RMS.Services.ReportServices
 
             };
         }
+
+
+
         public async Task<OrdersByTypeDTO> GetOrdersByTypeAsync()
         {
             var today = DateTime.Today;
             var tomorrow = today.AddDays(1);
 
             var orders = await _unitOfWork.GetRepository<Order>().GetAllAsync();
+
+
+            if (orders is null)
+                throw new FailedToRetrieveOrdersException();
 
             var validOrders = orders.Where(o =>
                 !o.IsDeleted &&
@@ -78,13 +89,21 @@ namespace RMS.Services.ReportServices
                 PickupCount = validOrders.Count(o => o.OrderType == OrderType.Pickup),
                 DeliveryCount = validOrders.Count(o => o.OrderType == OrderType.Delivery)
             };
+
+
         }
+
+
+
         public async Task<IEnumerable<RevenueDTO>> GetRevenueAsync(int? branchId, DateTime? from, DateTime? to)
         {
             var today = DateTime.Today;
             var tomorrow = today.AddDays(1);
 
             var orders = await _unitOfWork.GetRepository<Order>().GetAllAsync();
+
+            if (orders is null)
+                throw new FailedToRetrieveOrdersException();
 
             var filtered = orders.Where(o =>
                 !o.IsDeleted &&
@@ -109,10 +128,14 @@ namespace RMS.Services.ReportServices
                 .OrderBy(r => r.Date)
                 .ToList();
         }
+
+
+
+
         public async Task<IEnumerable<TopItemsDto>> GetTopItemsAsync(int top)
         {
             if (top <= 0)
-                throw new Exception("Top must be greater than 0");
+                throw new InvalidTopValueException();
 
             var today = DateTime.Today;
             var tomorrow = today.AddDays(1);
@@ -122,6 +145,11 @@ namespace RMS.Services.ReportServices
             var orders = await _unitOfWork
                 .GetRepository<Order>()
                 .GetAllAsync(spec);
+
+
+            if (orders is null)
+                throw new FailedToRetrieveOrdersException();
+
 
             var result = orders
                 .Where(o => o.CreatedAt >= today && o.CreatedAt < tomorrow)
@@ -137,8 +165,12 @@ namespace RMS.Services.ReportServices
                 .Take(top)
                 .ToList();
 
+
             return result;
         }
+
+
+
         public async Task<IEnumerable<InventoryUsageDTO>> GetInventoryUsageAsync()
         {
             var to = DateTime.Today.AddDays(1);
@@ -149,6 +181,10 @@ namespace RMS.Services.ReportServices
             var orders = await _unitOfWork
                 .GetRepository<Order>()
                 .GetAllAsync(spec);
+
+
+            if (orders is null)
+                throw new FailedToRetrieveOrdersException();
 
             var result = orders
                 .SelectMany(o => o.OrderItems.SelectMany(oi =>

@@ -369,7 +369,15 @@
 	<data name="RecipeDeleteFailed" xml:space="preserve">
   <value>فشل حذف الوصفة رقم {0}</value>
 </data>
-	
+<data name="FailedToRetrieveOrders" xml:space="preserve">
+  <value>فشل في استرداد بيانات الطلبات.</value>
+</data>
+	<data name="FailedToRetrieveStock" xml:space="preserve">
+  <value>فشل في استرداد بيانات المخزون.</value>
+</data>
+	<data name="InvalidTopValue" xml:space="preserve">
+  <value>يجب أن تكون قيمة Top أكبر من صفر.</value>
+</data>	
 	
 	
 	

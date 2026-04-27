@@ -168,7 +168,10 @@ namespace RMS.Shared.SharedResources
 
 
 
-
+        // Report
+        public const string FailedToRetrieveOrders = "FailedToRetrieveOrders";
+        public const string FailedToRetrieveStock = "FailedToRetrieveStock";
+        public const string InvalidTopValue = "InvalidTopValue";
 
 
 
