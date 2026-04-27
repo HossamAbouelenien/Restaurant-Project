@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using RMS.Domain.Contracts;
 using RMS.Domain.Entities;
 using RMS.Services.EmailServices;
+using RMS.Services.Exceptions;
 using RMS.Services.Specifications.BranchStockSpec;
 using RMS.Services.Specifications.UserSpec;
 using RMS.ServicesAbstraction.IEmailServices;
@@ -38,6 +39,7 @@ namespace RMS.Services.UserServices
 
 
 
+
         public async Task<PaginatedResult<GetUserDTO>> GetAllUserWithBranchAsync(UserQueryParams queryParams)
         {
             var repo = _unitOfWork.GetRepository<User>();
@@ -57,14 +59,25 @@ namespace RMS.Services.UserServices
             return paginatedResult;
         }
 
+
+
+
+
         public async Task<UserDetailsDTO> GetUserDetailsAsync(string id)
         {
             var Repo = _unitOfWork.GetRepository<User>();
             var Spec = new UserWithBranchSpecifications(id);
             var user = await Repo.GetByIdAsync(Spec);
+
+            if (user is null)
+                throw new UserNotFoundExceptionId(id);
+
             var DataToReturn = _mapper.Map<UserDetailsDTO>(user);
             return DataToReturn;
         }
+
+
+
 
         public async Task<UserDetailsDTO> AddUserAsync(CreateUserDto createUserDto)
         {
@@ -88,7 +101,10 @@ namespace RMS.Services.UserServices
 
             if (!createdUser.Succeeded)
             {
-                throw new Exception(string.Join(", ", createdUser.Errors.Select(e => e.Description)));
+
+                var errors = string.Join(", ", createdUser.Errors.Select(e => e.Description));
+                throw new UserCreationFailedException(errors);
+
             }
 
             var role = string.IsNullOrEmpty(createUserDto.RoleId)
@@ -151,6 +167,9 @@ namespace RMS.Services.UserServices
 
         }
 
+
+
+
         public async Task<UserDetailsDTO> UpdateUserAsync(string id, UpdateUserDto updateUserDto)
         {
             var repo = _unitOfWork.GetRepository<User>();
@@ -158,15 +177,21 @@ namespace RMS.Services.UserServices
             var user = await repo.GetByIdAsync(spec);
 
             if (user == null)
-                throw new Exception(SharedResourcesKeys.NotFound);
+                throw new UserNotFoundExceptionId(id);
 
             _mapper.Map(updateUserDto, user);
+
             user.UserName = updateUserDto.Email;
             repo.Update(user);
             await _unitOfWork.SaveChangesAsync();
+
             var result = _mapper.Map<UserDetailsDTO>(user);
             return result;
+
         }
+
+
+
 
 
         public async Task<bool> ToggleUserStatusAsync(string id)
@@ -178,7 +203,7 @@ namespace RMS.Services.UserServices
             var user = await repo.GetByIdAsync(spec);
 
             if (user == null)
-                throw new Exception("User not found");
+                throw new UserNotFoundExceptionId(id);
 
             if (!user.IsDeleted)
             {
@@ -199,8 +224,12 @@ namespace RMS.Services.UserServices
             return true;
         }
 
+
+
+
         public async Task<PaginatedResult<GetUserDTO>> GetInactiveUsersAsync(UserQueryParams queryParams)
         {
+
             var repo = _unitOfWork.GetRepository<User>();
 
             var spec = new InactiveUsersWithBranchSpecification(queryParams);
@@ -219,6 +248,7 @@ namespace RMS.Services.UserServices
                 countOfAllUsers,
                 dataToReturn
             );
+
         }
 
         public async Task<List<string>> GetRolesAsync()
@@ -254,7 +284,8 @@ namespace RMS.Services.UserServices
 
             if (!createdUser.Succeeded)
             {
-                throw new Exception(string.Join(", ", createdUser.Errors.Select(e => e.Description)));
+                var errors = string.Join(", ", createdUser.Errors.Select(e => e.Description));
+                throw new UserCreationFailedException(errors);
             }
 
             var role = SD.Role_Customer;
@@ -268,15 +299,20 @@ namespace RMS.Services.UserServices
 
         }
 
+
+
         public async Task<PaginatedResult<GetCustomerDTO>> GetAllCustomerUserAysnc(CustomerQueryParams queryParams)
         {
             var repo = _unitOfWork.GetRepository<User>();
             var spec = new CustomerByPhoneSpecification(queryParams);
+
             var users = await repo.GetAllAsync(spec);
             var dataToReturn = _mapper.Map<IEnumerable<GetCustomerDTO>>(users);
             var countOfReturnedUsers = dataToReturn.Count();
+
             var countSpec = new CustomersByPhoneCountSpecification(queryParams);
             var countOfAllUsers = await repo.CountAsync(countSpec);
+
             var paginatedResult = new PaginatedResult<GetCustomerDTO>(
                 queryParams.PageIndex,
                 countOfReturnedUsers,
@@ -285,31 +321,38 @@ namespace RMS.Services.UserServices
             );
 
             return paginatedResult;
+
+
         }
+
+
 
 
         public async Task<GetCustomerDTO> UpdateCustomerAddress(string id, UpdateCustomerAddressDTO updateCustomerAddressDTO)
         {
+
+
             var repo = _unitOfWork.GetRepository<User>();
             var spec = new UserWithBranchSpecifications(id);
             var user = await repo.GetByIdAsync(spec);
 
             if (user == null)
-                throw new Exception(SharedResourcesKeys.NotFound);
+                throw new UserNotFoundExceptionId(id);
 
-            // ✅ Map الـ DTO الأول لـ Address Entity
-            var newAddress = _mapper.Map<Address>(updateCustomerAddressDTO.addressDTO);
-
-            // ✅ تأكد إن الـ collection مش null
+          
+            var newAddress = _mapper.Map<Address>(updateCustomerAddressDTO.addressDTO);  
             user.Addresses ??= new List<Address>();
-
             user.Addresses.Add(newAddress);
 
             repo.Update(user);
             await _unitOfWork.SaveChangesAsync();
 
             return _mapper.Map<GetCustomerDTO>(user);
+
+
         }
+
+
 
 
         public async Task UpdateAddressAsync(string userId, UpdateAddressDto dto)
@@ -321,7 +364,7 @@ namespace RMS.Services.UserServices
             var user = await repo.GetByIdAsync(spec);
 
             if (user == null)
-                throw new Exception("User or Address Not Found");
+                throw new UserNotFoundExceptionId(userId);
 
             var address = user.Addresses.First(a =>
                 a.BuildingNumber == dto.OldBuildingNumber &&
@@ -329,11 +372,16 @@ namespace RMS.Services.UserServices
                 a.City == dto.OldCity
             );
 
+            if (address is null)
+                throw new AddressNotFoundException(userId);
+
             _mapper.Map(dto, address);
 
             repo.Update(user);
             await _unitOfWork.SaveChangesAsync();
         }
+
+
 
         public async Task DeleteAddressAsync(string userId, DeleteAddressDto dto)
         {
@@ -344,7 +392,7 @@ namespace RMS.Services.UserServices
             var user = await repo.GetByIdAsync(spec);
 
             if (user == null)
-                throw new Exception("User Not Found");
+                throw new UserNotFoundExceptionId(userId);
 
             var address = user.Addresses.FirstOrDefault(a =>
                 a.BuildingNumber == dto.BuildingNumber &&
@@ -353,7 +401,7 @@ namespace RMS.Services.UserServices
             );
 
             if (address == null)
-                throw new Exception("Address Not Found");
+                throw new AddressNotFoundException(userId);
 
             user.Addresses.Remove(address);
 

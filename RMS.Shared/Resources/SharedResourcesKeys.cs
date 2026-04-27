@@ -177,7 +177,10 @@ namespace RMS.Shared.SharedResources
 
 
 
-
+        // User
+        public const string UserNotFoundId = "UserNotFound";
+        public const string UserCreationFailed = "UserCreationFailed";
+        public const string AddressNotFound = "AddressNotFound";
 
 
 
