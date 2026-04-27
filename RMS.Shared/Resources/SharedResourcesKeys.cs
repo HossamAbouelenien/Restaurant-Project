@@ -25,6 +25,7 @@ namespace RMS.Shared.SharedResources
 
 
         // Branch
+        public const string BranchNotFound = "BranchNotFound";
         public const string DeleteInActiveBranch = "DeleteInActiveBranch";
         public const string DeleteBranchWithActiveOrders = "DeleteBranchWithActiveOrders";
 
