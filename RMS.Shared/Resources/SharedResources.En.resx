@@ -335,7 +335,25 @@
 <data name="NotificationNotFound" xml:space="preserve">
   <value>Notification with id {0} is not found</value>
 </data>
-	
+
+<data name="InvalidPaymentMethod" xml:space="preserve">
+  <value>Invalid payment method: {0}</value>
+</data>
+	<data name="InsufficientStock" xml:space="preserve">
+  <value>Insufficient stock. {0}</value>
+</data>
+	<data name="PaymentNotFound" xml:space="preserve">
+  <value>Payment record for order {0} is not found</value>
+</data>
+	<data name="CancelReceivedOrderOnly" xml:space="preserve">
+  <value>Only orders with status 'Received' can be cancelled</value>
+</data>
+	<data name="OrderItemNotFound" xml:space="preserve">
+  <value>Order item with id {0} is not found</value>
+</data>
+	<data name="IngredientNotInBranch" xml:space="preserve">
+  <value>Ingredient with id {0} is not available in this branch</value>
+</data>
 	
 	
 	

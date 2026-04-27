@@ -113,7 +113,7 @@ namespace RMS.Services.DeliveryServices
                 throw new OrderNotFoundException(dto.OrderId);
 
             if (order.OrderType != OrderType.Delivery)
-                throw new InvalidOrderTypeException(dto.OrderId);
+                throw new InvalidOrderTypeException(order.OrderType.ToString());
 
             if (order.Delivery != null && order.Delivery.DriverId != null)
                 throw new OrderAlreadyAssignedException(dto.OrderId);

@@ -23,8 +23,8 @@ namespace RMS.Services.Exceptions
     { }
 
 
-    public sealed class InvalidOrderTypeException(int orderId)
-        : BadRequestException(SharedResourcesKeys.InvalidOrderType, orderId)
+    public sealed class InvalidOrderTypeException(string type)
+    : BadRequestException(SharedResourcesKeys.InvalidOrderType, type)
     { }
 
 
