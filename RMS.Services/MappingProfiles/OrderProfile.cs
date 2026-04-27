@@ -36,7 +36,8 @@ namespace RMS.Services.MappingProfiles
             CreateMap<OrderItemDTO, OrderItem>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.OrderItemId))
                 
-                .ReverseMap().ForMember(dest => dest.MenuItemName, opt => opt.MapFrom(src => src.MenuItem!.Name));
+                .ReverseMap().ForMember(dest => dest.MenuItemName, opt => opt.MapFrom(src => src.MenuItem!.Name))
+                .ForMember(dest => dest.ArabicMenuItemName, opt => opt.MapFrom(src => src.MenuItem!.ArabicName));
 
             CreateMap<Order, OrderDetailsDTO>()
                     .ForMember(dest => dest.OrderItems, opt => opt.MapFrom(src => src.OrderItems))

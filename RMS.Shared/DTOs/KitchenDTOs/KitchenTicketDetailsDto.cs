@@ -19,5 +19,7 @@ namespace RMS.Shared.DTOs.KitchenDTOs
         public int OrderId { get; set; }
 
         public List<string> Items { get; set; } = new();
+        public List<string> ArabicItems { get; set; } = new();
+
     }
 }
