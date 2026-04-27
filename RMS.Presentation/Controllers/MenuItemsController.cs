@@ -85,9 +85,9 @@ namespace RMS.Presentation.Controllers
         }
 
         [HttpGet("popular")]
-        public async Task<IActionResult> GetPopular()
+        public async Task<IActionResult> GetPopular([FromQuery] int? branchId)
         {
-            var result = await _menuItemService.GetPopularMenuItemsAsync(4);
+            var result = await _menuItemService.GetPopularMenuItemsAsync(4, branchId);
             return Ok(result);
         }
 
