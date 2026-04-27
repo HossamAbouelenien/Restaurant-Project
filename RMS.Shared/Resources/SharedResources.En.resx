@@ -256,8 +256,10 @@
 	<data name="DeleteBranchWithActiveOrders" xml:space="preserve">
   <value>Branch with id {0} cannot be deleted because it has active orders</value>
 </data>
-	
-	
+
+	<data name="BranchStockNotFound" xml:space="preserve">
+  <value>Branch stock with id {0} is not found</value>
+</data>
 	
 	
 	

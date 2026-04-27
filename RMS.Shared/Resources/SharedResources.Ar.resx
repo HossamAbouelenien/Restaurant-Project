@@ -252,10 +252,11 @@
 </data>
 	<data name="DeleteBranchWithActiveOrders" xml:space="preserve">
   <value>لا يمكن حذف الفرع رقم {0} لوجود طلبات نشطة</value>
-</data>	
-	
-	
-	
+</data>
+
+	<data name="BranchStockNotFound" xml:space="preserve">
+  <value>مخزون الفرع رقم {0} غير موجود</value>
+</data>
 	
 	
 	

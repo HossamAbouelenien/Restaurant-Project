@@ -30,6 +30,10 @@ namespace RMS.Shared.SharedResources
         public const string DeleteBranchWithActiveOrders = "DeleteBranchWithActiveOrders";
 
 
+        // BranchStock
+        public const string BranchStockNotFound = "BranchStockNotFound";
+
+
         // MenuItem
         public const string DeleteActiveMenuItem = "DeleteActiveMenuItem";
 
