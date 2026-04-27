@@ -142,7 +142,9 @@ namespace RMS.Shared.SharedResources
         public const string TableNotInBranch = "TableNotInBranch";
         public const string FreeTable = "FreeTable";
         public const string CompletedTableOrder = "CompletedTableOrder";
-
+        public const string TableNumberRequired = "TableNumberRequired";
+        public const string TableNumberAlreadyExists = "TableNumberAlreadyExists";
+        public const string TableOrderNotFound = "TableOrderNotFound";
 
 
 

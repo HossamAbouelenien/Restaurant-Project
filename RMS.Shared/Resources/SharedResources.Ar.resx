@@ -377,8 +377,16 @@
 </data>
 	<data name="InvalidTopValue" xml:space="preserve">
   <value>يجب أن تكون قيمة Top أكبر من صفر.</value>
-</data>	
-	
+</data>
+	<data name="TableNumberRequired" xml:space="preserve">
+  <value>رقم الطاولة مطلوب.</value>
+</data>
+	<data name="TableNumberAlreadyExists" xml:space="preserve">
+  <value>رقم الطاولة '{0}' موجود بالفعل في هذا الفرع.</value>
+</data>
+	<data name="TableOrderNotFound" xml:space="preserve">
+  <value>طلب الطاولة بالمعرف '{0}' غير موجود.</value>
+</data>
 	
 	
 	
