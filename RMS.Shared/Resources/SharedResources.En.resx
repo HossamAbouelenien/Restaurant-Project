@@ -128,18 +128,11 @@
   <data name="Invalid" xml:space="preserve">
     <value>Invalid</value>
   </data>
-  <data name="InvalidOrderType" xml:space="preserve">
-    <value>Order is not a delivery type</value>
-  </data>
-  <data name="InvalidStatusValue" xml:space="preserve">
-    <value>Invalid status value</value>
-  </data>
+ 
   <data name="NotFound" xml:space="preserve">
     <value>Not Found</value>
   </data>
-  <data name="OrderAssignedToDelivery" xml:space="preserve">
-    <value>Order already assigned</value>
-  </data>
+
   <data name="OrderAssignedToYou" xml:space="preserve">
     <value>New Delivery Has Assigned To You !</value>
   </data>
@@ -149,9 +142,7 @@
   <data name="Unauthorized" xml:space="preserve">
     <value>Unauthorized</value>
   </data>
-  <data name="InvalidStatusTransition" xml:space="preserve">
-    <value>Invalid status transition</value>
-  </data>
+ 
   <data name="EmailIsNotConfirmed" xml:space="preserve">
     <value>Email is not confirmed</value>
   </data>
@@ -236,9 +227,6 @@
   <data name="OrderItem" xml:space="preserve">
     <value>Order must have at least one item</value>
   </data>
-  <data name="OrderIsNotReadyYet" xml:space="preserve">
-    <value>Order is not ready yet</value>
-  </data>
 
   <data name="BasketNotFound" xml:space="preserve">
      <value>Basket with id {0} is not found</value>
@@ -273,8 +261,37 @@
 	<data name="DeleteCategoryWithMenuItems" xml:space="preserve">
   <value>Category with id {0} cannot be deleted because it has menu items</value>
 </data>
-	
-	
+
+	<data name="DeliveryNotFound" xml:space="preserve">
+  <value>Delivery with id {0} is not found</value>
+</data>
+	<data name="OrderNotFound" xml:space="preserve">
+  <value>Order with id {0} is not found</value>
+</data>
+	<data name="DriverNotFound" xml:space="preserve">
+  <value>Driver with id {0} is not found</value>
+</data>
+	<data name="InvalidDriverRole" xml:space="preserve">
+  <value>User with id {0} is not a driver</value>
+</data>
+	<data name="UnauthorizedDriver" xml:space="preserve">
+  <value>You are not authorized to update this delivery</value>
+</data>
+	<data name="InvalidOrderType" xml:space="preserve">
+  <value>Order with id {0} is not a delivery order</value>
+</data>
+	<data name="OrderAssignedToDelivery" xml:space="preserve">
+  <value>Order with id {0} is already assigned to a driver</value>
+</data>
+	<data name="InvalidStatusValue" xml:space="preserve">
+  <value>Status value "{0}" is not valid</value>
+</data>
+	<data name="InvalidStatusTransition" xml:space="preserve">
+  <value>Cannot transition from "{0}" to "{1}"</value>
+</data>
+	<data name="OrderIsNotReadyYet" xml:space="preserve">
+  <value>Order with id {0} is not ready yet</value>
+</data>
 	
 	
 	

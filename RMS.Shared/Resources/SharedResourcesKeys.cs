@@ -49,13 +49,27 @@ namespace RMS.Shared.SharedResources
         public const string DeleteCategoryWithMenuItems = "DeleteCategoryWithMenuItems";
 
 
+
+
         // Delivery
+
+
         public const string InvalidOrderType = "InvalidOrderType";
         public const string OrderAssignedToDelivery = "OrderAssignedToDelivery";
         public const string OrderAssignedToYou = "OrderAssignedToYou";
         public const string InvalidStatusValue = "InvalidStatusValue";
         public const string InvalidStatusTransition = "InvalidStatusTransition";
         public const string OrderIsNotReadyYet = "OrderIsNotReadyYet";
+
+        public const string DeliveryNotFound = "DeliveryNotFound";
+        public const string OrderNotFound = "OrderNotFound";
+        public const string DriverNotFound = "DriverNotFound";
+        public const string InvalidDriverRole = "InvalidDriverRole";
+        public const string UnauthorizedDriver = "UnauthorizedDriver";
+
+
+
+
 
 
         // Auth

@@ -126,18 +126,12 @@
   <data name="Invalid" xml:space="preserve">
     <value>قيمة غير صالحة</value>
   </data>
-  <data name="InvalidOrderType" xml:space="preserve">
-    <value>الطلب ليس نوع توصيل</value>
-  </data>
-  <data name="InvalidStatusValue" xml:space="preserve">
-    <value>قيمة الحالة غير صالحة</value>
-  </data>
+
+
   <data name="NotFound" xml:space="preserve">
     <value>غير متوفر</value>
   </data>
-  <data name="OrderAssignedToDelivery" xml:space="preserve">
-    <value>تم تعيين الطلب بالفعل</value>
-  </data>
+
   <data name="OrderAssignedToYou" xml:space="preserve">
     <value>تم تعيين توصيل جديد لك!</value>
   </data>
@@ -147,9 +141,7 @@
   <data name="Unauthorized" xml:space="preserve">
     <value>غير مصرح به</value>
   </data>
-  <data name="InvalidStatusTransition" xml:space="preserve">
-    <value>انتقال حالة غير صالح</value>
-  </data>
+>
   <data name="EmailIsNotConfirmed" xml:space="preserve">
     <value>البريد الإلكتروني غير مؤكد</value>
   </data>
@@ -234,9 +226,6 @@
   <data name="OrderItem" xml:space="preserve">
     <value>يجب أن يحتوي الطلب على عنصر واحد على الأقل</value>
   </data>
-  <data name="OrderIsNotReadyYet" xml:space="preserve">
-    <value>الطلب ليس جاهزا بعد </value>
-  </data>
 	<data name="BasketNotFound" xml:space="preserve">
   <value>السلة رقم {0} غير موجودة</value>
 </data>
@@ -270,7 +259,37 @@
 	<data name="DeleteCategoryWithMenuItems" xml:space="preserve">
   <value>لا يمكن حذف الصنف رقم {0} لأنه يحتوي على عناصر قائمة</value>
 </data>
-	
+
+	<data name="DeliveryNotFound" xml:space="preserve">
+  <value>التوصيل رقم {0} غير موجود</value>
+</data>
+	<data name="OrderNotFound" xml:space="preserve">
+  <value>الطلب رقم {0} غير موجود</value>
+</data>
+	<data name="DriverNotFound" xml:space="preserve">
+  <value>السائق رقم {0} غير موجود</value>
+</data>
+	<data name="InvalidDriverRole" xml:space="preserve">
+  <value>المستخدم رقم {0} ليس سائقاً</value>
+</data>
+	<data name="UnauthorizedDriver" xml:space="preserve">
+  <value>غير مصرح لك بتعديل هذا التوصيل</value>
+</data>
+	<data name="InvalidOrderType" xml:space="preserve">
+  <value>الطلب رقم {0} ليس طلب توصيل</value>
+</data>
+	<data name="OrderAssignedToDelivery" xml:space="preserve">
+  <value>الطلب رقم {0} تم تعيينه بالفعل لسائق</value>
+</data>
+	<data name="InvalidStatusValue" xml:space="preserve">
+  <value>قيمة الحالة "{0}" غير صالحة</value>
+</data>
+	<data name="InvalidStatusTransition" xml:space="preserve">
+  <value>لا يمكن الانتقال من حالة "{0}" إلى حالة "{1}"</value>
+</data>
+	<data name="OrderIsNotReadyYet" xml:space="preserve">
+  <value>الطلب رقم {0} ليس جاهزاً بعد</value>
+</data>
 	
 	
 	
