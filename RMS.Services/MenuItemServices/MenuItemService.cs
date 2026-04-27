@@ -301,12 +301,11 @@ namespace RMS.Services.MenuItemsServices
 
 
 
-        public async Task<IEnumerable<MenuItemDTO>> GetPopularMenuItemsAsync(int limit)
+        public async Task<IEnumerable<MenuItemDTO>> GetPopularMenuItemsAsync(int limit, int? branchId)
         {
             var repo = _unitOfWork.GetRepository<MenuItem>();
 
-            var spec = new PopularMenuItemsSpecification(limit);
-
+            var spec = new PopularMenuItemsSpecification(limit, branchId);
             var items = await repo.GetAllAsync(spec);
 
             return _mapper.Map<IEnumerable<MenuItemDTO>>(items);
