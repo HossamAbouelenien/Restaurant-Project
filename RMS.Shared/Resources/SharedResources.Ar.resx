@@ -243,4 +243,26 @@
   <data name="OrderIsNotReadyYet" xml:space="preserve">
     <value>الطلب ليس جاهزا بعد </value>
   </data>
+	<data name="BasketNotFound" xml:space="preserve">
+  <value>السلة رقم {0} غير موجودة</value>
+</data>
+	<data name="BasketOperationFailed" xml:space="preserve">
+  <value>فشلت العملية على السلة رقم {0}</value>
+</data>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 </root>

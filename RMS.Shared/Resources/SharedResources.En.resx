@@ -243,4 +243,39 @@
   <data name="OrderIsNotReadyYet" xml:space="preserve">
     <value>Order is not ready yet</value>
   </data>
+
+  <data name="BasketNotFound" xml:space="preserve">
+     <value>Basket with id {0} is not found</value>
+  </data>
+  <data name="BasketOperationFailed" xml:space="preserve">
+    <value>Operation failed for basket with id {0}</value>
+  </data>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 </root>

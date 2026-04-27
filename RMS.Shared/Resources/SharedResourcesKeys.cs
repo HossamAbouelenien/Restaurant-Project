@@ -86,5 +86,55 @@ namespace RMS.Shared.SharedResources
 
 
 
+
+
+        // Basket
+        public const string BasketNotFound = "BasketNotFound";
+        public const string BasketOperationFailed = "BasketOperationFailed";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     }
+
+
+
+
+
+
+
+
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
