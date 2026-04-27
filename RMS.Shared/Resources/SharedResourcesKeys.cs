@@ -159,7 +159,12 @@ namespace RMS.Shared.SharedResources
         public const string IngredientNameRequired = "IngredientNameRequired";
 
 
-
+        // Recipe
+        public const string RecipeNotFound = "RecipeNotFound";
+        public const string RecipeAlreadyExists = "RecipeAlreadyExists";
+        public const string RecipeAddFailed = "RecipeAddFailed";
+        public const string RecipeUpdateFailed = "RecipeUpdateFailed";
+        public const string RecipeDeleteFailed = "RecipeDeleteFailed";
 
 
 

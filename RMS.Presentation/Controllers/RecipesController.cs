@@ -35,30 +35,20 @@ namespace RMS.Presentation.Controllers
         [HttpPost]
         public async Task<ActionResult<RecipesListDTO>> AddRecipeToMenuItem([FromBody] AddRecipeToMenuItemDTO dto)
         {
-            try
-            {
+            
                 var addedRecipe = await _recipeService.AddRecipeToMenuItemAsync(dto);
                 return Ok(addedRecipe);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+           
         }
 
 
         [HttpPut("{id}")]
         public async Task<ActionResult<RecipesListDTO>> UpdateRecipeQuantity(int id, [FromBody] UpdateRecipeQuantityDTO dto)
         {
-            try
-            {
+            
                 var updatedRecipe = await _recipeService.UpdateRecipeQuantityRequiredAsync(id, dto);
                 return Ok(updatedRecipe);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
+           
         }
 
         [HttpDelete("{id}")]
