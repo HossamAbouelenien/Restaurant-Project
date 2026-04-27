@@ -328,8 +328,10 @@
 	<data name="DuplicateIngredient" xml:space="preserve">
   <value>لا يمكن إضافة نفس المكون أكثر من مرة</value>
 </data>
-	
-	
+
+<data name="NotificationNotFound" xml:space="preserve">
+  <value>الإشعار رقم {0} غير موجود</value>
+</data>
 	
 	
 	

@@ -48,6 +48,10 @@ namespace RMS.Shared.SharedResources
 
 
 
+        // Notification
+        public const string NotificationNotFound = "NotificationNotFound";
+
+
         // Category
 
         public const string CategoryNotFound = "CategoryNotFound";

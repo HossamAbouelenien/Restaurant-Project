@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using RMS.Domain.Contracts;
 using RMS.Domain.Entities;
+using RMS.Services.Exceptions;
 using RMS.Services.Specifications.NotificationSpec;
 using RMS.ServicesAbstraction.IHubServices.INotificationServices;
 using RMS.Shared.DTOs.NotificationDTOs;
@@ -63,7 +64,10 @@ namespace RMS.Services.NotificationServices
             var notification = await repo.GetByIdAsync(id);
 
             if (notification == null)
-                throw new Exception("Notification not found");
+            {
+                throw new NotificationNotFoundException(id);
+            }
+                
 
             notification.IsRead = true;
 
