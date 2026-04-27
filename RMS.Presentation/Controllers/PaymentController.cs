@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using RMS.Domain.Entities;
 using RMS.Services.PaymobServices;
 using RMS.ServicesAbstraction.IPaymentServices;
+using RMS.Shared.DTOs.PaymentsDTOS;
 using RMS.Shared.QueryParams;
 using System.Security.Claims;
 
@@ -61,9 +62,9 @@ namespace RMS.Presentation.Controllers
 
         [Authorize]
         [HttpPost("confirm-cash/{orderId}")]
-        public async Task<IActionResult> ConfirmCashPayment(int orderId)
+        public async Task<IActionResult> ConfirmCashPayment(int orderId, [FromBody] decimal dto)
         {
-            await _payment.ConfirmCashPaymentAsync(orderId);
+            await _payment.ConfirmCashPaymentAsync(orderId , dto);
             return Ok();
         }
 

@@ -14,7 +14,7 @@ namespace RMS.ServicesAbstraction.IPaymentServices
         Task<string> PayOrderAsync(int orderId, string userId);
         Task HandleWebhookAsync(PaymobWebhookDto dto);
 
-        Task ConfirmCashPaymentAsync(int orderId);
+        Task ConfirmCashPaymentAsync(int orderId , decimal paidAmount);
         Task<PaginatedResult<PaymentDto>> GetAllAsync(PaymentQueryParams queryParams);
     }
 }

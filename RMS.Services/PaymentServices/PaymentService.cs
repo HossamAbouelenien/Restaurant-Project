@@ -150,10 +150,7 @@ public class PaymentService : IPaymentService
     }
 
 
-
-
-
-    public async Task ConfirmCashPaymentAsync(int orderId)
+    public async Task ConfirmCashPaymentAsync(int orderId , decimal paidAmount)
     {
         var orderRepo = _unitOfWork.GetRepository<Order>();
         var paymentRepo = _unitOfWork.GetRepository<Payment>();
@@ -171,6 +168,9 @@ public class PaymentService : IPaymentService
 
         if (payment.PaymentStatus == PaymentStatus.Paid)
             throw new OrderAlreadyPaidException(orderId);
+
+        payment.PaidAmount = paidAmount;
+        payment.PaymentMethod = PaymentMethod.Cash;
 
         payment.PaymentStatus = PaymentStatus.Paid;
         payment.PaidAt = DateTime.Now;

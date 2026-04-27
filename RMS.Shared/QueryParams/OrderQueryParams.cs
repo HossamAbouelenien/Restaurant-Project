@@ -10,6 +10,7 @@ namespace RMS.Shared.QueryParams
     {
         public int? BranchId { get; set; }
         public string? Status { get; set; }
+        public string? PaymentStatus { get; set; }
         public string? OrderType { get; set; }
         public DateOnly? Date { get; set; }
         public string? PaymentStatus { get; set; }
