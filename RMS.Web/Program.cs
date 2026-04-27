@@ -240,10 +240,17 @@ namespace RMS.Web
             builder.Services.AddScoped<IPaymentService, PaymentService>();
             builder.Services.AddHttpClient<IPaymobService, PaymobService>();
 
-            builder.Host.UseSerilog((context, services, configuration) =>
-            {
-                configuration.ReadFrom.Configuration(context.Configuration);
-            });
+            //builder.Host.UseSerilog((context, services, configuration) =>
+            //{
+            //    configuration.ReadFrom.Configuration(context.Configuration);
+            //});
+            //builder.Host.UseSerilog((context, services, configuration) =>
+            //{
+            //    configuration
+            //        .ReadFrom.Configuration(context.Configuration)
+            //        .ReadFrom.Services(services)
+            //        .Enrich.FromLogContext();
+            //});
 
             builder.Services.Configure<PaymobSettings>(
                 builder.Configuration.GetSection("Paymob")
@@ -410,10 +417,10 @@ namespace RMS.Web
                 await next();
             });
 
-            app.UseSerilogRequestLogging(options =>
-            {
-                options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms";
-            });
+            //app.UseSerilogRequestLogging(options =>
+            //{
+            //    options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms";
+            //});
 
 
             app.UseAuthentication();

@@ -27,8 +27,9 @@ namespace RMS.Presentation.Controllers
             {
                 if (registerationRequestDTO == null)
                 {
-                    // Test Log the error for debugging purposes
-                    //_logger.LogInformation("Registeration data is required");
+                    //Test Log the error for debugging purposes
+
+                   //_logger.LogInformation("Registeration data is required");
 
                     return BadRequest("Registeration data is required");
                 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RMS.Domain.Entities;
 using RMS.ServicesAbstraction;
 using RMS.ServicesAbstraction.IUserServices;
@@ -6,6 +7,7 @@ using RMS.Shared;
 using RMS.Shared.DTOs.AddressDTOs;
 using RMS.Shared.DTOs.UserDTOs;
 using RMS.Shared.QueryParams;
+using System.Security.Claims;
 
 namespace RMS.Presentation.Controllers
 {
@@ -151,6 +153,22 @@ namespace RMS.Presentation.Controllers
                     message = ex.Message
                 });
             }
+        }
+
+        //[Authorize]
+        [HttpGet("my-addresses")]
+        public async Task<IActionResult> GetMyAddresses([FromQuery] AddressQueryParams queryParams)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            queryParams.UserId = userId;
+
+            var result = await _userService.GetUserAddressesAsync(queryParams);
+
+            return Ok(result);
         }
 
 
