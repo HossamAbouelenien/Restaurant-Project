@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using RMS.Domain.Contracts;
 using RMS.Domain.Entities;
 using RMS.Domain.Enums;
+using RMS.Services.Exceptions;
 using RMS.Services.Specifications.BranchStockSpec;
 using RMS.Services.Specifications.DeliverySpec;
 using RMS.Services.Specifications.OrderSpec;
@@ -71,10 +72,12 @@ namespace RMS.Services.DeliveryServices
         {
             var driverId = _httpContextAccessor.HttpContext?
                 .User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
             if (string.IsNullOrEmpty(driverId))
             {
-                throw new Exception(SharedResourcesKeys.NotFound);
+                throw new UnauthorizedDriverException();
             }
+
             var spec = new DeliveriesWithOrderSpecification(driverId);
             var deliveries = await _unitOfWork.GetRepository<Delivery>().GetAllAsync(spec);
             var data = _mapper.Map<IEnumerable<DeliveryDetailsDto>>(deliveries);
@@ -86,10 +89,12 @@ namespace RMS.Services.DeliveryServices
             var Repo = _unitOfWork.GetRepository<Delivery>();
             var spec = new DeliveryByIdSpecification(id);
             var delivery = await Repo.GetByIdAsync(spec);
-            if (delivery == null)
+
+            if (delivery is null)
             {
-                throw new Exception(SharedResourcesKeys.NotFound);
+                throw new DeliveryNotFoundException(id);
             }
+
             var data = _mapper.Map<DeliveryDetailsDto>(delivery);
             return data;
 
@@ -105,28 +110,28 @@ namespace RMS.Services.DeliveryServices
             var order = await orderRepo.GetByIdAsync(orderSpec);
 
             if (order == null)
-                throw new Exception(SharedResourcesKeys.NotFound);
+                throw new OrderNotFoundException(dto.OrderId);
 
             if (order.OrderType != OrderType.Delivery)
-                throw new Exception(SharedResourcesKeys.InvalidOrderType);
+                throw new InvalidOrderTypeException(order.OrderType.ToString());
 
             if (order.Delivery != null && order.Delivery.DriverId != null)
-                throw new Exception(SharedResourcesKeys.OrderAssignedToDelivery);
+                throw new OrderAlreadyAssignedException(dto.OrderId);
 
             var driver = await _userManager.FindByIdAsync(dto.DriverId);
 
             if (driver == null)
-                throw new Exception(SharedResourcesKeys.NotFound);
+                throw new DriverNotFoundException(dto.DriverId);
 
             if (!await _userManager.IsInRoleAsync(driver, SD.Role_Driver))
-                throw new Exception(SharedResourcesKeys.Invalid);
+                throw new InvalidDriverRoleException(dto.DriverId);
 
-            
+
             var deliverySpec = new DeliveryByOrderIdSpecification(dto.OrderId);
             var delivery = await deliveryRepo.GetByIdAsync(deliverySpec);
 
             if (delivery == null)
-                throw new Exception(SharedResourcesKeys.NotFound);
+                throw new DeliveryNotFoundException(dto.OrderId);
 
             delivery.DriverId = dto.DriverId;
             //delivery.AssignedAt = DateTime.UtcNow;
@@ -180,30 +185,35 @@ namespace RMS.Services.DeliveryServices
             
             var spec = new DeliveryByIdSpecification(id);
             var delivery = await deliveryRepo.GetByIdAsync(spec);
+
             if (delivery == null)
-                throw new Exception(SharedResourcesKeys.NotFound);
+                throw new DeliveryNotFoundException(id);
 
             var order = await orderRepo.GetByIdAsync(delivery.OrderId);
 
             if (order == null)
-                throw new Exception(SharedResourcesKeys.NotFound);
+                throw new OrderNotFoundException(delivery.OrderId);
 
             if (order.Status != OrderStatus.Ready)
             {
-                throw new Exception(SharedResourcesKeys.OrderIsNotReadyYet);
+                throw new OrderNotReadyException(delivery.OrderId);
             }
 
 
             if (!isAdmin && delivery.DriverId != userId)
-                throw new Exception(SharedResourcesKeys.Unauthorized);
+                throw new UnauthorizedDriverException();
 
-            
+
             if (!Enum.TryParse<DeliveryStatus>(dto.Status, true, out var parsedStatus))
-                throw new Exception(SharedResourcesKeys.InvalidStatusValue);
+                throw new InvalidStatusValueException(dto.Status);
 
-            
+
             if (!IsValidTransition(delivery.DeliveryStatus, parsedStatus))
-                throw new Exception(SharedResourcesKeys.InvalidStatusTransition);
+                throw new InvalidStatusTransitionException(
+                    delivery.DeliveryStatus.ToString(),
+                    parsedStatus.ToString());
+
+
             if (parsedStatus == DeliveryStatus.Delivered)
             {
                 delivery.DeliveredAt = DateTime.UtcNow;
@@ -225,6 +235,8 @@ namespace RMS.Services.DeliveryServices
             }
 
             
+
+
             delivery.DeliveryStatus = parsedStatus;
 
             deliveryRepo.Update(delivery);
@@ -243,6 +255,8 @@ namespace RMS.Services.DeliveryServices
                         "DeliveryStatusChange"
                     );
 
+
+
             var result = _mapper.Map<DeliveryDetailsDto>(delivery);
          
             await _restaurantNotifier.SendAsync(
@@ -252,6 +266,9 @@ namespace RMS.Services.DeliveryServices
                 $"customers_id_{delivery.Order!.UserId}");
 
             return result;
+
+
+
         }
 
 

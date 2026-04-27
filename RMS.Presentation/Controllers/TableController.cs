@@ -21,25 +21,33 @@ namespace RMS.Presentation.Controllers
             _tableService = tableService;
         }
 
+
         [HttpPost]
         public async Task<ActionResult<TableDTO>> CreateTable(CreateTableDTO createTable)
         {
             var table = await _tableService.CreateTableAsync(createTable);
             return Ok(table);
         }
+
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TableDTO>>> GetAllTables([FromQuery] TableQueryParams queryParams)
         {
             var tables = await _tableService.GetAllTablesAsync(queryParams);
             return Ok(tables);
         }
+
+
+
         [HttpGet("{id}")]
         public async Task<ActionResult<TableDTO>> GetTableById(int id)
         {
             var table = await _tableService.GetTableByIdAsync(id);
-            if (table == null) return NotFound();
             return Ok(table);
         }
+
+
+
         [HttpPatch("{id}")]
         public async Task<ActionResult<TableDTO>>UpdateTable(int id,UpdateTableDTO dto) { 
             var table= await _tableService.UpdateTableAsync(id, dto);
@@ -53,6 +61,8 @@ namespace RMS.Presentation.Controllers
             await _tableService.DeleteTableAsync(id);
             return Ok();
         }
+
+
         [HttpPatch("{id}/status")]
         public async Task<ActionResult> UpdateTableStatus(int id)
         {
@@ -60,5 +70,8 @@ namespace RMS.Presentation.Controllers
             return Ok();
         }
 
+
     }
 }
+
+

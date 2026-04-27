@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using RMS.Domain.Contracts;
 using RMS.Domain.Entities;
 using RMS.Domain.Enums;
+using RMS.Services.Exceptions;
 using RMS.Services.PaymobServices;
 using RMS.Services.Specifications.PaymentSpec;
 using RMS.ServicesAbstraction;
@@ -36,6 +37,8 @@ public class PaymentService : IPaymentService
     }
 
    
+
+
     public async Task<string> PayOrderAsync(int orderId, string userId)
     {
         var orderRepo = _unitOfWork.GetRepository<Order>();
@@ -44,10 +47,10 @@ public class PaymentService : IPaymentService
         var order = await orderRepo.GetByIdAsync(orderId);
 
         if (order == null)
-            throw new Exception(SharedResourcesKeys.NotFound);
+            throw new OrderNotFoundException(orderId);
 
         if (order.UserId != userId)
-            throw new Exception(SharedResourcesKeys.Unauthorized);
+            throw new UnauthorizedOrderException();
 
         var existingPayment = await paymentRepo.GetByIdAsync(
             new PaymentByOrderIdSpecification(orderId)
@@ -56,7 +59,7 @@ public class PaymentService : IPaymentService
         if (existingPayment != null)
         {
             if (existingPayment.PaymentStatus == PaymentStatus.Paid)
-                throw new Exception(SharedResourcesKeys.OrderAlreadyPaid);
+                throw new OrderAlreadyPaidException(orderId);
 
             var token = await _paymob.GetPaymentKeyAsync(order.TotalAmount, order.Id);
             return _paymob.BuildIframeUrl(token);
@@ -71,6 +74,8 @@ public class PaymentService : IPaymentService
             PaidAmount = order.TotalAmount
         };
 
+
+
         await paymentRepo.AddAsync(payment);
 
         order.Status = OrderStatus.AwaitingPayment;
@@ -80,9 +85,14 @@ public class PaymentService : IPaymentService
         var newToken = await _paymob.GetPaymentKeyAsync(order.TotalAmount, order.Id);
 
         return _paymob.BuildIframeUrl(newToken);
+
+
     }
 
    
+
+
+
     public async Task HandleWebhookAsync(PaymobWebhookDto dto)
     {
        
@@ -140,6 +150,9 @@ public class PaymentService : IPaymentService
     }
 
 
+
+
+
     public async Task ConfirmCashPaymentAsync(int orderId)
     {
         var orderRepo = _unitOfWork.GetRepository<Order>();
@@ -147,23 +160,27 @@ public class PaymentService : IPaymentService
 
         var order = await orderRepo.GetByIdAsync(orderId);
         if (order == null)
-            throw new Exception("Order not found");
+            throw new OrderNotFoundException(orderId);
 
         var payment = await paymentRepo.GetByIdAsync(
             new PaymentByOrderIdSpecification(orderId)
         );
 
         if (payment == null)
-            throw new Exception("Payment not found");
+            throw new PaymentNotFoundException(orderId);
 
         if (payment.PaymentStatus == PaymentStatus.Paid)
-            throw new Exception("Already paid");
+            throw new OrderAlreadyPaidException(orderId);
 
         payment.PaymentStatus = PaymentStatus.Paid;
         payment.PaidAt = DateTime.Now;
 
         await _unitOfWork.SaveChangesAsync();
     }
+
+
+
+
 
 
     public async Task<PaginatedResult<PaymentDto>> GetAllAsync(PaymentQueryParams queryParams)
@@ -182,4 +199,29 @@ public class PaymentService : IPaymentService
         return new PaginatedResult<PaymentDto>(queryParams.PageIndex,queryParams.PageSize,count,data);
       
     }
+
+
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

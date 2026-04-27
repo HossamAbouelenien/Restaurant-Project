@@ -20,24 +20,33 @@ namespace RMS.Presentation.Controllers
         {
             _branchStockService = branchStockService;
         }
+
+
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<BranchStockDTO>>> GetAllBranchStock([FromQuery]BrandStockQueryParams queryParams)
         {
             var BranchStocks = await _branchStockService.GetAllBranchStockAsync(queryParams);
             return Ok(BranchStocks);
         }
+
+
         [HttpGet("{id}")]
         public async Task<ActionResult<BranchStockDTO>> GetBranchStock(int id)
         {
             var BranchStock = await _branchStockService.GetBranchStockAsync(id);
             return Ok(BranchStock);
         }
+
+
         [HttpPatch("{id}")]
         public async Task<ActionResult<BranchStockDTO>> UpdateBranchStock(int id, UpdateBranchStockDTO updateBranchStock)
         {
             var BranchStock = await _branchStockService.UpdateBranchStockAsync(id, updateBranchStock);
             return Ok(BranchStock);
         }
+
+
 
     }
 }

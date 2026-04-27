@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using RMS.Domain.Entities;
+using RMS.Services.Exceptions;
 using RMS.ServicesAbstraction.IIdentityService;
 using RMS.Shared.DTOs.IdentityDTOs;
 using System.Net;
@@ -20,6 +21,7 @@ namespace RMS.Presentation.Controllers
         private readonly IAuthService _authService = authService;
         private readonly ILogger<AuthController> _logger = logger;
 
+
         [HttpPost("register")]
         public async Task<ActionResult<UserDTO>> Register([FromBody] RegisterationRequestDTO registerationRequestDTO)
         {
@@ -31,20 +33,11 @@ namespace RMS.Presentation.Controllers
 
                    //_logger.LogInformation("Registeration data is required");
 
-                    return BadRequest("Registeration data is required");
-                }
-
-                if (await _authService.IsEmailExistsAsync(registerationRequestDTO.Email))
-                {
-                    return Conflict($"User with email '{registerationRequestDTO.Email}' already exists");
-                }
+               
 
                 var user = await _authService.RegisterAsync(registerationRequestDTO);
 
-                if (user == null)
-                {
-                    return BadRequest("Registration failed");
-                }
+               
 
                 var response = new
                 {
@@ -53,27 +46,17 @@ namespace RMS.Presentation.Controllers
                 };
 
                 return StatusCode(StatusCodes.Status201Created, response);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, new
-                {
-
-                    Message = "An error occurred during registration",
-                    Error = ex.Message
-                });
-            }
+            
+           
         }
+
+
 
         [HttpPost("login")]
         public async Task<ActionResult<TokenDTO>> Login([FromBody] LoginRequestDTO loginRequestDTO)
         {
-            try
-            {
-                if (loginRequestDTO == null)
-                {
-                    return BadRequest("Login data is required");
-                }
+            
+               
 
                 var loginResponse = await _authService.LoginAsync(loginRequestDTO);
 
@@ -91,23 +74,18 @@ namespace RMS.Presentation.Controllers
                 SetTokenCookies(loginResponse.AccessToken, loginResponse.RefreshToken, loginResponse.ExpiresAt);
 
                 return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, new
-                {
-                    Message = "An error occurred during login",
-                    Error = ex.Message
-                });
-            }
+            
+          
         }
+
+
+
 
 
         [HttpPost("refresh-token")]
         public async Task<ActionResult<UserDTO>> RefreshAccessToken()
         {
-            try
-            {
+           
               
                 var refreshToken = Request.Cookies["refreshToken"];
 
@@ -135,12 +113,14 @@ namespace RMS.Presentation.Controllers
                     Message = "Token refreshed successfully",
                     Data = tokenResponse
                 });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { Message = "An error occurred during token refresh", Error = ex.Message });
-            }
+           
+
+
         }
+
+
+
+
 
 
         //[HttpPost("logout")]
@@ -157,6 +137,10 @@ namespace RMS.Presentation.Controllers
         //}
 
 
+
+
+
+
         [Authorize]
         [HttpGet("CurrentUser")]
         public async Task<ActionResult<UserDTO>> GetCurrentUser()
@@ -164,7 +148,10 @@ namespace RMS.Presentation.Controllers
             var email = User.FindFirst(ClaimTypes.Email)?.Value;
 
             if (email == null)
-                return Unauthorized();
+            {
+                throw new UnauthorizedDriverException();
+
+            }
             var user = await _authService.GetCurrentUserAsync(email);
             return Ok(user);
 
@@ -176,7 +163,10 @@ namespace RMS.Presentation.Controllers
         public async Task<ActionResult<UserDTO>> UpdateCurrentUserAsync(string email,[FromBody] UpdateCurrentUserDTO dto)
         {
             if (email == null)
-                return Unauthorized();
+            {
+                throw new UnauthorizedDriverException();
+            }
+               
             var updatedUser = await _authService.UpdateCurrentUserAsync(email, dto);
             return Ok(updatedUser);
 
@@ -254,6 +244,7 @@ namespace RMS.Presentation.Controllers
         }
 
 
+
         [HttpGet("external-callback")]
         public async Task<IActionResult> ExternalLoginCallback([FromQuery] string provider)
         {
@@ -318,4 +309,55 @@ namespace RMS.Presentation.Controllers
             Response.Cookies.Delete("refreshToken");
         }
     }
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
