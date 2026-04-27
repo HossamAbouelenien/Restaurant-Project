@@ -351,8 +351,24 @@
 	<data name="IngredientNotInBranch" xml:space="preserve">
   <value>المكوّن رقم {0} غير متوفر في هذا الفرع</value>
 </data>
-	
-	
+<data name="UnauthorizedOrder" xml:space="preserve">
+  <value>غير مصرح لك بالدفع لهذا الطلب</value>
+</data>
+	<data name="RecipeNotFound" xml:space="preserve">
+  <value>الوصفة رقم {0} غير موجودة</value>
+</data>
+	<data name="RecipeAlreadyExists" xml:space="preserve">
+  <value>الوصفة لعنصر القائمة رقم {0} والمكون رقم {1} موجودة مسبقاً</value>
+</data>
+	<data name="RecipeAddFailed" xml:space="preserve">
+  <value>فشل إضافة الوصفة</value>
+</data>
+	<data name="RecipeUpdateFailed" xml:space="preserve">
+  <value>فشل تحديث الوصفة رقم {0}</value>
+</data>
+	<data name="RecipeDeleteFailed" xml:space="preserve">
+  <value>فشل حذف الوصفة رقم {0}</value>
+</data>
 	
 	
 	

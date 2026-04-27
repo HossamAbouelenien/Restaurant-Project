@@ -102,9 +102,14 @@ namespace RMS.Shared.SharedResources
         public const string MenuItemIngredient = "MenuItemIngredient";
         public const string DuplicateIngredient = "DuplicateIngredient";
 
+
+
         // Payment
 
         public const string OrderAlreadyPaid = "OrderAlreadyPaid";
+        public const string UnauthorizedOrder = "UnauthorizedOrder";
+
+
 
         // Order
         public const string FailedOrders = "FailedOrders";
@@ -154,7 +159,12 @@ namespace RMS.Shared.SharedResources
         public const string IngredientNameRequired = "IngredientNameRequired";
 
 
-
+        // Recipe
+        public const string RecipeNotFound = "RecipeNotFound";
+        public const string RecipeAlreadyExists = "RecipeAlreadyExists";
+        public const string RecipeAddFailed = "RecipeAddFailed";
+        public const string RecipeUpdateFailed = "RecipeUpdateFailed";
+        public const string RecipeDeleteFailed = "RecipeDeleteFailed";
 
 
 
