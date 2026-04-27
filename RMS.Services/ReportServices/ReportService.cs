@@ -126,11 +126,12 @@ namespace RMS.Services.ReportServices
             var result = orders
                 .Where(o => o.CreatedAt >= today && o.CreatedAt < tomorrow)
                 .SelectMany(o => o.OrderItems)
-                .GroupBy(oi => new { oi.MenuItemId, oi.MenuItem.Name })
+                .GroupBy(oi => new { oi.MenuItemId, oi.MenuItem.Name, oi.MenuItem.ArabicName })
                 .Select(g => new TopItemsDto
                 {
                     MenuItemId = g.Key.MenuItemId,
                     Name = g.Key.Name,
+                    ArabicName = g.Key.ArabicName,
                     OrderCount = g.Count()
                 })
                 .OrderByDescending(x => x.OrderCount)
@@ -157,6 +158,7 @@ namespace RMS.Services.ReportServices
                         o.CreatedAt,
                         r.IngredientId,
                         IngredientName = r.Ingredient.Name,
+                        IngredientArabicName = r.Ingredient.ArabicName,
                         Unit = r.Ingredient.Unit.ToString(), 
                         QuantityUsed = r.QuantityRequired * oi.Quantity
                     })
@@ -166,13 +168,15 @@ namespace RMS.Services.ReportServices
                     Date = x.CreatedAt.Date,
                     x.IngredientId,
                     x.IngredientName,
-                    x.Unit 
+                    x.Unit ,
+                    x.IngredientArabicName
                 })
                 .Select(g => new InventoryUsageDTO
                 {
                     Date = g.Key.Date,
                     IngredientId = g.Key.IngredientId,
                     IngredientName = g.Key.IngredientName,
+                    IngredientArabicName = g.Key.IngredientArabicName,
                     Unit = g.Key.Unit, 
                     QuantityUsed = g.Sum(x => x.QuantityUsed)
                 })
