@@ -78,6 +78,13 @@ namespace RMS.Shared.SharedResources
         public const string ConfirmEmail = "ConfirmEmail";
         public const string ErrorHappend = "ErrorHappend";
 
+        public const string EmailNotConfirmed = "EmailNotConfirmed";
+        public const string EmailAlreadyExists = "EmailAlreadyExists";
+        public const string RegistrationFailed = "RegistrationFailed";
+        public const string AuthError = "AuthError";
+        public const string UserNotFound = "UserNotFound";
+
+
 
         // MenuItem
 

@@ -5,6 +5,8 @@ using Microsoft.Extensions.Configuration;
 using RMS.Domain.Contracts;
 using RMS.Domain.Entities;
 using RMS.Services.EmailServices;
+using RMS.Services.Exceptions;
+using RMS.Services.Exceptions.Base;
 using RMS.Services.Specifications.IdentitySpec;
 using RMS.ServicesAbstraction.IEmailServices;
 using RMS.ServicesAbstraction.IIdentityService;
@@ -46,6 +48,8 @@ namespace RMS.Services.IdentityService
             return User is not null ? true : false;
         }
 
+
+
         public async Task<TokenDTO?> LoginAsync(LoginRequestDTO loginRequestDTO)
         {
             try
@@ -60,7 +64,7 @@ namespace RMS.Services.IdentityService
                
                 if (!user.EmailConfirmed)
                 {
-                    throw new InvalidOperationException(SharedResourcesKeys.EmailIsNotConfirmed);
+                    throw new EmailNotConfirmedException(loginRequestDTO.Email);
                 }
 
                 bool isValid = await _userManager.CheckPasswordAsync(user, loginRequestDTO.Password);
@@ -90,11 +94,29 @@ namespace RMS.Services.IdentityService
 
                 return tokenDTO;
             }
+
+
+            catch (AppException)
+            {
+                
+                throw;
+            }
+
+
             catch (Exception ex)
             {
-                throw new InvalidOperationException(SharedResourcesKeys.ErrorHappend, ex);
+                throw new AuthException();
             }
+
+
+
         }
+
+
+
+
+
+
 
         public async Task<UserDTO?> RegisterAsync(RegisterationRequestDTO registerationRequestDTO)
         {
@@ -102,7 +124,7 @@ namespace RMS.Services.IdentityService
             {
                 if (await IsEmailExistsAsync(registerationRequestDTO.Email))
                 {
-                    throw new InvalidOperationException(SharedResourcesKeys.AlreadyExists);
+                    throw new EmailAlreadyExistsException(registerationRequestDTO.Email);
                 }
 
                 User user = new()
@@ -120,7 +142,7 @@ namespace RMS.Services.IdentityService
                 if (!result.Succeeded)
                 {
                     var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-                    throw new InvalidOperationException($"{SharedResourcesKeys.Failed}: {errors}");
+                    throw new RegistrationFailedException(errors);
                 }
 
                
@@ -147,10 +169,21 @@ namespace RMS.Services.IdentityService
 
                 return userDto;
             }
+
+
+            catch (AppException)
+            {
+                throw;
+            }
+
+
             catch (Exception ex)
             {
-                throw new InvalidOperationException(SharedResourcesKeys.ErrorHappend, ex);
+                throw new AuthException();
             }
+
+
+
         }
 
         public async Task<TokenDTO?> RefreshAccessTokenAsync(RefreshTokenRequestDTO refreshTokenRequestDTO)
@@ -199,11 +232,27 @@ namespace RMS.Services.IdentityService
                     ExpiresAt = jwtToken.ValidTo
                 };
                 return tokenDTO;
+
+
+
             }
-            catch (Exception ex)
+
+
+
+            catch (AppException)
             {
-                throw new InvalidOperationException("An unexpected error occurred during token refresh", ex);
+                throw;
             }
+
+
+            catch (Exception)
+            {
+                throw new AuthException();
+            }
+
+
+
+
         }
 
 
@@ -213,22 +262,37 @@ namespace RMS.Services.IdentityService
         //}
 
 
+
         public async Task<UserDTO?> GetCurrentUserAsync(string email)
         {
             var spec = new UserByEmailSpecification(email);
 
             var user = await _unitOfWork.GetRepository<User>()
-                .GetByIdAsync(spec)
-                ?? throw new KeyNotFoundException($"User with email {email} not found");
+                .GetByIdAsync(spec);
+
+
+            if (user == null)
+            {
+                throw new UserNotFoundException(email);
+            }
+               
 
             return _mapper.Map<UserDTO>(user);
         }
 
 
+
+
         public async Task<UserDTO> UpdateCurrentUserAsync(string email, UpdateCurrentUserDTO dto)
         {
-            var user = await _userManager.FindByEmailAsync(email)
-                       ?? throw new KeyNotFoundException();
+            var user = await _userManager.FindByEmailAsync(email);
+
+            if(user is null)
+            {
+                throw new UserNotFoundException(email);
+            }
+           
+                       
 
             _mapper.Map(dto, user); 
 
@@ -242,7 +306,12 @@ namespace RMS.Services.IdentityService
             var result = await _userManager.UpdateAsync(user);
 
             if (!result.Succeeded)
-                throw new Exception(string.Join(", ", result.Errors.Select(e => e.Description)));
+            {
+
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                throw new RegistrationFailedException(errors);
+
+            }
 
             var role = await _userManager.GetRolesAsync(user);
 
@@ -255,6 +324,11 @@ namespace RMS.Services.IdentityService
         }
 
         
+
+
+
+
+
         public async Task<string> ConfirmEmailAsync(string? userId, string? code)
         {
             if (userId == null || code == null)
@@ -274,6 +348,10 @@ namespace RMS.Services.IdentityService
         }
 
         
+
+
+
+
         public async Task<string> SendResetPasswordCode(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
@@ -301,6 +379,7 @@ namespace RMS.Services.IdentityService
             return SharedResourcesKeys.Success;
         }
 
+
         
         public async Task<(string result, string? resetSessionToken)> VerifyResetCode(string code)
         {
@@ -327,6 +406,8 @@ namespace RMS.Services.IdentityService
         }
 
        
+
+
         public async Task<string> ResetPassword(string resetSessionToken, string newPassword, string confirmPassword)
         {
             if (newPassword != confirmPassword)
@@ -362,6 +443,9 @@ namespace RMS.Services.IdentityService
         }
 
        
+
+
+
         public async Task<TokenDTO?> ExternalLoginAsync(ClaimsPrincipal principal, string provider)
         {
             try
@@ -407,12 +491,18 @@ namespace RMS.Services.IdentityService
                         var createResult = await _userManager.CreateAsync(user);
 
                         if (!createResult.Succeeded)
-                            throw new Exception(string.Join(", ", createResult.Errors.Select(e => e.Description)));
+                        {
+                            var errors = string.Join(", ", createResult.Errors.Select(e => e.Description));
+                            throw new RegistrationFailedException(errors);
+                        }
+
 
                         if (!await _roleManager.RoleExistsAsync("Customer"))
                             await _roleManager.CreateAsync(new IdentityRole("Customer"));
 
                         await _userManager.AddToRoleAsync(user, "Customer");
+
+
                     }
 
                     var newProvider = new UserProvider
@@ -444,12 +534,77 @@ namespace RMS.Services.IdentityService
                     ExpiresAt = jwt.ValidTo.ToUniversalTime()
                 };
             }
-            catch (Exception ex)
+
+
+
+            catch (AppException)
             {
-                throw new InvalidOperationException(SharedResourcesKeys.ErrorHappend, ex);
+                throw;
             }
+
+
+            catch (Exception)
+            {
+                throw new AuthException();
+            }
+
+
         }
 
 
     }
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

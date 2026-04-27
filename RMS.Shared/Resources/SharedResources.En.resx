@@ -292,7 +292,19 @@
 	<data name="OrderIsNotReadyYet" xml:space="preserve">
   <value>Order with id {0} is not ready yet</value>
 </data>
-	
+
+	<data name="EmailNotConfirmed" xml:space="preserve">
+  <value>Email "{0}" is not confirmed</value>
+</data>
+	<data name="EmailAlreadyExists" xml:space="preserve">
+  <value>Email "{0}" is already registered</value>
+</data>
+	<data name="RegistrationFailed" xml:space="preserve">
+  <value>Registration failed: {0}</value>
+</data>
+	<data name="AuthError" xml:space="preserve">
+  <value>An error occurred during authentication</value>
+</data>
 	
 	
 	
