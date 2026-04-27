@@ -305,6 +305,16 @@
 	<data name="AuthError" xml:space="preserve">
   <value>An error occurred during authentication</value>
 </data>
+
+	<data name="IngredientNotFound" xml:space="preserve">
+  <value>Ingredient with id {0} is not found</value>
+</data>
+	<data name="IngredientAlreadyExists" xml:space="preserve">
+  <value>Ingredient "{0}" already exists</value>
+</data>
+	<data name="IngredientNameRequired" xml:space="preserve">
+  <value>Ingredient name is required</value>
+</data>
 	
 	
 	

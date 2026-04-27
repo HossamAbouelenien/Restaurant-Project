@@ -291,7 +291,7 @@
   <value>الطلب رقم {0} ليس جاهزاً بعد</value>
 </data>
 
-	<data name="EmailNotConfirmed" xml:space="preserve">
+<data name="EmailNotConfirmed" xml:space="preserve">
   <value>البريد الإلكتروني "{0}" غير مؤكد</value>
 </data>
 	<data name="EmailAlreadyExists" xml:space="preserve">
@@ -303,7 +303,15 @@
 	<data name="AuthError" xml:space="preserve">
   <value>حدث خطأ أثناء المصادقة</value>
 </data>
-	
+	<data name="IngredientNotFound" xml:space="preserve">
+  <value>المكون رقم {0} غير موجود</value>
+</data>
+	<data name="IngredientAlreadyExists" xml:space="preserve">
+  <value>المكون "{0}" موجود مسبقاً</value>
+</data>
+	<data name="IngredientNameRequired" xml:space="preserve">
+  <value>اسم المكون مطلوب</value>
+</data>
 	
 	
 	
