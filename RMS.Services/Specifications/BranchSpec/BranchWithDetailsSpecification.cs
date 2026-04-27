@@ -21,8 +21,9 @@ namespace RMS.Services.Specifications.BranchSpec
             AddInclude(b => b.Users);
             AddInclude(b => b.Tables);
             AddInclude(b => b.BranchStocks);
+            AddInclude("BranchStocks.Ingredient");
 
-         
+
             ApplyPagination(param.PageSize, param.PageIndex);
 
             
@@ -35,6 +36,7 @@ namespace RMS.Services.Specifications.BranchSpec
             AddInclude(b => b.Users);
             AddInclude(b => b.Tables);
             AddInclude(b => b.BranchStocks);
+            AddInclude("BranchStocks.Ingredient");
         }
     }
 }

@@ -25,6 +25,13 @@ namespace RMS.Presentation.Controllers
         [HttpPost("register")]
         public async Task<ActionResult<UserDTO>> Register([FromBody] RegisterationRequestDTO registerationRequestDTO)
         {
+            try
+            {
+                if (registerationRequestDTO == null)
+                {
+                    //Test Log the error for debugging purposes
+
+                   //_logger.LogInformation("Registeration data is required");
 
                
 

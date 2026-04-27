@@ -96,7 +96,7 @@ namespace RMS.Services.UserServices
                 CreatedAt = DateTime.UtcNow
             };
 
-           
+
             var createdUser = await _userManager.CreateAsync(user, SD.DefaultPassword);
 
             if (!createdUser.Succeeded)
@@ -258,7 +258,7 @@ namespace RMS.Services.UserServices
                               .Select(r => r.Name!)
                               .Distinct()
                               .OrderBy(r => r)
-                              .ToList()  
+                              .ToList()
             );
         }
 
@@ -270,9 +270,9 @@ namespace RMS.Services.UserServices
 
             User user = new()
             {
-              
+
                 Name = createCustomerDTO.Name,
-                UserName = $"{createCustomerDTO.Name}.{ createCustomerDTO.PhoneNumber}",
+                UserName = $"{createCustomerDTO.Name}.{createCustomerDTO.PhoneNumber}",
                 PhoneNumber = createCustomerDTO.PhoneNumber,
                 RoleId = SD.Role_Customer,
                 CreatedAt = DateTime.Now,
@@ -408,6 +408,34 @@ namespace RMS.Services.UserServices
             repo.Update(user);
             await _unitOfWork.SaveChangesAsync();
         }
-    }
 
+
+        public async Task<PaginatedResult<AddressDto>> GetUserAddressesAsync(AddressQueryParams queryParams)
+        {
+            var repo = _unitOfWork.GetRepository<User>();
+
+            var spec = new UserAddressesSpecification(queryParams.UserId);
+            var user = await repo.GetByIdAsync(spec);
+
+            if (user == null)
+                throw new Exception("User Not Found");
+
+            var totalCount = user.Addresses.Count;
+
+            var addresses = user.Addresses
+                .Skip((queryParams.PageIndex - 1) * queryParams.PageSize)
+                .Take(queryParams.PageSize)
+                .ToList();
+
+            var mapped = _mapper.Map<List<AddressDto>>(addresses);
+
+            return new PaginatedResult<AddressDto>(
+                totalCount,
+                queryParams.PageSize,
+                queryParams.PageIndex,
+                mapped
+            );
+        }
+
+    }
 }
