@@ -39,6 +39,9 @@ namespace RMS.Shared.SharedResources
         public const string DeleteActiveMenuItem = "DeleteActiveMenuItem";
 
 
+        // Kitchen
+        public const string KitchenTicketNotFound = "KitchenTicketNotFound";
+
 
 
         // Category
@@ -128,7 +131,10 @@ namespace RMS.Shared.SharedResources
 
 
 
-
+        // Ingredient
+        public const string IngredientNotFound = "IngredientNotFound";
+        public const string IngredientAlreadyExists = "IngredientAlreadyExists";
+        public const string IngredientNameRequired = "IngredientNameRequired";
 
 
 

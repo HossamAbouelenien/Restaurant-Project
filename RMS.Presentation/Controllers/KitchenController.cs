@@ -23,12 +23,16 @@ namespace RMS.Presentation.Controllers
         {
             _kitchenService = kitchenService;
         }
+
+
         [HttpGet("KitchenTickets")]
         public async Task<ActionResult<KitchenBoardDto>> GetAllKitchenTicketsGroupedByStatusForCurrentBranchAsync([FromQuery] KitchenTicketQueryParams queryParams)
         {
             var KitchenTickets = await _kitchenService.GetAllKitchenTicketsGroupedByStatusForCurrentBranchAsync(queryParams);
             return Ok(KitchenTickets);
         }
+
+
         [HttpGet("{id}")]
         public async Task<ActionResult<KitchenTicketDetailsDto>> GetSingleKitchenTicketWithsOrderItemsAsync(int id)
         {
@@ -36,12 +40,14 @@ namespace RMS.Presentation.Controllers
             return Ok(KitchenTicket);
         }
 
+
         [HttpGet("ActiveStations")]
         public async Task<ActionResult<List<ActivePendingStationsDTOs>>> GetListOfActiveStationsWithPendingCountAsync([FromQuery] int branchId)
         {
             var ActiveStationsWithPendingCount = await _kitchenService.GetListOfActiveStationsWithPendingCountAsync(branchId);
             return Ok(ActiveStationsWithPendingCount);
         }
+
 
         [HttpPut("{ticketId}")]
         public async Task<IActionResult> UpdateTicketStatus(int ticketId,[FromBody] UpdateTicketStatusRequestDto dto)             
@@ -61,5 +67,14 @@ namespace RMS.Presentation.Controllers
 
 
         }
+
+
     }
+
+
+
+
 }
+
+
+
