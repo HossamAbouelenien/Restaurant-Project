@@ -315,7 +315,9 @@
 	<data name="IngredientNameRequired" xml:space="preserve">
   <value>Ingredient name is required</value>
 </data>
-	
+	<data name="KitchenTicketNotFound" xml:space="preserve">
+  <value>Kitchen ticket with id {0} is not found</value>
+</data>
 	
 	
 	

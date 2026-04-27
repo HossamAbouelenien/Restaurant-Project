@@ -141,7 +141,7 @@
   <data name="Unauthorized" xml:space="preserve">
     <value>غير مصرح به</value>
   </data>
->
+
   <data name="EmailIsNotConfirmed" xml:space="preserve">
     <value>البريد الإلكتروني غير مؤكد</value>
   </data>
@@ -312,7 +312,9 @@
 	<data name="IngredientNameRequired" xml:space="preserve">
   <value>اسم المكون مطلوب</value>
 </data>
-	
+	<data name="KitchenTicketNotFound" xml:space="preserve">
+  <value>تذكرة المطبخ رقم {0} غير موجودة</value>
+</data>
 	
 	
 	
