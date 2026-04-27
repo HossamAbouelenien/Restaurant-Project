@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using RMS.Domain.Contracts;
 using RMS.Domain.Entities;
+using RMS.Services.Exceptions;
 using RMS.Services.Specifications.Tablespec;
 using RMS.ServicesAbstraction;
 using RMS.Shared;
@@ -28,22 +29,27 @@ namespace RMS.Services.TableServices
             _mapper = mapper;
         }
 
+
+
         public async Task<TableDTO> CreateTableAsync(CreateTableDTO dto)
         {
             var repo = _unitOfWork.GetRepository<Table>();
             var branch=  await _unitOfWork.GetRepository<Branch>().GetByIdAsync(dto.BranchId);
 
-            if (branch == null) 
-                throw new Exception(SharedResourcesKeys.NotFound);
+            if (branch == null)
+                throw new BranchNotFoundException(dto.BranchId);
+
+            if (dto.Capacity < 1 || dto.Capacity > 20)
+                throw new TableCapacityInvalidException();
 
             var specBranchId = new TableBranchIdSpecification(dto.BranchId);
             var tablesFromDb= await repo.GetAllAsync(specBranchId);
 
             if (tablesFromDb.Any(t => t.TableNumber == dto.TableNumber))
-                throw new Exception(SharedResourcesKeys.AlreadyExists);
+                throw new TableNumberAlreadyExistsException(dto.TableNumber);
 
             if (dto.Capacity < 1 || dto.Capacity > 20)
-                throw new Exception(SharedResourcesKeys.TableCapacityInvalid);
+                throw new TableCapacityInvalidException();
 
             var table = _mapper.Map<Table>(dto);
             await repo.AddAsync(table);
@@ -54,6 +60,9 @@ namespace RMS.Services.TableServices
             return _mapper.Map<TableDTO>(tableWithIncludes);
         }
 
+
+
+
         public async Task DeleteTableAsync(int id)
         {
             var repo = _unitOfWork.GetRepository<Table>();
@@ -61,10 +70,10 @@ namespace RMS.Services.TableServices
             var table = await repo.GetByIdAsync(spec);
 
             if (table is null)
-                throw new Exception(SharedResourcesKeys.NotFound);
+                throw new TableNotFoundException(id);
 
             if (table.IsOccupied)
-                throw new Exception(SharedResourcesKeys.OccupiedTable);
+                throw new OccupiedTableException(id);
 
             table.IsDeleted = true;
             table.DeletedAt = DateTime.UtcNow;
@@ -72,23 +81,35 @@ namespace RMS.Services.TableServices
             await _unitOfWork.SaveChangesAsync();
         }
 
+
+
+
         public async Task<PaginatedResult<TableDTO>> GetAllTablesAsync(TableQueryParams queryParams)
         {
             var repo = _unitOfWork.GetRepository<Table>();
             var spec = new TableSpecification(queryParams);
+
             var tables = await repo.GetAllAsync(spec);
             var tableDtos = _mapper.Map<IEnumerable<TableDTO>>(tables);
+
             var countSpec = new TableCountSpecification(queryParams);
             var countOfTables = await repo.CountAsync(countSpec);
             var pageSize = tableDtos.Count();
+
             var paginatedResult = new PaginatedResult<TableDTO>(
                 queryParams.PageIndex,
                 pageSize,
                 countOfTables,
                 tableDtos
             );
+
             return paginatedResult;
+
         }
+
+
+
+
         public async Task<TableDTO> GetTableByIdAsync(int id)
         {
             var repo = _unitOfWork.GetRepository<Table>();
@@ -96,10 +117,13 @@ namespace RMS.Services.TableServices
             var table = await repo.GetByIdAsync(spec);
 
             if (table == null)
-                throw new Exception(SharedResourcesKeys.NotFound);
+                throw new TableNotFoundException(id);
 
             return _mapper.Map<TableDTO>(table);
         }
+
+
+
 
         public async Task<TableDTO> UpdateTableAsync(int id, UpdateTableDTO dto)
         {
@@ -108,15 +132,15 @@ namespace RMS.Services.TableServices
             var tableFromDb = await repo.GetByIdAsync(spec);
 
             if (tableFromDb == null)
-                throw new Exception(SharedResourcesKeys.NotFound);
+                throw new TableNotFoundException(id);
 
             dto.TableNumber = dto.TableNumber?.Trim();
 
             if (string.IsNullOrWhiteSpace(dto.TableNumber))
-                throw new Exception(SharedResourcesKeys.Required);
+                throw new TableNumberRequiredException();
 
             if (dto.Capacity < 1 || dto.Capacity > 20)
-                throw new Exception(SharedResourcesKeys.TableCapacityInvalid);
+                throw new TableCapacityInvalidException();
 
             var branchSpec = new TableBranchIdSpecification(tableFromDb.BranchId);
             var tablesInSameBranch = await repo.GetAllAsync(branchSpec);
@@ -124,7 +148,7 @@ namespace RMS.Services.TableServices
             if (tablesInSameBranch.Any(t => t.Id != id &&
                 t.TableNumber.Trim().ToLower() == dto.TableNumber.ToLower()))
             {
-                throw new Exception(SharedResourcesKeys.TableBranch);
+                throw new TableNumberDuplicateInBranchException(dto.TableNumber);
             }
 
             _mapper.Map(dto, tableFromDb);
@@ -137,9 +161,6 @@ namespace RMS.Services.TableServices
         
         public async Task<IEnumerable<TableOrderDTO>> GetAllTableOrdersAsync(TableOrderQueryParams queryParams)
         {
-            var repo = _unitOfWork.GetRepository<TableOrder>();
-            var spec = new TableOrderSpecification(queryParams);
-            var tableOrders = await repo.GetAllAsync(spec);
 
             if (queryParams.TableId.HasValue)
             {
@@ -148,28 +169,45 @@ namespace RMS.Services.TableServices
                 var table = await tableRepo.GetByIdAsync(tableSpec);
 
                 if (table is null)
-                    throw new Exception(SharedResourcesKeys.NotFound);
+                    throw new TableNotFoundException(queryParams.TableId.Value);
             }
 
+
+            var repo = _unitOfWork.GetRepository<TableOrder>();
+            var spec = new TableOrderSpecification(queryParams);
+            var tableOrders = await repo.GetAllAsync(spec);
+
+
             return _mapper.Map<IEnumerable<TableOrderDTO>>(tableOrders);
+
         }
+
+
+
+
         public async Task ToggleTableStatusAsync(int id)
         {
+
             var repo = _unitOfWork.GetRepository<Table>();
             var spec = new TableWithOrdersSpecification(id);
             var table = await repo.GetByIdAsync(spec);
 
             if (table is null)
-                throw new Exception(SharedResourcesKeys.NotFound);
+                throw new TableNotFoundException(id);
 
             if (table.IsOccupied == true && table.TableOrders.Any(to => to.CompletedAt == null))
-                throw new Exception(SharedResourcesKeys.FreeTable);
+                throw new FreeTableException(id);
 
             table.IsOccupied = !table.IsOccupied;
             table.UpdatedAt = DateTime.UtcNow;
             repo.Update(table);
             await _unitOfWork.SaveChangesAsync();
+
         }
+
+
+
+
         public async Task<TableOrderDTO> CompleteTableOrderAsync(int id)
         {
             var repo = _unitOfWork.GetRepository<TableOrder>();
@@ -177,10 +215,10 @@ namespace RMS.Services.TableServices
             var tableOrder = await repo.GetByIdAsync(id);
 
             if (tableOrder is null)
-                throw new Exception(SharedResourcesKeys.NotFound);
+                throw new TableOrderNotFoundException(id);
 
             if (tableOrder.CompletedAt != null)
-                throw new Exception(SharedResourcesKeys.CompletedTableOrder);
+                throw new CompletedTableOrderException(id);
 
             tableOrder.CompletedAt = DateTime.UtcNow;
 
@@ -190,5 +228,15 @@ namespace RMS.Services.TableServices
             return _mapper.Map<TableOrderDTO>(tableOrder);
         }
 
+
+
     }
 }
+
+
+
+
+
+
+
+
