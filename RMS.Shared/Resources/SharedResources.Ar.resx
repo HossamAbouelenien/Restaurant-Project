@@ -290,8 +290,19 @@
 	<data name="OrderIsNotReadyYet" xml:space="preserve">
   <value>الطلب رقم {0} ليس جاهزاً بعد</value>
 </data>
-	
-	
+
+	<data name="EmailNotConfirmed" xml:space="preserve">
+  <value>البريد الإلكتروني "{0}" غير مؤكد</value>
+</data>
+	<data name="EmailAlreadyExists" xml:space="preserve">
+  <value>البريد الإلكتروني "{0}" مسجل مسبقاً</value>
+</data>
+	<data name="RegistrationFailed" xml:space="preserve">
+  <value>فشل تسجيل المستخدم: {0}</value>
+</data>
+	<data name="AuthError" xml:space="preserve">
+  <value>حدث خطأ أثناء المصادقة</value>
+</data>
 	
 	
 	
