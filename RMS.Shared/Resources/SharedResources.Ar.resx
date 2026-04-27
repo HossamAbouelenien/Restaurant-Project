@@ -163,9 +163,6 @@
   <data name="MenuItemIngredient" xml:space="preserve">
     <value>يجب أن يحتوي عنصر القائمة على مكون واحد على الأقل</value>
   </data>
-  <data name="DuplicateIngredient" xml:space="preserve">
-    <value>المكونات المكررة غير مسموح بها</value>
-  </data>
   <data name="OrderAlreadyPaid" xml:space="preserve">
     <value>تم دفع الطلب بالفعل</value>
   </data>
@@ -315,9 +312,26 @@
 	<data name="KitchenTicketNotFound" xml:space="preserve">
   <value>تذكرة المطبخ رقم {0} غير موجودة</value>
 </data>
-	
-	
-	
+
+	<data name="MenuItemNotFound" xml:space="preserve">
+  <value>عنصر القائمة رقم {0} غير موجود</value>
+</data>
+	<data name="MenuItemNoIngredients" xml:space="preserve">
+  <value>يجب إضافة مكون واحد على الأقل لعنصر القائمة</value>
+</data>
+	<data name="InvalidIngredientIds" xml:space="preserve">
+  <value>معرفات المكونات التالية غير صالحة: {0}</value>
+</data>
+	<data name="ImageUploadFailed" xml:space="preserve">
+  <value>فشل رفع الصورة</value>
+</data>
+	<data name="DuplicateIngredient" xml:space="preserve">
+  <value>لا يمكن إضافة نفس المكون أكثر من مرة</value>
+</data>
+
+<data name="NotificationNotFound" xml:space="preserve">
+  <value>الإشعار رقم {0} غير موجود</value>
+</data>
 	
 	
 	

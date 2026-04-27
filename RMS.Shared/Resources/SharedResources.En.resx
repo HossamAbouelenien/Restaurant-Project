@@ -164,9 +164,6 @@
   <data name="MenuItemIngredient" xml:space="preserve">
     <value>MenuItem must have at least one ingredient</value>
   </data>
-  <data name="DuplicateIngredient" xml:space="preserve">
-    <value>Duplicate ingredients not allowed</value>
-  </data>
   <data name="OrderAlreadyPaid" xml:space="preserve">
     <value>Order already paid</value>
   </data>
@@ -318,7 +315,26 @@
 	<data name="KitchenTicketNotFound" xml:space="preserve">
   <value>Kitchen ticket with id {0} is not found</value>
 </data>
+
+	<data name="MenuItemNotFound" xml:space="preserve">
+  <value>Menu item with id {0} is not found</value>
+</data>
+	<data name="MenuItemNoIngredients" xml:space="preserve">
+  <value>At least one ingredient is required for a menu item</value>
+</data>
+	<data name="InvalidIngredientIds" xml:space="preserve">
+  <value>The following ingredient ids are invalid: {0}</value>
+</data>
+	<data name="ImageUploadFailed" xml:space="preserve">
+  <value>Image upload failed</value>
+</data>
+	<data name="DuplicateIngredient" xml:space="preserve">
+  <value>Duplicate ingredients are not allowed</value>
+</data>
 	
+<data name="NotificationNotFound" xml:space="preserve">
+  <value>Notification with id {0} is not found</value>
+</data>
 	
 	
 	
