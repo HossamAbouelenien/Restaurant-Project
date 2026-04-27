@@ -75,6 +75,8 @@ namespace RMS.Services.IdentityService
             return refreshToken;
         }
 
+
+
         public async Task<bool> RevokeRefreshTokenAsync(string refreshTokenId)
         {
             var repo = _unitOfWork.GetRepository<RefreshToken>();
@@ -91,6 +93,7 @@ namespace RMS.Services.IdentityService
             return true;
         }
 
+
         public async Task SaveRefreshTokenAsync(string userId, string jwtTokenId, string refreshToken, DateTime expiresAt)
         {
             var refreshTokenEntity = new RefreshToken
@@ -105,6 +108,8 @@ namespace RMS.Services.IdentityService
             await _unitOfWork.SaveChangesAsync();
         }
 
+
+
         public async Task<(bool IsValid, string? UserId, string? TokenFamilyId, bool TokenReused)> ValidateRefreshTokenAsync(string refreshToken)
         {
             var repo = _unitOfWork.GetRepository<RefreshToken>();
@@ -116,6 +121,8 @@ namespace RMS.Services.IdentityService
             {
                 return (false, null, null, false);
             }
+
+
 
             if (!storedToken.IsValid)
             {
@@ -133,6 +140,8 @@ namespace RMS.Services.IdentityService
                 return (false, storedToken.UserId, storedToken.JwtTokenId, true);
             }
 
+
+
             if (storedToken.ExpiresAt < DateTime.UtcNow)
             {
                 return (false, storedToken.UserId, storedToken.JwtTokenId, false);
@@ -140,5 +149,16 @@ namespace RMS.Services.IdentityService
 
             return (true, storedToken.UserId, storedToken.JwtTokenId, false);
         }
+
     }
 }
+
+
+
+
+
+
+
+
+
+
