@@ -36,6 +36,10 @@ namespace RMS.Shared.SharedResources
 
 
         // MenuItem
+        public const string MenuItemNotFound = "MenuItemNotFound";
+        public const string MenuItemNoIngredients = "MenuItemNoIngredients";
+        public const string InvalidIngredientIds = "InvalidIngredientIds";
+        public const string ImageUploadFailed = "ImageUploadFailed";
         public const string DeleteActiveMenuItem = "DeleteActiveMenuItem";
 
 
