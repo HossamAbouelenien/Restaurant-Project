@@ -16,5 +16,7 @@ namespace RMS.ServicesAbstraction.IPaymentServices
 
         Task ConfirmCashPaymentAsync(int orderId , decimal paidAmount);
         Task<PaginatedResult<PaymentDto>> GetAllAsync(PaymentQueryParams queryParams);
+
+        Task<List<PaymentDto>> GetAllWithoutPaginationAsync();
     }
 }
