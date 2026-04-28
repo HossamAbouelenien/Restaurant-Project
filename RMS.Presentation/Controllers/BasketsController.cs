@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using RMS.ServicesAbstraction;
 using RMS.Shared.DTOs.BasketDTOs;
 
@@ -13,31 +8,29 @@ namespace RMS.Presentation.Controllers
     [Route("api/[controller]")]
     public class BasketsController : ControllerBase
     {
-
         private readonly IBasketService _basketService;
 
         public BasketsController(IBasketService basketService)
         {
-            this._basketService = basketService;
+            _basketService = basketService;
         }
 
-
         [HttpGet]
-        public async Task<ActionResult<BasketDTO>> GetBasket(string id)
+        public async Task<ActionResult<BasketDTO>> GetBasket([FromQuery] string id)
         {
             var basket = await _basketService.GetBasketAsync(id);
             return Ok(basket);
         }
 
         [HttpPost]
-        public async Task<ActionResult<BasketDTO>> CreateOrUpdateBasket(BasketDTO basket)
+        public async Task<ActionResult<BasketDTO>> CreateOrUpdateBasket([FromBody] BasketDTO basket)
         {
-            var CreatedOrUpdatedBasket = await _basketService.CreateOrUpdateBasketAsync(basket);
-            return Ok(CreatedOrUpdatedBasket);
+            var result = await _basketService.CreateOrUpdateBasketAsync(basket);
+            return Ok(result);
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<bool>> DeleteBasket(string id)
+        public async Task<ActionResult<bool>> DeleteBasket([FromRoute] string id)
         {
             var result = await _basketService.DeleteBasketAsync(id);
             return Ok(result);
