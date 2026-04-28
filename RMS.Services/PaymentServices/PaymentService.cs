@@ -200,9 +200,18 @@ public class PaymentService : IPaymentService
       
     }
 
+    public async Task<List<PaymentDto>> GetAllWithoutPaginationAsync()
+    {
+        var today = DateTime.Today;
+        var tomorrow = today.AddDays(1);
 
 
+        var repo = _unitOfWork.GetRepository<Payment>();
 
+        var payments = await repo.GetAllAsync();
+
+        return _mapper.Map<List<PaymentDto>>(payments);
+    }
 }
 
 
