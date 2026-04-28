@@ -13,7 +13,7 @@ namespace RMS.Shared.QueryParams
         public string? PaymentStatus { get; set; }
         public string? OrderType { get; set; }
         public DateOnly? Date { get; set; }
-        public string? PaymentStatus { get; set; }
+        //public string? PaymentStatus { get; set; }
         public string? PaymentMethod { get; set; }
 
         #region Pagination
