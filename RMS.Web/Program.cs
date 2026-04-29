@@ -1,4 +1,5 @@
 using CloudinaryDotNet;
+using Elastic.CommonSchema;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -20,6 +21,8 @@ using RMS.Presentation.Hubs.Notification;
 using RMS.Presentation.Hubs.RestaurantHub;
 using RMS.Services;
 using RMS.Services.AiServices;
+using RMS.Services.AiServices.NutritionServices;
+using RMS.Services.AiServices.NutritionServices.Options;
 using RMS.Services.BasketService;
 using RMS.Services.BranchServices;
 using RMS.Services.BranchStockServices;
@@ -86,11 +89,22 @@ namespace RMS.Web
 
             //================= Mahmoud (45 : 60) =================
 
+            builder.Services.Configure<OpenAiOptions>(
+    builder.Configuration.GetSection(OpenAiOptions.SectionName));
 
+            builder.Services.AddHttpClient<INutritionAiService, NutritionAiService>(client =>
+            {
+                client.Timeout = TimeSpan.FromSeconds(45);
+                client.BaseAddress = new Uri("https://api.openai.com/");
 
+                // ✅ أضف السطر ده
+                var apiKey = builder.Configuration["OpenAI:ApiKey"];
+                client.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", apiKey);
+            });
 
-
-
+            builder.Services.AddScoped<INutritionService, NutritionService>();
+            builder.Services.AddScoped<INutritionRepository, NutritionRepository>();
             builder.Services.AddScoped<IRestaurantNotifier, RestaurantNotifier>();
             builder.Services.AddScoped<INotificationService, NotificationService>();
             builder.Services.AddScoped<IRealTimeNotifier, RealTimeNotifier>();
@@ -115,7 +129,7 @@ namespace RMS.Web
             builder.Services.AddScoped<IOrderService, OrderService>();
             builder.Services.AddScoped<IBranchStockService, BranchStockService>();
             //================= Mustafa (75 : 150) =================
-            builder.Services.AddIdentity<User, IdentityRole>()
+            builder.Services.AddIdentity<RMS.Domain.Entities.User, IdentityRole>()
                           .AddEntityFrameworkStores<AppDbContext>()
                           .AddDefaultTokenProviders();
 
