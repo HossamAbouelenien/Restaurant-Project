@@ -54,8 +54,10 @@ namespace RMS.Services.MappingProfiles
 
 
             CreateMap<BranchStock, BranchStockDTO>()
-                .ForMember(dest => dest.IngredientName, opt => opt.MapFrom(src => src.Ingredient.Name))
-                .ForMember(dest => dest.BranchName, opt => opt.MapFrom(src => src.Branch.Name));
+                .ForMember(dest => dest.IngredientName, opt => opt.MapFrom(src => src.Ingredient!.Name))
+                .ForMember(dest => dest.IngredientArabicName, opt => opt.MapFrom(src => src.Ingredient!.ArabicName))
+                .ForMember(dest => dest.Unit, opt => opt.MapFrom(src => src.Ingredient!.Unit))
+                .ForMember(dest => dest.BranchName, opt => opt.MapFrom(src => src.Branch!.Name));
 
 
         }
