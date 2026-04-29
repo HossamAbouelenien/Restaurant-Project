@@ -407,7 +407,16 @@
 	<data name="AiEmptyResponse" xml:space="preserve">
   <value>AI service returned empty content</value>
 </data>
-	
+
+	<data name="MenuItemsNotFound" xml:space="preserve">
+  <value>No menu items found for the given basket</value>
+</data>
+	<data name="AiServiceFailed" xml:space="preserve">
+  <value>AI service failed: {0}</value>
+</data>
+	<data name="AiInvalidResponse" xml:space="preserve">
+  <value>AI returned invalid response: {0}</value>
+</data>
 	
 	
 	

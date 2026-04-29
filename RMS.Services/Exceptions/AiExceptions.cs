@@ -17,4 +17,13 @@ namespace RMS.Services.Exceptions
     { }
 
 
+    public sealed class AiInvalidResponseException(string message)
+    : BadRequestException(SharedResourcesKeys.AiInvalidResponse, message)
+    { }
+
+    public sealed class MenuItemsNotFoundException()
+        : NotFoundException(SharedResourcesKeys.MenuItemsNotFound)
+    { }
+
+
 }

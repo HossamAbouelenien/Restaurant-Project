@@ -185,13 +185,13 @@ namespace RMS.Shared.SharedResources
 
 
 
-        // AI
+        // Nutrition / AI
         public const string AiServiceError = "AiServiceError";
         public const string AiEmptyResponse = "AiEmptyResponse";
-
-
-
-
+        
+        public const string MenuItemsNotFound = "MenuItemsNotFound";
+        public const string AiServiceFailed = "AiServiceFailed";
+        public const string AiInvalidResponse = "AiInvalidResponse";
 
 
 
