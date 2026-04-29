@@ -396,7 +396,12 @@
 	<data name="AddressNotFound" xml:space="preserve">
   <value>العنوان الخاص بالمستخدم رقم {0} غير موجود</value>
 </data>
-	
+	<data name="AiServiceError" xml:space="preserve">
+  <value>فشل الاتصال بخدمة الذكاء الاصطناعي: {0}</value>
+</data>
+	<data name="AiEmptyResponse" xml:space="preserve">
+  <value>لم تُرجع خدمة الذكاء الاصطناعي أي بيانات</value>
+</data>
 	
 	
 	

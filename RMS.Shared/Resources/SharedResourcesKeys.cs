@@ -185,6 +185,20 @@ namespace RMS.Shared.SharedResources
 
 
 
+        // AI
+        public const string AiServiceError = "AiServiceError";
+        public const string AiEmptyResponse = "AiEmptyResponse";
+
+
+
+
+
+
+
+
+
+
+
 
 
 
