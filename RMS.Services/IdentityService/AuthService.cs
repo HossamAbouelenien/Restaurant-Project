@@ -89,7 +89,8 @@ namespace RMS.Services.IdentityService
                 {
                     AccessToken = token,
                     RefreshToken = newRefreshToken,
-                    ExpiresAt = jwtToken.ValidTo
+                    ExpiresAt = jwtToken.ValidTo,
+                    RoleId = (await _userManager.GetRolesAsync(user)).FirstOrDefault() ?? "Customer"
                 };
 
                 return tokenDTO;
