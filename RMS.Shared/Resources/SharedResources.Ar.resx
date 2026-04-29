@@ -396,8 +396,22 @@
 	<data name="AddressNotFound" xml:space="preserve">
   <value>العنوان الخاص بالمستخدم رقم {0} غير موجود</value>
 </data>
+	<data name="AiServiceError" xml:space="preserve">
+  <value>فشل الاتصال بخدمة الذكاء الاصطناعي: {0}</value>
+</data>
+	<data name="AiEmptyResponse" xml:space="preserve">
+  <value>لم تُرجع خدمة الذكاء الاصطناعي أي بيانات</value>
+</data>
 	
-	
+	<data name="MenuItemsNotFound" xml:space="preserve">
+  <value>لم يتم العثور على عناصر قائمة للسلة المحددة</value>
+</data>
+	<data name="AiServiceFailed" xml:space="preserve">
+  <value>فشلت خدمة الذكاء الاصطناعي: {0}</value>
+</data>
+	<data name="AiInvalidResponse" xml:space="preserve">
+  <value>استجابة الذكاء الاصطناعي غير صالحة: {0}</value>
+</data>
 	
 	
 	

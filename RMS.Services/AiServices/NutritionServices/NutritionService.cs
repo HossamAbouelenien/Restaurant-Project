@@ -3,6 +3,7 @@ using RMS.Domain.Contracts;
 using RMS.Domain.Entities;
 using RMS.Domain.Entities.CustomerBasket;
 using RMS.Services.AiServices.Helper;
+using RMS.Services.Exceptions;
 using RMS.Services.Exceptions.Base;
 using RMS.ServicesAbstraction.IAiServices;
 using RMS.Shared.DTOs.NutritionDTOs;
@@ -42,10 +43,10 @@ namespace RMS.Services.AiServices.NutritionServices
             var basket = await _basketRepository.GetBasketAsync(basketId);
 
             if (basket is null)
-                throw new Exception($"Basket '{basketId}' was not found.");
+                throw new BasketNotFoundException(basketId);
 
             if (basket.Items is null || basket.Items.Count == 0)
-                throw new Exception("Basket is empty. Add items before calculating nutrition.");
+                throw new BasketOperationFailedException(basketId);
 
             // Step 2: Extract MenuItemIds
             var menuItemIds = basket.Items.Select(i => i.Id).Distinct().ToList();
@@ -54,7 +55,7 @@ namespace RMS.Services.AiServices.NutritionServices
             var menuItems = await _nutritionRepository.GetMenuItemsWithIngredientsAsync(menuItemIds, cancellationToken);
 
             if (menuItems is null || menuItems.Count == 0)
-                throw new Exception("No menu items found for the given basket.");
+                throw new MenuItemsNotFoundException();
 
             // Step 4: Build structured DTO list for prompt builder
             var nutritionItems = BuildNutritionItems(basket.Items, menuItems);
@@ -74,7 +75,7 @@ namespace RMS.Services.AiServices.NutritionServices
             catch (Exception ex)
             {
                 _logger.LogError(ex, "AI service failed for basket {BasketId}", basketId);
-                throw new Exception($"AI FAILED: {ex.Message} | Inner: {ex.InnerException?.Message}");
+                throw new AiServiceException(ex.Message);
             }
 
             // Step 7: Parse and return structured response
@@ -141,11 +142,11 @@ namespace RMS.Services.AiServices.NutritionServices
                 };
 
                 var result = JsonSerializer.Deserialize<NutritionResponseDto>(cleaned, options);
-                return result ?? throw new InvalidOperationException("AI returned null nutrition data.");
+                return result ?? throw new AiInvalidResponseException("AI returned null nutrition data.");
             }
             catch (JsonException ex)
             {
-                throw new Exception($"AI returned invalid JSON: {ex.Message}");
+                throw new AiInvalidResponseException(ex.Message);
             }
         }
     }

@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using RMS.Services.AiServices.NutritionServices.Models;
 using RMS.Services.AiServices.NutritionServices.Options;
+using RMS.Services.Exceptions;
 using RMS.ServicesAbstraction.IAiServices;
 using System;
 using System.Collections.Generic;
@@ -73,15 +74,21 @@ namespace RMS.Services.AiServices.NutritionServices
             {
                 var error = await response.Content.ReadAsStringAsync(cancellationToken);
                 _logger.LogError("OpenAI API error {StatusCode}: {Error}", response.StatusCode, error);
-                throw new HttpRequestException($"OpenAI API returned {response.StatusCode}");
+                throw new AiServiceException(response.StatusCode.ToString());
             }
 
             var responseJson = await response.Content.ReadAsStringAsync(cancellationToken);
             var parsed = JsonSerializer.Deserialize<OpenAiChatResponse>(responseJson,
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-            var rawContent = parsed?.Choices?.FirstOrDefault()?.Message?.Content
-                ?? throw new InvalidOperationException("OpenAI returned empty content.");
+            var rawContent = parsed?.Choices?.FirstOrDefault()?.Message?.Content;
+
+            if (rawContent is null)
+            {
+                _logger.LogError("OpenAI returned empty content");
+                throw new AiEmptyResponseException();
+            }
+                
 
             _logger.LogDebug("Raw AI response received ({Length} chars)", rawContent.Length);
 
