@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RMS.Domain.Contracts;
-using RMS.Domain.Entities;
 using RMS.Persistence.Data.Contexts;
 
 namespace RMS.Persistence.Repositories

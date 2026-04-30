@@ -1,7 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using RMS.Domain.Contracts;
-using RMS.Domain.Entities;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace RMS.Persistence
 {
