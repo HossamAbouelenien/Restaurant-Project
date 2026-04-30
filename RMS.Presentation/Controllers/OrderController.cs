@@ -23,7 +23,7 @@ namespace RMS.Presentation.Controllers
             _logger = logger;
         }
         
-        [Authorize(Roles = SD.Role_Admin + "" + SD.Role_Customer + "" + SD.Role_Waiter + "" + SD.Role_Cashier)]
+        //[Authorize(Roles = SD.Role_Admin + "" + SD.Role_Customer + "" + SD.Role_Waiter + "" + SD.Role_Cashier)]
         [HttpPost]
         public async Task<IActionResult> CreateOrder(CreateOrderDTO orderDto)
         {
@@ -35,7 +35,7 @@ namespace RMS.Presentation.Controllers
         
         }
 
-        [Authorize(Roles = SD.Role_Admin + "" + SD.Role_Waiter + "" + SD.Role_Cashier)]
+        //[Authorize(Roles = SD.Role_Admin + "" + SD.Role_Waiter + "" + SD.Role_Cashier)]
         [HttpGet]
         public async Task<ActionResult<PaginatedResult<OrderDTO>>> GetAllOrders([FromQuery] OrderQueryParams queryParams)
         {
@@ -46,7 +46,7 @@ namespace RMS.Presentation.Controllers
          
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<OrderDetailsDTO>> GetOrderById(int id)
         {
@@ -59,7 +59,7 @@ namespace RMS.Presentation.Controllers
 
 
         [HttpGet("my")]
-        [Authorize(Roles = SD.Role_Customer)]
+        //[Authorize(Roles = SD.Role_Customer)]
         public async Task<ActionResult<PaginatedResult<OrderDTO>>> GetCustomerOrdersHistory([FromQuery] OrderQueryParams queryParams)
         {
             _logger.LogInformation("GetCustomerOrdersHistory request started");
@@ -78,7 +78,7 @@ namespace RMS.Presentation.Controllers
         }
 
         [HttpGet("myactive")]
-        [Authorize(Roles = SD.Role_Customer)]
+        //[Authorize(Roles = SD.Role_Customer)]
         public async Task<ActionResult<PaginatedResult<MyDeliveryActiveCustomersDTO>>> GetCustomerActiveOrdersHistory([FromQuery] OrderQueryParams queryParams)
         {
             _logger.LogInformation("GetCustomerActiveOrdersHistory request started");
@@ -96,7 +96,7 @@ namespace RMS.Presentation.Controllers
 
         }
 
-        [Authorize(Roles = SD.Role_Admin + "" + SD.Role_Waiter + "" + SD.Role_Cashier)]
+        //[Authorize(Roles = SD.Role_Admin + "" + SD.Role_Waiter + "" + SD.Role_Cashier)]
         [HttpPut("{orderId}/status")]
         public async Task<ActionResult<OrderDTO>> UpdateOrderStatus(int orderId, [FromBody] string newStatus)
         {
@@ -106,7 +106,7 @@ namespace RMS.Presentation.Controllers
           
         }
 
-        [Authorize(Roles = SD.Role_Admin + "" + SD.Role_Waiter )]
+        //[Authorize(Roles = SD.Role_Admin + "" + SD.Role_Waiter )]
         [HttpPost("{orderId}/items")]
         public async Task<ActionResult<AddedItemsDTO>> AddItemsToOrder(int orderId, [FromBody] List<CreateOrderItemDTO> items)
         {

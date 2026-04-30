@@ -24,7 +24,7 @@ namespace RMS.Presentation.Controllers
             _logger = logger;
         }
 
-        [Authorize(Roles = SD.Role_Admin)]
+        //[Authorize(Roles = SD.Role_Admin)]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<GetUserDTO>>> GetAllUserWithBranchAsync([FromQuery] UserQueryParams queryParams)
         {
@@ -33,7 +33,7 @@ namespace RMS.Presentation.Controllers
             return Ok(Users);
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpGet("{id}")]
         [ActionName("GetUserDetails")]
         public async Task<ActionResult<UserDetailsDTO>> GetUserDetailsAsync(string id)
@@ -44,7 +44,7 @@ namespace RMS.Presentation.Controllers
         }
 
 
-        [Authorize(Roles = SD.Role_Admin)]
+        //[Authorize(Roles = SD.Role_Admin)]
         [HttpPost]
         public async Task<ActionResult<UserDetailsDTO>> AddUserAsync(CreateUserDto createUserDto)
         {
@@ -55,7 +55,7 @@ namespace RMS.Presentation.Controllers
         }
 
 
-        [Authorize]
+        //[Authorize]
         [HttpPut("{id}")]
         public async Task<ActionResult<UserDetailsDTO>> UpdateUserAsync(string id, UpdateUserDto updateUserDto)
         {
@@ -73,7 +73,7 @@ namespace RMS.Presentation.Controllers
         }
 
 
-        [Authorize]
+        //[Authorize]
         [HttpPatch("{id}/toggle-status")]
         public async Task<ActionResult> ToggleUserStatus(string id)
         {
@@ -83,7 +83,7 @@ namespace RMS.Presentation.Controllers
         }
 
 
-        [Authorize(Roles = SD.Role_Admin)]
+        //[Authorize(Roles = SD.Role_Admin)]
         [HttpGet("Roles")]
         public async Task<ActionResult<List<string>>> GetRolesAsync()
         {
@@ -94,7 +94,7 @@ namespace RMS.Presentation.Controllers
         }
 
 
-        [Authorize(Roles = SD.Role_Admin)]
+        //[Authorize(Roles = SD.Role_Admin)]
         [HttpGet("inactive")]
         public async Task<ActionResult<PaginatedResult<GetUserDTO>>> GetInactiveUsers([FromQuery] UserQueryParams queryParams)
         {
@@ -103,7 +103,7 @@ namespace RMS.Presentation.Controllers
             return Ok(users);
         }
 
-        [Authorize(Roles = SD.Role_Admin)]
+        //[Authorize(Roles = SD.Role_Admin)]
         [HttpPost("AddCustomerAsync")]
         public async Task<ActionResult<CreateCustomerDTO>> AddCustomerAsync(CreateCustomerDTO createCustomerDTO)
         {
@@ -113,7 +113,7 @@ namespace RMS.Presentation.Controllers
             return Ok(user);
         }
 
-        [Authorize(Roles = SD.Role_Admin)]
+        //[Authorize(Roles = SD.Role_Admin)]
         [HttpGet("GetAllCustomerUserAysnc")]
         public async Task<ActionResult<PaginatedResult<GetCustomerDTO>>> GetAllCustomerUserAysnc([FromQuery]CustomerQueryParams queryParams)
         {
@@ -122,7 +122,7 @@ namespace RMS.Presentation.Controllers
             return Ok(Users);
         }
 
-        [Authorize(Roles = SD.Role_Admin + " " + SD.Role_Customer)]
+        //[Authorize(Roles = SD.Role_Admin + " " + SD.Role_Customer)]
         [HttpPut("{id}/address")]
         public async Task<ActionResult<GetCustomerDTO>> UpdateCustomerAddress(string id, UpdateCustomerAddressDTO updateCustomerAddressDTO)
         {
@@ -132,7 +132,7 @@ namespace RMS.Presentation.Controllers
         }
 
 
-        [Authorize(Roles = SD.Role_Admin + " " + SD.Role_Customer)]
+        //[Authorize(Roles = SD.Role_Admin + " " + SD.Role_Customer)]
         [HttpPut("{userId}/addresses")]
         public async Task<IActionResult> UpdateAddress(
             [FromRoute] string userId,
@@ -151,7 +151,7 @@ namespace RMS.Presentation.Controllers
            
         }
 
-        [Authorize(Roles = SD.Role_Admin + " " + SD.Role_Customer)]
+        //[Authorize(Roles = SD.Role_Admin + " " + SD.Role_Customer)]
         [HttpDelete("{userId}/addresses")]
         public async Task<IActionResult> DeleteAddress(
             [FromRoute] string userId,
@@ -170,7 +170,7 @@ namespace RMS.Presentation.Controllers
            
         }
 
-        [Authorize(Roles = SD.Role_Admin + " " + SD.Role_Customer)]
+        //[Authorize(Roles = SD.Role_Admin + " " + SD.Role_Customer)]
         [HttpGet("my-addresses")]
         public async Task<IActionResult> GetMyAddresses([FromQuery] AddressQueryParams queryParams)
         {

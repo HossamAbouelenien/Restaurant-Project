@@ -18,7 +18,7 @@ namespace RMS.Presentation.Controllers
             _logger = logger;
         }
 
-        [Authorize(Roles = SD.Role_Admin)]
+        //[Authorize(Roles = SD.Role_Admin)]
         [HttpGet("dashboard")]
         public async Task <IActionResult> GetReport()
         {
@@ -28,7 +28,7 @@ namespace RMS.Presentation.Controllers
         }
 
 
-        [Authorize(Roles = SD.Role_Admin)]
+        //[Authorize(Roles = SD.Role_Admin)]
         [HttpGet("revenue")]
         public async Task<IActionResult> GetRevenue(
             [FromQuery] int? branchId,
@@ -41,7 +41,7 @@ namespace RMS.Presentation.Controllers
         }
 
 
-        [Authorize(Roles = SD.Role_Admin)]
+        //[Authorize(Roles = SD.Role_Admin)]
         [HttpGet("orders-by-type")]
         public async Task<IActionResult> GetOrdersByType()
         {
@@ -51,7 +51,7 @@ namespace RMS.Presentation.Controllers
         }
 
 
-        [Authorize(Roles = SD.Role_Admin)]
+        //[Authorize(Roles = SD.Role_Admin)]
         [HttpGet("top-items")]
         public async Task<IActionResult> GetTopItems([FromQuery] int top = 5)
         {
@@ -61,7 +61,7 @@ namespace RMS.Presentation.Controllers
         }
 
 
-        [Authorize(Roles = SD.Role_Admin + "" + SD.Role_Chef)]
+        //[Authorize(Roles = SD.Role_Admin + "" + SD.Role_Chef)]
         [HttpGet("inventory-usage")]
         public async Task<IActionResult> GetInventoryUsage()
         {
@@ -70,7 +70,7 @@ namespace RMS.Presentation.Controllers
             return Ok(result);
         }
 
-        [Authorize(Roles = SD.Role_Admin + "" + SD.Role_Driver)]
+        //[Authorize(Roles = SD.Role_Admin + "" + SD.Role_Driver)]
         [HttpGet("daily-revenue")]
         public async Task<IActionResult> GetDailyRevenue([FromQuery] int? branchId)
         {

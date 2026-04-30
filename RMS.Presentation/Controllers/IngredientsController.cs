@@ -20,7 +20,7 @@ namespace RMS.Presentation.Controllers
             _logger = logger;
         }
 
-        [Authorize(Roles = SD.Role_Admin + "" + SD.Role_Chef)]
+        //[Authorize(Roles = SD.Role_Admin + "" + SD.Role_Chef)]
         [HttpGet]
         public async Task<IActionResult> GetAllIngredients(
           [FromQuery] int pageIndex = 1,
@@ -31,7 +31,7 @@ namespace RMS.Presentation.Controllers
             return Ok(result);
         }
 
-        [Authorize(Roles = SD.Role_Admin + "" + SD.Role_Chef)]
+        //[Authorize(Roles = SD.Role_Admin + "" + SD.Role_Chef)]
         [HttpGet("{id}")]
 
         public async Task<IActionResult> GetIngredientById(int id)
@@ -48,7 +48,7 @@ namespace RMS.Presentation.Controllers
 
         }
 
-        [Authorize(Roles = SD.Role_Admin + "" + SD.Role_Chef)]
+        //[Authorize(Roles = SD.Role_Admin + "" + SD.Role_Chef)]
         [HttpPost]
         public async Task<IActionResult> AddIngredient(CreateIngredientDTO NewIngredient)
         {
@@ -58,7 +58,7 @@ namespace RMS.Presentation.Controllers
 
         }
 
-        [Authorize(Roles = SD.Role_Admin)]
+        //[Authorize(Roles = SD.Role_Admin)]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateIngredient(int id, [FromBody] CreateIngredientDTO UpdateIngredient)
         {
@@ -67,7 +67,7 @@ namespace RMS.Presentation.Controllers
             return Ok(Ingredient);
         }
 
-        [Authorize(Roles = SD.Role_Admin)]
+        //[Authorize(Roles = SD.Role_Admin)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteIngredient(int id)
         {

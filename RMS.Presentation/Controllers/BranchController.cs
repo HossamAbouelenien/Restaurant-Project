@@ -23,7 +23,7 @@ namespace RMS.Presentation.Controllers
         }
 
 
-        [Authorize(Roles = SD.Role_Admin)]
+        //[Authorize(Roles = SD.Role_Admin)]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<BranchDTO>>> GetAllBranches()
         {
@@ -33,7 +33,7 @@ namespace RMS.Presentation.Controllers
         }
 
 
-        [Authorize(Roles = SD.Role_Admin)]
+        //[Authorize(Roles = SD.Role_Admin)]
         [HttpGet("GetAllBranchesWithTables")]
         public async Task<ActionResult<PaginatedResult<GetBranchDTO>>> GetAllBranchesWithOrdersAndTablesAsync([FromQuery] BranchQueryParams param)
         {
@@ -42,7 +42,7 @@ namespace RMS.Presentation.Controllers
             return Ok(result);
         }
 
-        [Authorize(Roles = SD.Role_Admin)]
+        //[Authorize(Roles = SD.Role_Admin)]
         [HttpGet("{id:int}")]
         public async Task<ActionResult<GetBranchDTO>> GetBranchById(int id)
         {
@@ -52,7 +52,7 @@ namespace RMS.Presentation.Controllers
         }
 
 
-        [Authorize(Roles = SD.Role_Admin)]
+        //[Authorize(Roles = SD.Role_Admin)]
         [HttpPut("{id}")]
         public async Task<ActionResult<UpdateBranchDTO>> UpdateBranch(int id, UpdateBranchDTO updateBranch)
         {
@@ -63,7 +63,7 @@ namespace RMS.Presentation.Controllers
 
 
 
-        [Authorize(Roles = SD.Role_Admin)]
+        //[Authorize(Roles = SD.Role_Admin)]
         [HttpPost]
         public async Task<ActionResult<CreateBranchDTO>> CreateBranch(CreateBranchDTO BranchDTO)
         {
@@ -74,7 +74,7 @@ namespace RMS.Presentation.Controllers
 
 
 
-        [Authorize(Roles = SD.Role_Admin)]
+        //[Authorize(Roles = SD.Role_Admin)]
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteBranch(int id)
         {
@@ -84,7 +84,7 @@ namespace RMS.Presentation.Controllers
         }
 
 
-        [Authorize(Roles = SD.Role_Admin)]
+        //[Authorize(Roles = SD.Role_Admin)]
         [HttpPatch("{id}/toggle-status")]
         public async Task<ActionResult> ToggleBranchStatus(int id)
         {

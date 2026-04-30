@@ -47,7 +47,7 @@ namespace RMS.Presentation.Controllers
             return Ok(result);
         }
 
-        [Authorize(Roles = SD.Role_Admin)]
+        //[Authorize(Roles = SD.Role_Admin)]
         [HttpPost]
         [Consumes("multipart/form-data")]
         public async Task<ActionResult<MenuItemDetailsDTO>> CreateMenuItem([FromForm] CreateMenuItemDTO dto)
@@ -62,7 +62,7 @@ namespace RMS.Presentation.Controllers
            
         }
 
-        [Authorize(Roles = SD.Role_Admin)]
+        //[Authorize(Roles = SD.Role_Admin)]
         [HttpPut("{id}")]
         public async Task<ActionResult<MenuItemDetailsDTO>> UpdateMenuItem(int id, [FromForm] UpdateMenuItemDTO dto)
         {
@@ -73,7 +73,7 @@ namespace RMS.Presentation.Controllers
            
         }
 
-        [Authorize(Roles = SD.Role_Admin + "" + SD.Role_Chef)]
+        //[Authorize(Roles = SD.Role_Admin + "" + SD.Role_Chef)]
         [HttpPatch("{id}/toggle-availability")]
         public async Task<ActionResult> ToggleAvailability(int id)
         {
@@ -82,7 +82,7 @@ namespace RMS.Presentation.Controllers
             return Ok(); 
         }
 
-        [Authorize(Roles = SD.Role_Admin)]
+        //[Authorize(Roles = SD.Role_Admin)]
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteMenuItem(int id)
         {
