@@ -459,6 +459,7 @@ namespace RMS.Web
             app.MapHub<NotificationHub>("/hubs/notifications");
 
             app.MapControllers();
+            app.MapGet("/", () => Results.Redirect("/swagger"));
 
             app.Run();
         }
