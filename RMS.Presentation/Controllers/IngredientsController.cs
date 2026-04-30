@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RMS.ServicesAbstraction.IServices.IIngredientServices;
 using RMS.Shared.DTOs.IngredientDTOs;
+using RMS.Shared.DTOs.Utility;
 
 namespace RMS.Presentation.Controllers
 {
@@ -14,6 +16,8 @@ namespace RMS.Presentation.Controllers
         {
             _ingredientService = ingredientService;
         }
+
+        [Authorize(Roles = SD.Role_Admin + "" + SD.Role_Chef)]
         [HttpGet]
         public async Task<IActionResult> GetAllIngredients(
           [FromQuery] int pageIndex = 1,
@@ -23,6 +27,7 @@ namespace RMS.Presentation.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = SD.Role_Admin + "" + SD.Role_Chef)]
         [HttpGet("{id}")]
 
         public async Task<IActionResult> GetIngredientById(int id)
@@ -33,6 +38,8 @@ namespace RMS.Presentation.Controllers
             return Ok(ingredient);
 
         }
+
+        [Authorize(Roles = SD.Role_Admin + "" + SD.Role_Chef)]
         [HttpPost]
         public async Task<IActionResult> AddIngredient(CreateIngredientDTO NewIngredient)
         {
@@ -40,12 +47,16 @@ namespace RMS.Presentation.Controllers
             return Ok(Ingredient);
 
         }
+
+        [Authorize(Roles = SD.Role_Admin)]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateIngredient(int id, [FromBody] CreateIngredientDTO UpdateIngredient)
         {
             var Ingredient = await _ingredientService.UpdateIngredientAsync(id, UpdateIngredient);
             return Ok(Ingredient);
         }
+
+        [Authorize(Roles = SD.Role_Admin)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteIngredient(int id)
         {

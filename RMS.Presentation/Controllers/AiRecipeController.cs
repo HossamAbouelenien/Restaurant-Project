@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RMS.ServicesAbstraction.IServices.IAiServices;
 using RMS.Shared.DTOs.AiDTOs;
+using RMS.Shared.DTOs.Utility;
 
 namespace RMS.Presentation.Controllers
 {
@@ -22,6 +24,7 @@ namespace RMS.Presentation.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = SD.Role_Admin)]
         [HttpPost("sync")]
         public async Task<IActionResult> Sync()
         {

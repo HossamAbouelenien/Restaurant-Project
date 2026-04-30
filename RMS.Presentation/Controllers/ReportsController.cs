@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RMS.ServicesAbstraction.IServices.IReportServices;
+using RMS.Shared.DTOs.Utility;
 
 namespace RMS.Presentation.Controllers
 {
@@ -13,7 +15,7 @@ namespace RMS.Presentation.Controllers
             _reportService = reportService;
         }
 
-
+        [Authorize(Roles = SD.Role_Admin)]
         [HttpGet("dashboard")]
         public async Task <IActionResult> GetReport()
         {
@@ -22,7 +24,7 @@ namespace RMS.Presentation.Controllers
         }
 
 
-
+        [Authorize(Roles = SD.Role_Admin)]
         [HttpGet("revenue")]
         public async Task<IActionResult> GetRevenue(
             [FromQuery] int? branchId,
@@ -34,7 +36,7 @@ namespace RMS.Presentation.Controllers
         }
 
 
-
+        [Authorize(Roles = SD.Role_Admin)]
         [HttpGet("orders-by-type")]
         public async Task<IActionResult> GetOrdersByType()
         {
@@ -43,7 +45,7 @@ namespace RMS.Presentation.Controllers
         }
 
 
-
+        [Authorize(Roles = SD.Role_Admin)]
         [HttpGet("top-items")]
         public async Task<IActionResult> GetTopItems([FromQuery] int top = 5)
         {
@@ -52,7 +54,7 @@ namespace RMS.Presentation.Controllers
         }
 
 
-
+        [Authorize(Roles = SD.Role_Admin + "" + SD.Role_Chef)]
         [HttpGet("inventory-usage")]
         public async Task<IActionResult> GetInventoryUsage()
         {
@@ -60,6 +62,7 @@ namespace RMS.Presentation.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = SD.Role_Admin + "" + SD.Role_Driver)]
         [HttpGet("daily-revenue")]
         public async Task<IActionResult> GetDailyRevenue([FromQuery] int? branchId)
         {

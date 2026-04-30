@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using RMS.Services.Services.PaymobServices;
 using RMS.ServicesAbstraction.IServices.IPaymentServices;
+using RMS.Shared.DTOs.Utility;
 using RMS.Shared.QueryParams;
 using System.Security.Claims;
 
@@ -66,6 +67,7 @@ namespace RMS.Presentation.Controllers
             return Ok();
         }
 
+        [Authorize(Roles = SD.Role_Admin + "" + SD.Role_Cashier)]
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] PaymentQueryParams queryParams)
         {
@@ -73,6 +75,7 @@ namespace RMS.Presentation.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = SD.Role_Admin + "" + SD.Role_Cashier)]
         [HttpGet("all")]
         public async Task<IActionResult> GetAllWithoutPagination()
         {

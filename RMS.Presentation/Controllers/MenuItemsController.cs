@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RMS.ServicesAbstraction.IServices.IMenuItemServices;
 using RMS.Shared;
 using RMS.Shared.DTOs.MenuItemDTOs;
 using RMS.Shared.DTOs.MenuItemsDTOs;
+using RMS.Shared.DTOs.Utility;
 using RMS.Shared.QueryParams;
 
 namespace RMS.Presentation.Controllers
@@ -18,7 +20,7 @@ namespace RMS.Presentation.Controllers
             _menuItemService = menuItemService;
         }
 
-        //[Authorize]
+       
         [HttpGet]
         //[Cache]
         public async Task<ActionResult<PaginatedResult<MenuItemDTO>>> GetAllMenuItems([FromQuery] MenuItemQueryParams queryParams)
@@ -35,7 +37,7 @@ namespace RMS.Presentation.Controllers
             return Ok(result);
         }
 
-
+        [Authorize(Roles = SD.Role_Admin)]
         [HttpPost]
         [Consumes("multipart/form-data")]
         public async Task<ActionResult<MenuItemDetailsDTO>> CreateMenuItem([FromForm] CreateMenuItemDTO dto)
@@ -49,6 +51,7 @@ namespace RMS.Presentation.Controllers
            
         }
 
+        [Authorize(Roles = SD.Role_Admin)]
         [HttpPut("{id}")]
         public async Task<ActionResult<MenuItemDetailsDTO>> UpdateMenuItem(int id, [FromForm] UpdateMenuItemDTO dto)
         {
@@ -59,7 +62,7 @@ namespace RMS.Presentation.Controllers
            
         }
 
-
+        [Authorize(Roles = SD.Role_Admin + "" + SD.Role_Chef)]
         [HttpPatch("{id}/toggle-availability")]
         public async Task<ActionResult> ToggleAvailability(int id)
         {
@@ -67,6 +70,7 @@ namespace RMS.Presentation.Controllers
             return Ok(); 
         }
 
+        [Authorize(Roles = SD.Role_Admin)]
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteMenuItem(int id)
         {

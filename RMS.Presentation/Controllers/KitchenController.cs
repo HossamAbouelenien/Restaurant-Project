@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RMS.ServicesAbstraction.IServices.IKitchenServices;
 using RMS.Shared.DTOs.KitchenDTOs;
+using RMS.Shared.DTOs.Utility;
 using RMS.Shared.QueryParams;
 
 namespace RMS.Presentation.Controllers
@@ -16,7 +18,7 @@ namespace RMS.Presentation.Controllers
             _kitchenService = kitchenService;
         }
 
-
+        [Authorize(Roles = SD.Role_Admin + "" + SD.Role_Waiter + "" + SD.Role_Chef)]
         [HttpGet("KitchenTickets")]
         public async Task<ActionResult<KitchenBoardDto>> GetAllKitchenTicketsGroupedByStatusForCurrentBranchAsync([FromQuery] KitchenTicketQueryParams queryParams)
         {
@@ -25,6 +27,7 @@ namespace RMS.Presentation.Controllers
         }
 
 
+        [Authorize(Roles = SD.Role_Admin + "" + SD.Role_Chef)]
         [HttpGet("{id}")]
         public async Task<ActionResult<KitchenTicketDetailsDto>> GetSingleKitchenTicketWithsOrderItemsAsync(int id)
         {
@@ -33,6 +36,8 @@ namespace RMS.Presentation.Controllers
         }
 
 
+        [Authorize(Roles = SD.Role_Admin + "" + SD.Role_Chef)]
+
         [HttpGet("ActiveStations")]
         public async Task<ActionResult<List<ActivePendingStationsDTOs>>> GetListOfActiveStationsWithPendingCountAsync([FromQuery] int branchId)
         {
@@ -40,7 +45,7 @@ namespace RMS.Presentation.Controllers
             return Ok(ActiveStationsWithPendingCount);
         }
 
-
+        [Authorize(Roles = SD.Role_Chef)]
         [HttpPut("{ticketId}")]
         public async Task<IActionResult> UpdateTicketStatus(int ticketId,[FromBody] UpdateTicketStatusRequestDto dto)             
         {
@@ -49,14 +54,12 @@ namespace RMS.Presentation.Controllers
         }
 
 
-
+        [Authorize(Roles = SD.Role_Waiter)]
         [HttpPatch("ConfirmServed/{id}")]
         public async Task<IActionResult> UpdateCofirmServeredColumn(int id)
         {
             var result = await _kitchenService.UpdateCofirmServeredColumn(id);
             return Ok(result);
-
-
 
         }
 

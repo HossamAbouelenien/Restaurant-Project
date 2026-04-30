@@ -1,25 +1,20 @@
 using CloudinaryDotNet;
-using Elastic.CommonSchema;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using RMS.Domain.Contracts;
-using RMS.Domain.Entities;
-using RMS.Persistence;
 using RMS.Persistence.Data.Contexts;
 using RMS.Persistence.Data.DataSeed;
 using RMS.Persistence.Repositories;
 using RMS.Persistence.Repositries;
 using RMS.Presentation.Hubs.Notification;
 using RMS.Presentation.Hubs.RestaurantHub;
-using RMS.Services;
 using RMS.Services.MappingProfiles;
 using RMS.Services.Services.AiServices;
 using RMS.Services.Services.AiServices.NutritionServices;
@@ -67,7 +62,6 @@ using RMS.ServicesAbstraction.IServices.IUserServices;
 using RMS.Shared.Utility;
 using RMS.Web.Extensions;
 using RMS.Web.Factories;
-using Serilog;
 using Serilog.Context;
 using StackExchange.Redis;
 using System.Globalization;
@@ -100,14 +94,14 @@ namespace RMS.Web
             //================= Mahmoud (45 : 60) =================
 
             builder.Services.Configure<OpenAiOptions>(
-    builder.Configuration.GetSection(OpenAiOptions.SectionName));
+            builder.Configuration.GetSection(OpenAiOptions.SectionName));
 
             builder.Services.AddHttpClient<INutritionAiService, NutritionAiService>(client =>
             {
                 client.Timeout = TimeSpan.FromSeconds(45);
                 client.BaseAddress = new Uri("https://api.openai.com/");
 
-                // ✅ أضف السطر ده
+              
                 var apiKey = builder.Configuration["OpenAI:ApiKey"];
                 client.DefaultRequestHeaders.Authorization =
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", apiKey);
