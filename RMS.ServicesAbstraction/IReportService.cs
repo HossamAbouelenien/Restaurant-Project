@@ -14,5 +14,6 @@ namespace RMS.ServicesAbstraction
         Task<OrdersByTypeDTO> GetOrdersByTypeAsync();
         Task<IEnumerable<TopItemsDto>> GetTopItemsAsync(int top);
         Task<IEnumerable<InventoryUsageDTO>> GetInventoryUsageAsync();
+        Task<IEnumerable<DailyRevenueDTO>> GetDailyRevenueLast7DaysAsync(int? branchId);
     }
 }
