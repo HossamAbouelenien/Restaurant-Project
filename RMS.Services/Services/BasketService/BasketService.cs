@@ -2,7 +2,7 @@
 using RMS.Domain.Contracts;
 using RMS.Domain.Entities.CustomerBasket;
 using RMS.Services.Exceptions;
-using RMS.ServicesAbstraction;
+using RMS.ServicesAbstraction.IServices.IBasketServices;
 using RMS.Shared.DTOs.BasketDTOs;
 
 namespace RMS.Services.Services.BasketService

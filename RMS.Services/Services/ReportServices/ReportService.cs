@@ -4,7 +4,7 @@ using RMS.Domain.Enums;
 using RMS.Services.Exceptions;
 using RMS.Services.Specifications.OrderSpec;
 using RMS.Services.Specifications.ReportSpec;
-using RMS.ServicesAbstraction;
+using RMS.ServicesAbstraction.IServices.IReportServices;
 using RMS.Shared.DTOs.ReportsDTOs;
 
 namespace RMS.Services.Services.ReportServices

@@ -1,0 +1,19 @@
+﻿using RMS.Shared;
+using RMS.Shared.DTOs.TableDTOs;
+using RMS.Shared.QueryParams;
+
+namespace RMS.ServicesAbstraction.IServices.ITableServices
+{
+   public interface ITableService
+    {
+        Task<TableDTO> CreateTableAsync(CreateTableDTO dto);
+        Task<PaginatedResult<TableDTO>> GetAllTablesAsync(TableQueryParams queryParams);
+        Task<TableDTO> GetTableByIdAsync(int id);
+        Task<TableDTO>UpdateTableAsync(int id,UpdateTableDTO dto);
+        Task DeleteTableAsync(int id);
+        Task<IEnumerable<TableOrderDTO>> GetAllTableOrdersAsync(TableOrderQueryParams queryParams);
+        Task ToggleTableStatusAsync(int id);
+        Task<TableOrderDTO> CompleteTableOrderAsync(int id);
+
+    }
+}

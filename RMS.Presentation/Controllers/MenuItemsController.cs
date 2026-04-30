@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RMS.Presentation.Attributes;
-using RMS.ServicesAbstraction;
+using RMS.ServicesAbstraction.IServices.IMenuItemServices;
 using RMS.Shared;
 using RMS.Shared.DTOs.MenuItemDTOs;
 using RMS.Shared.DTOs.MenuItemsDTOs;

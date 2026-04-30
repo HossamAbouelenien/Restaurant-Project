@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using RMS.ServicesAbstraction;
+using RMS.ServicesAbstraction.IServices.ITableServices;
 using RMS.Shared.DTOs.TableDTOs;
 using RMS.Shared.QueryParams;
 using System;

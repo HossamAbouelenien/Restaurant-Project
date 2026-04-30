@@ -3,7 +3,7 @@ using Microsoft.Extensions.Options;
 using RMS.Services.Exceptions;
 using RMS.Services.Services.AiServices.NutritionServices.Models;
 using RMS.Services.Services.AiServices.NutritionServices.Options;
-using RMS.ServicesAbstraction.IAiServices;
+using RMS.ServicesAbstraction.IServices.IAiServices;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;

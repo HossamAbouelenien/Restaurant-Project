@@ -3,7 +3,7 @@ using RMS.Domain.Contracts;
 using RMS.Domain.Entities;
 using RMS.Services.Exceptions;
 using RMS.Services.Specifications.NotificationSpec;
-using RMS.ServicesAbstraction.IHubServices.INotificationServices;
+using RMS.ServicesAbstraction.IServices.IHubServices.INotificationServices;
 using RMS.Shared.DTOs.NotificationDTOs;
 using RMS.Shared.QueryParams;
 

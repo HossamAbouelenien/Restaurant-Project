@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using RMS.ServicesAbstraction;
+using RMS.ServicesAbstraction.IServices.IBranchStockServices;
 using RMS.Shared.DTOs.BranchStockDTOs;
 using RMS.Shared.QueryParams;
 using System;

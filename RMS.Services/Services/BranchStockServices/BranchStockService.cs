@@ -3,8 +3,8 @@ using RMS.Domain.Contracts;
 using RMS.Domain.Entities;
 using RMS.Services.Exceptions;
 using RMS.Services.Specifications.BranchStockSpec;
-using RMS.ServicesAbstraction;
-using RMS.ServicesAbstraction.IHubServices.IRestaurantNotifier;
+using RMS.ServicesAbstraction.IServices.IBranchStockServices;
+using RMS.ServicesAbstraction.IServices.IHubServices.IRestaurantNotifier;
 using RMS.Shared.DTOs.BranchStockDTOs;
 using RMS.Shared.QueryParams;
 

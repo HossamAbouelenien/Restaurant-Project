@@ -4,7 +4,7 @@ using RMS.Domain.Entities;
 using RMS.Domain.Entities.CustomerBasket;
 using RMS.Services.Exceptions;
 using RMS.Services.Services.AiServices.Helper;
-using RMS.ServicesAbstraction.IAiServices;
+using RMS.ServicesAbstraction.IServices.IAiServices;
 using RMS.Shared.DTOs.NutritionDTOs;
 using System.Text.Json;
 

@@ -1,6 +1,6 @@
 ﻿using RMS.Domain.Contracts;
 using RMS.Domain.Entities;
-using RMS.ServicesAbstraction.IAiServices;
+using RMS.ServicesAbstraction.IServices.IAiServices;
 using RMS.Shared.DTOs.AiDTOs;
 using System.Net.Http.Json;
 using System.Text.Json;

@@ -4,8 +4,8 @@ using RMS.Domain.Entities;
 using RMS.Domain.Enums;
 using RMS.Services.Exceptions;
 using RMS.Services.Specifications.KitchenTicketSpec;
-using RMS.ServicesAbstraction.IHubServices.IRestaurantNotifier;
-using RMS.ServicesAbstraction.IKitchenServices;
+using RMS.ServicesAbstraction.IServices.IHubServices.IRestaurantNotifier;
+using RMS.ServicesAbstraction.IServices.IKitchenServices;
 using RMS.Shared.DTOs.KitchenDTOs;
 using RMS.Shared.QueryParams;
 

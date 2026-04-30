@@ -3,7 +3,7 @@ using RMS.Domain.Contracts;
 using RMS.Domain.Entities;
 using RMS.Services.Exceptions;
 using RMS.Services.Specifications.CategorySpec;
-using RMS.ServicesAbstraction.ICategoriesService;
+using RMS.ServicesAbstraction.IServices.ICategoryServices;
 using RMS.Shared.DTOs.CategoryDTOs;
 
 namespace RMS.Services.Services.CategoryServices

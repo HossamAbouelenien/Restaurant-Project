@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RMS.ServicesAbstraction;
-using RMS.ServicesAbstraction.IKitchenServices;
+using RMS.ServicesAbstraction.IServices.IKitchenServices;
 using RMS.Shared.DTOs.BranchStockDTOs;
 using RMS.Shared.DTOs.KitchenDTOs;
 using RMS.Shared.QueryParams;

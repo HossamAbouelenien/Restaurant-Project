@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using RMS.ServicesAbstraction.IHubServices.INotificationServices;
+using RMS.ServicesAbstraction.IServices.IHubServices.INotificationServices;
 using System;
 using System.Collections.Generic;
 using System.Linq;
