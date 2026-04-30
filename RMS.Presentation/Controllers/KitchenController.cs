@@ -1,15 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using RMS.ServicesAbstraction;
+﻿using Microsoft.AspNetCore.Mvc;
 using RMS.ServicesAbstraction.IServices.IKitchenServices;
-using RMS.Shared.DTOs.BranchStockDTOs;
 using RMS.Shared.DTOs.KitchenDTOs;
 using RMS.Shared.QueryParams;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RMS.Presentation.Controllers
 {

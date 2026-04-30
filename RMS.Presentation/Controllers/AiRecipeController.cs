@@ -1,11 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RMS.ServicesAbstraction.IServices.IAiServices;
 using RMS.Shared.DTOs.AiDTOs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RMS.Presentation.Controllers
 {

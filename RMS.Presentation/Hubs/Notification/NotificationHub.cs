@@ -1,12 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using RMS.Domain.Entities;
 using RMS.Shared.DTOs.Utility;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RMS.Presentation.Hubs.Notification
 {

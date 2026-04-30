@@ -1,11 +1,9 @@
-﻿using CloudinaryDotNet;
-using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using RMS.Domain.Entities;
 using RMS.Services.Exceptions;
 using RMS.ServicesAbstraction.IServices.IIdentityService;
 using RMS.Shared.DTOs.IdentityDTOs;
