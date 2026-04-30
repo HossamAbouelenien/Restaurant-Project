@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using RMS.ServicesAbstraction.IServices.IMenuItemServices;
 using RMS.Shared;
 using RMS.Shared.DTOs.MenuItemDTOs;
@@ -14,10 +15,12 @@ namespace RMS.Presentation.Controllers
     public class MenuItemsController : ControllerBase
     {
         private readonly IMenuItemService _menuItemService;
+        private readonly ILogger<MenuItemsController> _logger;
 
-        public MenuItemsController(IMenuItemService menuItemService)
+        public MenuItemsController(IMenuItemService menuItemService, ILogger<MenuItemsController> logger)
         {
             _menuItemService = menuItemService;
+            _logger = logger;
         }
 
        
@@ -25,6 +28,7 @@ namespace RMS.Presentation.Controllers
         //[Cache]
         public async Task<ActionResult<PaginatedResult<MenuItemDTO>>> GetAllMenuItems([FromQuery] MenuItemQueryParams queryParams)
         {
+            _logger.LogInformation("GetAllMenuItems request started");
             var result = await _menuItemService.GetAllMenuItemsAsync(queryParams);
             return Ok(result);
         }
@@ -32,8 +36,14 @@ namespace RMS.Presentation.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<MenuItemDetailsDTO>> GetMenuItemById(int id)
         {
+            _logger.LogInformation("GetMenuItemById request started");
             var result = await _menuItemService.GetMenuItemByIdAsync(id);
-            if (result is null) return NotFound();
+            if (result is null)
+            {
+                _logger.LogWarning("MenuItem with id {Id} not found", id);
+                return NotFound();
+            }
+                
             return Ok(result);
         }
 
@@ -42,6 +52,7 @@ namespace RMS.Presentation.Controllers
         [Consumes("multipart/form-data")]
         public async Task<ActionResult<MenuItemDetailsDTO>> CreateMenuItem([FromForm] CreateMenuItemDTO dto)
         {
+            _logger.LogInformation("CreateMenuItem request started");
             if (!ModelState.IsValid) return BadRequest(ModelState);
 
            
@@ -55,7 +66,7 @@ namespace RMS.Presentation.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<MenuItemDetailsDTO>> UpdateMenuItem(int id, [FromForm] UpdateMenuItemDTO dto)
         {
-           
+                _logger.LogInformation("UpdateMenuItem request started");
                 var result = await _menuItemService.UpdateMenuItemAsync(id, dto);
                 return Ok(result);
             
@@ -66,6 +77,7 @@ namespace RMS.Presentation.Controllers
         [HttpPatch("{id}/toggle-availability")]
         public async Task<ActionResult> ToggleAvailability(int id)
         {
+            _logger.LogInformation("ToggleAvailability request started");
             await _menuItemService.ToggleAvailabilityAsync(id);
             return Ok(); 
         }
@@ -74,8 +86,8 @@ namespace RMS.Presentation.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteMenuItem(int id)
         {
-           
-                await _menuItemService.DeleteMenuItemAsync(id);
+            _logger.LogInformation("DeleteMenuItem request started");
+            await _menuItemService.DeleteMenuItemAsync(id);
                 return Ok();
           
         }
@@ -83,6 +95,7 @@ namespace RMS.Presentation.Controllers
         [HttpGet("popular")]
         public async Task<IActionResult> GetPopular([FromQuery] int? branchId)
         {
+            _logger.LogInformation("GetPopularMenuItems request started");
             var result = await _menuItemService.GetPopularMenuItemsAsync(4, branchId);
             return Ok(result);
         }
@@ -90,6 +103,7 @@ namespace RMS.Presentation.Controllers
         [HttpGet("stats")]
         public async Task<ActionResult<MenuItemsStatsDTO>> GetStats()
         {
+            _logger.LogInformation("GetMenuItemsStats request started");
             var stats = await _menuItemService.GetStatsAsync();
             return Ok(stats);
         }

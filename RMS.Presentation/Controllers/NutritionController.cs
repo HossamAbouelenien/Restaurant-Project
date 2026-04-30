@@ -28,10 +28,11 @@ namespace RMS.Presentation.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status502BadGateway)]
-        public async Task<IActionResult> CalculateNutrition(
-     [FromRoute] string basketId,
-     CancellationToken cancellationToken)
+        public async Task<IActionResult> CalculateNutrition([FromRoute] string basketId,
+                    CancellationToken cancellationToken)
+     
         {
+            _logger.LogInformation("CalculateNutrition request started");
             try
             {
                 var result = await _nutritionService
