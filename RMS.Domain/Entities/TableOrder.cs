@@ -21,7 +21,6 @@ public class TableOrder : BaseEntity
     public Order? Order { get; set; }
 
     // ── Sitting data ──────────────────────────────────────────────────────────
-    //SeatedAt => CreatedAt with fluent Api
-    //public DateTime SeatedAt { get; set; } = DateTime.UtcNow;
+   
     public DateTime? CompletedAt { get; set; }
 }
