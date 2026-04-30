@@ -13,5 +13,6 @@
 
         public int? BranchId { get; set; }
         public string? BranchName { get; set; }
+        public string? BranchArabicName { get; set; }
     }
 }
