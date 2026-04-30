@@ -1,12 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Configuration;
 using RMS.Domain.Entities;
-using RMS.Shared.DTOs.MenuItemsDTOs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RMS.Services.MappingProfiles
 {

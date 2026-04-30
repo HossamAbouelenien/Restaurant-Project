@@ -1,6 +1,5 @@
 ﻿using RMS.Domain.Entities;
 using RMS.Domain.Enums;
-using RMS.Shared.QueryParams;
 
 namespace RMS.Services.Specifications.KitchenTicketSpec
 {
