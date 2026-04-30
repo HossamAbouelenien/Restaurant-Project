@@ -1,6 +1,4 @@
-﻿using RMS.Domain.Entities;
-
-namespace RMS.Domain.Contracts
+﻿namespace RMS.Domain.Contracts
 {
     public interface IGenericRepository<TEntity> where TEntity : class
     {
