@@ -1,8 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using RMS.Domain.Entities;
-using RMS.ServicesAbstraction;
-using RMS.ServicesAbstraction.IUserServices;
+﻿using Microsoft.AspNetCore.Mvc;
+using RMS.ServicesAbstraction.IServices.IUserServices;
 using RMS.Shared;
 using RMS.Shared.DTOs.AddressDTOs;
 using RMS.Shared.DTOs.UserDTOs;

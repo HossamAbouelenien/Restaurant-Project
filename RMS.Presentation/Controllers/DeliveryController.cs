@@ -1,20 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using RMS.Services.Exceptions;
-using RMS.ServicesAbstraction;
-using RMS.ServicesAbstraction.IDeliveryServices;
+using RMS.ServicesAbstraction.IServices.IDeliveryServices;
 using RMS.Shared;
-using RMS.Shared.DTOs.BranchStockDTOs;
 using RMS.Shared.DTOs.DeliveryDTOs;
-using RMS.Shared.DTOs.OrderDTOs;
 using RMS.Shared.DTOs.Utility;
 using RMS.Shared.QueryParams;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RMS.Presentation.Controllers
 {

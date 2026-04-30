@@ -2,11 +2,6 @@
 using RMS.Domain.Entities;
 using RMS.Shared.DTOs.BranchDTOs;
 using RMS.Shared.DTOs.BranchStockDTOs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RMS.Services.MappingProfiles
 {

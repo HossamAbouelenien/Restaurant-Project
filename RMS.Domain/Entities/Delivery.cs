@@ -20,8 +20,6 @@ public class Delivery : BaseEntity
     public User? Driver { get; set; }
 
     // ── Delivery data ─────────────────────────────────────────────────────────
-    //AssignedAt => CreatedAt with fluent Api
-    //public DateTime AssignedAt { get; set; } = DateTime.UtcNow;
     public DateTime? DeliveredAt { get; set; }
 
     [Required]

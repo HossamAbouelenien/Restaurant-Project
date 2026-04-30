@@ -29,6 +29,5 @@ public class BranchStock : BaseEntity
     [Range(0, 999999)]
     public decimal LowThreshold { get; set; }
 
-    //LastUpdated => UpdatedAt with fluent Api
-    //public DateTime LastUpdated { get; set; } = DateTime.UtcNow;
+    
 }

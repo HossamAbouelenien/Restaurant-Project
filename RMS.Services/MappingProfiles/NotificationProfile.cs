@@ -1,12 +1,6 @@
 ﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore.Query.Internal;
 using RMS.Domain.Entities;
 using RMS.Shared.DTOs.NotificationDTOs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RMS.Services.MappingProfiles
 {

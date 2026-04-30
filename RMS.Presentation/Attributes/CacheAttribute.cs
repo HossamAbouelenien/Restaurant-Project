@@ -2,12 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
-using RMS.ServicesAbstraction;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using RMS.ServicesAbstraction.IServices.ICacheServices;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace RMS.Presentation.Attributes
 {

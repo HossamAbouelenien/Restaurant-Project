@@ -1,13 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using RMS.ServicesAbstraction.IHubServices.INotificationServices;
+using RMS.ServicesAbstraction.IServices.IHubServices.INotificationServices;
 using RMS.Shared.QueryParams;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RMS.Presentation.Controllers
 {

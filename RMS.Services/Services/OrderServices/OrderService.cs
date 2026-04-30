@@ -1,0 +1,978 @@
+﻿using AutoMapper;
+using RMS.Domain.Contracts;
+using RMS.Domain.Entities;
+using RMS.Domain.Enums;
+using RMS.Services.Exceptions;
+using RMS.Services.Specifications.BranchStockSpec;
+using RMS.Services.Specifications.KitchenTicketSpec;
+using RMS.Services.Specifications.MenuItemSpec;
+using RMS.Services.Specifications.OrderSpec;
+using RMS.ServicesAbstraction.IServices.IHubServices.INotificationServices;
+using RMS.ServicesAbstraction.IServices.IHubServices.IRestaurantNotifier;
+using RMS.ServicesAbstraction.IServices.IOrderServices;
+using RMS.Shared;
+using RMS.Shared.DTOs.BranchStockDTOs;
+using RMS.Shared.DTOs.OrderDTOs;
+using RMS.Shared.DTOs.Utility;
+using RMS.Shared.QueryParams;
+
+namespace RMS.Services.Services.OrderServices
+{
+    public class OrderService : IOrderService
+
+    {
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
+        private readonly INotificationService _notificationService;
+        private readonly IRestaurantNotifier _restaurantNotifier;
+
+        public OrderService(IUnitOfWork unitOfWork, IMapper mapper, INotificationService notificationService, IRestaurantNotifier restaurantNotifier)
+        {
+            _unitOfWork = unitOfWork;
+            _mapper = mapper;
+            _notificationService = notificationService;
+            _restaurantNotifier = restaurantNotifier;
+        }
+
+
+        public async Task<OrderDTO> CreateOrderAsync(CreateOrderDTO orderDto)
+        {
+            // Parse OrderType
+
+            if (!Enum.TryParse<OrderType>(orderDto.OrderType, ignoreCase: true, out var orderType))
+            {
+                throw new InvalidOrderTypeException(orderDto.OrderType);
+            }
+                
+
+            // Parse PaymentMethod
+
+            if (!Enum.TryParse<PaymentMethod>(orderDto.PaymentMethod, ignoreCase: true, out var paymentMethod))
+            {
+                throw new InvalidPaymentMethodException(orderDto.PaymentMethod);
+            }
+                
+
+
+            var Repo = _unitOfWork.GetRepository<Order>();
+            var ItemRepo = _unitOfWork.GetRepository<MenuItem>();
+            var orderItems = new List<CreateOrderItemDTO>();
+
+            // Validate OrderType-specific fields
+
+            if (orderType == OrderType.DineIn && !orderDto.TableId.HasValue)
+            {
+                throw new TableRequiredException();
+
+            }
+
+            if (orderType == OrderType.Delivery && orderDto.DeliveryAddress is null)
+            {
+                throw new DeliveryAddressRequiredException(); 
+
+            }
+
+            // Validate Items
+            if (orderDto.Items == null || !orderDto.Items.Any())
+            {
+                throw new OrderItemRequiredException();
+            }
+                
+
+            var duplicateItems = orderDto.Items.GroupBy(i => i.MenuItemId).Where(g => g.Count() > 1);
+            if (duplicateItems.Any())
+            {
+                throw new DuplicateMenuItemsException();
+            }
+                
+
+            // Validate branch and customer existence
+
+            var branchExists = await _unitOfWork.GetRepository<Branch>().GetByIdAsync(orderDto.BranchId) != null;
+            var UserSpec = new UserSpecification(orderDto.UserId!);
+            var customerExists = await _unitOfWork.GetRepository<User>().GetByIdAsync(UserSpec) != null;
+            if (!branchExists) throw new BranchNotFoundException(orderDto.BranchId);
+            if (!customerExists) throw new UserNotFoundException(orderDto.UserId!);
+
+            var ingredientConsumption = new Dictionary<int, decimal>();
+
+
+            foreach (var item in orderDto.Items)
+            {
+                var menuItemSpec = new MenuItemWithBranchStockSpecification(item.MenuItemId);
+                var menuItem = await ItemRepo.GetByIdAsync(menuItemSpec) ?? throw new MenuItemNotFoundException(item.MenuItemId);
+
+
+                foreach (var recipe in menuItem.Recipes)
+                {
+
+                    var totalRequired = recipe.QuantityRequired * item.Quantity;
+                    // Accumulate total required quantity for each ingredient across all items
+                    if (ingredientConsumption.ContainsKey(recipe.IngredientId))
+                        ingredientConsumption[recipe.IngredientId] += totalRequired;
+                    else
+                        ingredientConsumption[recipe.IngredientId] = totalRequired;
+
+                }
+
+                orderItems.Add(new CreateOrderItemDTO { MenuItemId = menuItem.Id, Quantity = item.Quantity, UnitPrice = menuItem.Price, Notes = item.Notes });
+
+            }
+
+            foreach (var (ingredientId, totalRequired) in ingredientConsumption)
+            {
+                var ingredientName = await _unitOfWork.GetRepository<Ingredient>().GetByIdAsync(ingredientId) is Ingredient ingredient
+                    ? ingredient.Name
+                    : "Unknown";
+
+                var StockSpec = new BranchStockWithBranchAndIngredient(orderDto.BranchId, ingredientId);
+                var stock = await _unitOfWork.GetRepository<BranchStock>().GetAllAsync(StockSpec);
+
+                var stockItem = stock.FirstOrDefault();
+
+                if (stockItem == null)
+                {
+                    throw new IngredientNotInBranchException(ingredientId);
+                }
+                  
+
+                if (stockItem.QuantityAvailable < totalRequired)
+                {
+                    // Build detailed error message showing how many of each menu item can be ordered based on the limiting ingredient
+                    string ErrorMessage = string.Empty;
+                    // For each ordered menu item, calculate how many can be made with the available stock of the limiting ingredient
+                    foreach (var item in orderDto.Items)
+                    {
+                        var menuItemSpec = new MenuItemWithBranchStockSpecification(item.MenuItemId);
+                        var menuItem = await ItemRepo.GetByIdAsync(menuItemSpec)
+                            ?? throw new MenuItemNotFoundException(item.MenuItemId);
+
+                        // For this menu item, find the recipe that uses the limiting ingredient and calculate how many can be made
+                        var limitingIngredient = menuItem.Recipes
+                            .Select(r =>
+                            {
+                                var stock = r.Ingredient!.BranchStocks
+                                    .FirstOrDefault(bs => bs.BranchId == orderDto.BranchId);
+
+                                var available = stock?.QuantityAvailable ?? 0;
+                                // Calculate how many of this menu item can be made with the available stock of this ingredient
+                                return new
+                                {
+                                    IngredientName = r.Ingredient.Name,
+                                    MaxPossible = (int)Math.Floor(available / r.QuantityRequired)
+                                };
+                            })
+                            .OrderBy(x => x.MaxPossible)
+                            .First(); // The most limiting ingredient determines how many of this menu item can be made
+                        // If this menu item is part of the order, include it in the error message
+                        ErrorMessage += $"You can only order {limitingIngredient.MaxPossible} of {menuItem.Name} " +
+                                        $"because '{limitingIngredient.IngredientName}' is insufficient.\n";
+                    }
+
+                    throw new InsufficientStockException(ErrorMessage);
+
+                }
+
+
+                stockItem.QuantityAvailable -= totalRequired;
+
+
+                if (stockItem.QuantityAvailable < stockItem.LowThreshold
+                    && stockItem.QuantityAvailable + totalRequired >= stockItem.LowThreshold)
+                {
+                    await _notificationService.CreateNotification(
+                        new Notification
+                        {
+                            Title = "Low Stock Alert",
+                            Message = $"{ingredientName} is low in branch {orderDto.BranchId}",
+                            BranchId = orderDto.BranchId,
+                            Type = "LowStock",
+                            Role = SD.Role_Admin,
+                        },
+                        SD.Group_Admins,
+                        "LowStockAlert"
+                    );
+                }
+            }
+
+            // ------------------------------------------------------------------------------
+
+            orderDto.Items = orderItems;
+            var order = _mapper.Map<Order>(orderDto);
+            order.TotalAmount = orderItems.Sum(i => i.Quantity * i.UnitPrice);
+            order.Payment = new Payment
+            {
+                PaymentMethod = paymentMethod,
+                PaymentStatus = paymentMethod == PaymentMethod.Card ? PaymentStatus.Pending : PaymentStatus.Pending 
+            };
+
+            order.Status = paymentMethod == PaymentMethod.Card
+                ? OrderStatus.AwaitingPayment
+                : OrderStatus.Received;
+            //order.Payment = new Payment
+            //{
+            //    PaymentMethod = paymentMethod,
+            //    PaymentStatus = PaymentStatus.Pending
+            //};
+
+            //OrderType-specific records
+            if (orderType == OrderType.DineIn)
+            {
+                // Validate Table belongs to same Branch
+                var table = await _unitOfWork.GetRepository<Table>().GetByIdAsync(orderDto.TableId!.Value);
+                if (table is null)
+                    throw new TableNotFoundException(orderDto.TableId.Value);
+                if (table.BranchId != orderDto.BranchId)
+                    throw new TableNotInBranchException();
+                if (table.IsOccupied)
+                    throw new TableAlreadyOccupiedOrderException();
+
+                // Create TableOrder (SeatedAt = CreatedAt handled by EF)
+                order.TableOrder = new TableOrder
+                {
+                    TableId = orderDto.TableId!.Value
+                };
+
+                // Mark table as occupied
+                table.IsOccupied = true;
+            }
+            else if (orderType == OrderType.Delivery)
+            {
+                // Create Delivery record (AssignedAt = CreatedAt, Driver assigned later)
+                order.Delivery = new Delivery
+                {
+                    DeliveryAddress = _mapper.Map<Address>(orderDto.DeliveryAddress),
+                    DeliveryStatus = DeliveryStatus.UnAssigned,
+                    //DriverId = "0"  // ← assigned later by Admin
+                };
+            }
+
+
+            // ------------------------------------------------------------------------------
+            await Repo.AddAsync(order);
+
+            var result = await _unitOfWork.SaveChangesAsync();
+
+            if (result > 0)
+            {
+                var categories = new HashSet<string>();
+
+                foreach (var item in order.OrderItems)
+                {
+                    var menuItemSpec = new MenuItemWithBranchStockSpecification(item.MenuItemId);
+                    var menuItem = await ItemRepo.GetByIdAsync(menuItemSpec) ?? throw new MenuItemNotFoundException(item.MenuItemId);
+
+                    if (categories.Add(menuItem.Category!.Name))
+                    {
+                        var KichenTicketRepo = _unitOfWork.GetRepository<KitchenTicket>();
+                        await KichenTicketRepo.AddAsync(new KitchenTicket
+                        {
+                            OrderId = order.Id,
+                            Station = menuItem.Category.Name
+                        });
+                    }
+
+                }
+
+                await _unitOfWork.SaveChangesAsync();
+
+                var Spec = new OrderWithItemsAndPaymentAndDeliveryAndKitchenTicketsSpecification(order.Id);
+                order = await Repo.GetByIdAsync(Spec) ?? throw new FailedRetrieveCreatedOrderException();
+
+                var orderToReturn = _mapper.Map<OrderDTO>(order);
+                var orderData = _mapper.Map<OrderDetailsDTO>(order);
+
+                await _restaurantNotifier.SendAsync(
+                         "OrderCreated",
+                         orderData,
+                         $"kitchen_branch_{orderDto.BranchId}",
+                                $"waiters_branch_{orderDto.BranchId}",
+                                $"cashiers_branch_{orderDto.BranchId}",
+                                $"customers_id_{orderDto.UserId}",
+                                "admins"
+                        );
+                await BranchStockNotifierAsync(ingredientConsumption, orderDto.BranchId);
+                return orderToReturn;
+            }
+
+            throw new FailedRetrieveCreatedOrderException();
+        }
+
+
+
+        public async Task<PaginatedResult<OrderDTO>> GetAllOrdersAsync(OrderQueryParams queryParams)
+        {
+            var repo = _unitOfWork.GetRepository<Order>();
+            var spec = new OrderWithBranchAndCustomerAndOrderItemsSpecification(queryParams);
+            var orders = await repo.GetAllAsync(spec);
+            var orderDtos = _mapper.Map<IEnumerable<OrderDTO>>(orders);
+            var countSpec = new OrderCountSpecification(queryParams);
+            var countOfOrders = await repo.CountAsync(countSpec);
+            var pageSize = orderDtos.Count();
+            var paginatedResult = new PaginatedResult<OrderDTO>(queryParams.PageIndex, pageSize, countOfOrders, orderDtos);
+            return paginatedResult;
+        }
+
+
+
+        public async Task<OrderDetailsDTO> GetOrderByIdAsync(int id)
+
+        {
+            var repo = _unitOfWork.GetRepository<Order>();
+            var spec = new OrderWithItemsAndPaymentAndDeliveryAndKitchenTicketsSpecification(id);
+            var order = await repo.GetByIdAsync(spec) ?? throw new OrderNotFoundException(id); ;
+            if (order == null) throw new OrderNotFoundException(id); 
+            var orderDetailsDto = _mapper.Map<OrderDetailsDTO>(order);
+
+            return orderDetailsDto;
+        }
+
+
+
+
+        public async Task<PaginatedResult<OrderDTO>> GetCustomerOrdersHistoryAsync(OrderQueryParams queryParams, string customerId)
+        {
+            var repo = _unitOfWork.GetRepository<Order>();
+            var spec = new OrderWithBranchAndCustomerAndOrderItemsSpecification(queryParams, customerId);
+            var orders = await repo.GetAllAsync(spec);
+            var orderDtos = _mapper.Map<IEnumerable<OrderDTO>>(orders);
+            var countSpec = new OrderCountSpecification(queryParams, customerId);
+            var countOfOrders = await repo.CountAsync(countSpec);
+            var pageSize = orderDtos.Count();
+            var paginatedResult = new PaginatedResult<OrderDTO>(queryParams.PageIndex, pageSize, countOfOrders, orderDtos);
+            return paginatedResult;
+        }
+
+
+
+
+        public async Task<PaginatedResult<MyDeliveryActiveCustomersDTO>> GetCustomerOrdersActiveAsync(OrderQueryParams queryParams, string customerId)
+        {
+            var repo = _unitOfWork.GetRepository<Order>();
+            var spec = new OrderWithBranchAndCustomerAndOrderItemsAndDeliverySpecification(queryParams, customerId);
+            var orders = await repo.GetAllAsync(spec);
+            var orderDtos = _mapper.Map<IEnumerable<MyDeliveryActiveCustomersDTO>>(orders);
+            var countSpec = new OrderCountSpecification(queryParams, customerId);
+            var countOfOrders = await repo.CountAsync(countSpec);
+            var pageSize = orderDtos.Count();
+            var paginatedResult = new PaginatedResult<MyDeliveryActiveCustomersDTO>(queryParams.PageIndex, pageSize, countOfOrders, orderDtos);
+            return paginatedResult;
+        }
+
+
+
+
+        public async Task<OrderDTO> UpdateOrderStatusAsync(int orderId, string newStatus)
+        {
+            var orderRepo = _unitOfWork.GetRepository<Order>();
+            var orderSpec = new OrderWithTableOrderAndBranchAndCustomerAndOrderItemsSpecification(orderId);
+            var orderToUpdate = await orderRepo.GetByIdAsync(orderSpec);
+
+            if (orderToUpdate == null) throw new OrderNotFoundException(orderId);
+
+            if (Enum.TryParse(typeof(OrderStatus), newStatus, true, out var parsedStatus))
+            {
+                switch (orderToUpdate.Status)
+                {
+                    case OrderStatus.Received:
+                        if (parsedStatus is OrderStatus.Preparing or OrderStatus.Cancelled)
+                            orderToUpdate.Status = (OrderStatus)parsedStatus;
+                        else
+                            throw new InvalidStatusTransitionOrderException(orderToUpdate.Status.ToString(), newStatus);
+                        break;
+
+                    case OrderStatus.Preparing:
+                        if (parsedStatus is OrderStatus.Ready)
+                            orderToUpdate.Status = (OrderStatus)parsedStatus;
+                        else
+                            throw new InvalidStatusTransitionOrderException(orderToUpdate.Status.ToString(), newStatus);
+                        break;
+
+                    case OrderStatus.Ready:
+                        if (parsedStatus is OrderStatus.Delivered)
+                            orderToUpdate.Status = (OrderStatus)parsedStatus;
+                        else
+                            throw new InvalidStatusTransitionOrderException(orderToUpdate.Status.ToString(), newStatus);
+                        break;
+
+                    case OrderStatus.Delivered:
+                    case OrderStatus.Cancelled:
+                        throw new InvalidStatusTransitionOrderException(orderToUpdate.Status.ToString(), newStatus);
+
+                    default:
+                        throw new InvalidStatusValueOrderException(newStatus);
+
+                }
+
+
+                // If order is being marked as Delivered, set DeliveryStatus to Delivered if it's a Delivery order
+                if (orderToUpdate.Status == OrderStatus.Delivered && orderToUpdate.OrderType == OrderType.Delivery)
+                {
+                    if (orderToUpdate.Delivery != null)
+                    {
+                        orderToUpdate.Delivery.DeliveryStatus = DeliveryStatus.Delivered;
+                        orderToUpdate.Delivery.UpdatedAt = DateTime.Now;
+                    }
+                    if (orderToUpdate.OrderType == OrderType.DineIn)
+                    {
+                        var table = await _unitOfWork.GetRepository<Table>().GetByIdAsync(orderToUpdate.TableOrder!.TableId);
+                        if (table != null)
+                        {
+                            table.IsOccupied = false;
+                        }
+                    }
+                }
+
+
+                // If order is being cancelled, release reserved stock and free up table if DineIn
+                if (orderToUpdate.Status == OrderStatus.Cancelled)
+                {
+                    orderToUpdate.TotalAmount = 0;
+                    // Free up table if DineIn
+                    if (orderToUpdate.OrderType == OrderType.DineIn)
+                    {
+                        var table = await _unitOfWork.GetRepository<Table>().GetByIdAsync(orderToUpdate.TableOrder!.TableId);
+                        if (table != null)
+                        {
+                            table.IsOccupied = false;
+                        }
+                    }
+                    var kitchenTicketSpec = new TicketByOrderSpecification(orderToUpdate.Id);
+                    var tickets = await _unitOfWork.GetRepository<KitchenTicket>().GetAllAsync(kitchenTicketSpec);
+                    foreach (var ticket in tickets)
+                    {
+                        ticket.IsDeleted = true;
+                        ticket.DeletedAt = DateTime.Now;
+                    }
+                    // Real Time Kitchen notification to cancel tickets would be implemented here (e.g., via SignalR)
+                    if (orderToUpdate.Delivery is not null)
+                    {
+                        var delivery = await _unitOfWork.GetRepository<Delivery>().GetByIdAsync(orderToUpdate.Delivery.Id);
+                        if (delivery is not null)
+                        {
+                            delivery.IsDeleted = true;
+                            delivery.DeletedAt = DateTime.Now;
+                        }
+                    }
+                    if (orderToUpdate.Payment is not null)
+                    {
+                        var payment = await _unitOfWork.GetRepository<Payment>().GetByIdAsync(orderToUpdate.Payment.Id);
+                        if (payment is not null && payment.PaymentStatus == PaymentStatus.Paid)
+                        {
+                            payment.PaymentStatus = PaymentStatus.Refunded;
+                            payment.UpdatedAt = DateTime.Now;
+                        }
+                    }
+
+                    Dictionary<int, decimal> ingredientConsumption = await CalculateIngredientConsumptionAsync(orderToUpdate.OrderItems, orderToUpdate.BranchId);
+                    await RevertStockForCancelledOrderAsync(ingredientConsumption, orderToUpdate.BranchId);
+                    await _unitOfWork.SaveChangesAsync();
+                    await BranchStockNotifierAsync(ingredientConsumption, orderToUpdate.BranchId);
+
+
+                }
+            }
+            else
+            {
+
+                throw new InvalidStatusValueOrderException(newStatus);
+
+            }
+
+
+            orderToUpdate.UpdatedAt = DateTime.Now;
+            var updatedResult = await _unitOfWork.SaveChangesAsync();
+            if (updatedResult > 0)
+            {
+                //return _mapper.Map<OrderDTO>(orderToUpdate);
+                var Spec = new OrderWithItemsAndPaymentAndDeliveryAndKitchenTicketsSpecification(orderId);
+                var order = await orderRepo.GetByIdAsync(Spec) ?? throw new FailedRetrieveCreatedOrderException(); 
+
+                var orderToReturn = _mapper.Map<OrderDTO>(order);
+                var orderData = _mapper.Map<OrderDetailsDTO>(order);
+
+                string EventName = orderToUpdate.Status == OrderStatus.Cancelled ? "OrderCancelled" : "OrderUpdated";
+
+                await _restaurantNotifier.SendAsync(
+                         EventName,
+                         orderData,
+                         $"kitchen_branch_{orderToUpdate.BranchId}",
+                                $"waiters_branch_{orderToUpdate.BranchId}",
+                                $"cashiers_branch_{orderToUpdate.BranchId}",
+                                $"customers_id_{orderToUpdate.UserId}",
+                                "admins"
+                        );
+
+                return orderToReturn;
+
+            }
+            else
+            {
+
+                throw new FailedUpdatingStatusException();
+
+            }
+
+
+        }
+
+        public async Task<AddedItemsDTO> AddItemsToOrderAsync(int orderId, List<CreateOrderItemDTO> items)
+        {
+            var orderRepo = _unitOfWork.GetRepository<Order>();
+            var orderSpec = new OrderWithTableOrderAndBranchAndCustomerAndOrderItemsSpecification(orderId);
+
+            var order = await orderRepo.GetByIdAsync(orderSpec);
+            if (order == null) throw new OrderNotFoundException(orderId);
+
+            if (order.Status != OrderStatus.Received)
+                throw new InvalidStatusTransitionOrderException(order.Status.ToString(), "AddItems");
+
+
+            var ItemRepo = _unitOfWork.GetRepository<MenuItem>();
+
+            var OldIngredientConsumption = new Dictionary<int, decimal>();
+            var NewIngredientConsumption = new Dictionary<int, decimal>();
+
+
+            foreach (var item in order.OrderItems)
+            {
+                var menuItemSpec = new MenuItemWithBranchStockSpecification(item.MenuItemId);
+                var menuItem = await ItemRepo.GetByIdAsync(menuItemSpec) ?? throw new MenuItemNotFoundException(item.MenuItemId);
+
+                foreach (var recipe in menuItem.Recipes)
+                {
+                    var totalRequired = recipe.QuantityRequired * item.Quantity;
+                    // Accumulate total required quantity for each ingredient across all items
+                    if (OldIngredientConsumption.ContainsKey(recipe.IngredientId))
+                        OldIngredientConsumption[recipe.IngredientId] += totalRequired;
+                    else
+                        OldIngredientConsumption[recipe.IngredientId] = totalRequired;
+                }
+            }
+
+            foreach (var item in items)
+            {
+                var menuItemSpec = new MenuItemWithBranchStockSpecification(item.MenuItemId);
+                var menuItem = await ItemRepo.GetByIdAsync(menuItemSpec) ?? throw new MenuItemNotFoundException(item.MenuItemId);
+
+                foreach (var recipe in menuItem.Recipes)
+                {
+                    var totalRequired = recipe.QuantityRequired * item.Quantity;
+                    // Accumulate total required quantity for each ingredient across all items
+                    if (NewIngredientConsumption.ContainsKey(recipe.IngredientId))
+                        NewIngredientConsumption[recipe.IngredientId] += totalRequired;
+                    else
+                        NewIngredientConsumption[recipe.IngredientId] = totalRequired;
+                }
+            }
+
+
+            foreach (var (ingredientId, totalRequired) in NewIngredientConsumption)
+            {
+                var StockSpec = new BranchStockWithBranchAndIngredient(order.BranchId, ingredientId);
+                var stock = await _unitOfWork.GetRepository<BranchStock>().GetAllAsync(StockSpec);
+                var stockItem = stock.FirstOrDefault();
+                if (stockItem == null)
+                    throw new IngredientNotInBranchException(ingredientId);
+
+                var remainingStock = stockItem.QuantityAvailable - OldIngredientConsumption.GetValueOrDefault(ingredientId, 0);
+                stockItem.QuantityAvailable -= totalRequired;
+                if (remainingStock < totalRequired)
+                {
+                    // Build detailed error message showing how many of each menu item can be ordered based on the limiting ingredient
+                    string ErrorMessage = string.Empty;
+                    // For each ordered menu item, calculate how many can be made with the available stock of the limiting ingredient
+                    foreach (var item in items)
+                    {
+                        var menuItemSpec = new MenuItemWithBranchStockSpecification(item.MenuItemId);
+                        var menuItem = await ItemRepo.GetByIdAsync(menuItemSpec)
+                            ?? throw new MenuItemNotFoundException(item.MenuItemId);
+
+                        // For this menu item, find the recipe that uses the limiting ingredient and calculate how many can be made
+                        var limitingIngredient = menuItem.Recipes
+                            .Select(r =>
+                            {
+                                var stock = r.Ingredient!.BranchStocks
+                                    .FirstOrDefault(bs => bs.BranchId == order.BranchId);
+
+                                var available = stock?.QuantityAvailable - OldIngredientConsumption.GetValueOrDefault(ingredientId, 0) ?? 0;
+                                // Calculate how many of this menu item can be made with the available stock of this ingredient
+                                return new
+                                {
+                                    IngredientName = r.Ingredient.Name,
+                                    MaxPossible = (int)Math.Floor(available / r.QuantityRequired)
+                                };
+                            })
+                            .OrderBy(x => x.MaxPossible)
+                            .First(); // The most limiting ingredient determines how many of this menu item can be made
+                        // If this menu item is part of the order, include it in the error message
+                        ErrorMessage += $"You can only order {limitingIngredient.MaxPossible} of {menuItem.Name} " +
+                                        $"because '{limitingIngredient.IngredientName}' is insufficient.\n";
+                    }
+
+                    throw new InsufficientStockException(ErrorMessage);
+
+                }
+
+
+            }
+
+
+            var categories = new HashSet<string>();
+
+            foreach (var item in order.OrderItems)
+            {
+                var menuItemSpec = new MenuItemWithBranchStockSpecification(item.MenuItemId);
+                var menuItem = await ItemRepo.GetByIdAsync(menuItemSpec) ?? throw new MenuItemNotFoundException(item.MenuItemId);
+                categories.Add(menuItem.Category!.Name);
+            }
+
+            foreach (var item in items)
+            {
+                var menuItemSpec = new MenuItemWithBranchStockSpecification(item.MenuItemId);
+                var menuItem = await ItemRepo.GetByIdAsync(menuItemSpec) ?? throw new MenuItemNotFoundException(item.MenuItemId);
+
+                // check if item already exists in order, if so, update quantity and unit price
+                var existingItem = order.OrderItems.FirstOrDefault(oi => oi.MenuItemId == item.MenuItemId);
+                item.UnitPrice = menuItem.Price;
+
+                if (existingItem != null)
+                {
+                    existingItem.Quantity += item.Quantity;
+                    order.TotalAmount += item.Quantity * menuItem.Price;
+                    continue; // Skip adding a new item
+                }
+                order.OrderItems.Add(new OrderItem
+                {
+                    MenuItemId = item.MenuItemId,
+                    Quantity = item.Quantity,
+                    UnitPrice = menuItem.Price,
+                    Notes = item.Notes
+                });
+                order.TotalAmount += item.Quantity * menuItem.Price;
+            }
+
+            var addedItemsDto = new AddedItemsDTO
+            {
+                OrderID = order.Id,
+                AddedItems = items
+            };
+
+            var result = await _unitOfWork.SaveChangesAsync();
+
+            if (result > 0)
+            {
+
+
+                foreach (var item in items)
+                {
+                    var menuItemSpec = new MenuItemWithBranchStockSpecification(item.MenuItemId);
+                    var menuItem = await ItemRepo.GetByIdAsync(menuItemSpec) ?? throw new MenuItemNotFoundException(item.MenuItemId);
+                    if (categories.Add(menuItem.Category!.Name))
+                    {
+                        var kitchenTicketRepo = _unitOfWork.GetRepository<KitchenTicket>();
+                        await kitchenTicketRepo.AddAsync(new KitchenTicket
+                        {
+                            OrderId = order.Id,
+                            Station = menuItem.Category.Name
+                        });
+                    }
+                }
+
+                await _unitOfWork.SaveChangesAsync();
+
+                var Spec = new OrderWithItemsAndPaymentAndDeliveryAndKitchenTicketsSpecification(order.Id);
+                order = await orderRepo.GetByIdAsync(Spec) ?? throw new FailedRetrieveCreatedOrderException();
+
+                var orderData = _mapper.Map<OrderDetailsDTO>(order);
+                await _restaurantNotifier.SendAsync(
+                         "OrderUpdated",
+                         orderData,
+                         $"kitchen_branch_{order.BranchId}",
+                                $"waiters_branch_{order.BranchId}",
+                                $"cashiers_branch_{order.BranchId}",
+                                $"customers_id_{order.UserId}",
+                                "admins"
+                        );
+                await BranchStockNotifierAsync(NewIngredientConsumption, order.BranchId);
+
+                return addedItemsDto;
+            }
+            else
+            {
+
+                throw new FailedRetrieveCreatedOrderException();
+
+            }
+
+        }
+
+
+
+
+
+        public async Task<OrderDTO> RemoveItemsFromOrderAsync(int orderId, int itemId)
+        {
+            var repo = _unitOfWork.GetRepository<Order>();
+            var spec = new OrderWithTableOrderAndBranchAndCustomerAndOrderItemsSpecification(orderId);
+            var order = await repo.GetByIdAsync(spec);
+
+            var menuItemRepo = _unitOfWork.GetRepository<MenuItem>();
+
+            if (order is null) throw new OrderNotFoundException(orderId);
+            if (order.Status != OrderStatus.Received) throw new DeleteReceivedOrderException();
+
+            var orderItemSpec = new OrderItemWithCategorySpecification(itemId);
+            var orderItemRepo = _unitOfWork.GetRepository<OrderItem>();
+            var orderItem = await orderItemRepo.GetByIdAsync(orderItemSpec);
+
+            if (orderItem is null || orderItem.OrderId != orderId) throw new OrderItemNotFoundException(itemId);
+
+            order.OrderItems.Remove(orderItem);
+
+            if (!order.OrderItems.Any()) throw new RemoveAllOrderItemsException();
+
+            var newCategories = new HashSet<string>();
+
+            foreach (var item in order.OrderItems)
+            {
+                var menuItemSpec = new MenuItemWithBranchStockSpecification(item.MenuItemId);
+                var menuItem = await menuItemRepo.GetByIdAsync(menuItemSpec) ?? throw new MenuItemNotFoundException(item.MenuItemId);
+                newCategories.Add(menuItem.Category!.Name);
+            }
+
+            if (!newCategories.Contains(orderItem.MenuItem!.Category!.Name))
+            {
+                var kitchenTicketRepo = _unitOfWork.GetRepository<KitchenTicket>();
+                var ticketSpec = new TicketByOrderSpecification(order.Id);
+                var tickets = await kitchenTicketRepo.GetAllAsync(ticketSpec);
+                var ticketToRemove = tickets.FirstOrDefault(t => t.Station == orderItem.MenuItem.Category!.Name);
+
+                if (ticketToRemove != null)
+                {
+                    kitchenTicketRepo.Remove(ticketToRemove);
+                }
+            }
+
+            var NewIngredientConsumption = new Dictionary<int, decimal>();
+
+            var removedItems = new List<OrderItem> { orderItem };
+            NewIngredientConsumption = await CalculateIngredientConsumptionAsync(removedItems, order.BranchId);
+            await RevertStockForCancelledOrderAsync (NewIngredientConsumption, order.BranchId);
+
+            order.TotalAmount -= orderItem.Quantity * orderItem.UnitPrice;
+            order.UpdatedAt = DateTime.Now;
+
+            var result = await _unitOfWork.SaveChangesAsync();
+
+            if (result > 0)
+            //return _mapper.Map<OrderDTO>(order);
+            {
+                var Spec = new OrderWithItemsAndPaymentAndDeliveryAndKitchenTicketsSpecification(orderId);
+                var theorder = await repo.GetByIdAsync(Spec) ?? throw new FailedRetrieveCreatedOrderException();
+
+                var orderToReturn = _mapper.Map<OrderDTO>(theorder);
+                var orderData = _mapper.Map<OrderDetailsDTO>(theorder);
+
+                await _restaurantNotifier.SendAsync(
+                         "OrderUpdated",
+                         orderData,
+                         $"kitchen_branch_{order.BranchId}",
+                                $"waiters_branch_{order.BranchId}",
+                                $"cashiers_branch_{order.BranchId}",
+                                $"customers_id_{order.UserId}",
+                                "admins"
+                        );
+                await BranchStockNotifierAsync(NewIngredientConsumption, order.BranchId);
+
+                return orderToReturn;
+            }
+
+            else
+                throw new FailedRetrieveCreatedOrderException();
+        }
+
+        public async Task CancelOrderAsync(int orderId)
+        {
+
+            // Get order to cancel
+            var orderRepo = _unitOfWork.GetRepository<Order>();
+            var orderSpec = new OrderWithTableOrderAndBranchAndCustomerAndOrderItemsSpecification(orderId);
+            var orderToCancel = await orderRepo.GetByIdAsync(orderSpec);
+
+            if (orderToCancel == null) throw new OrderNotFoundException(orderId);
+            if (orderToCancel.Status != OrderStatus.Received) throw new CancelReceivedOrderOnlyException();
+            // when cancelling an order, we need to:
+            // 1. Set order status to Cancelled
+            orderToCancel.Status = OrderStatus.Cancelled;
+            // 2. If DineIn, free up the table
+            if (orderToCancel.OrderType == OrderType.DineIn)
+            {
+                var table = await _unitOfWork.GetRepository<Table>().GetByIdAsync(orderToCancel.TableOrder!.TableId);
+                if (table != null)
+                {
+                    table.IsOccupied = false;
+                }
+            }
+            // 3. Mark related kitchen tickets as cancelled (or deleted)
+            var kitchenTicketSpec = new TicketByOrderSpecification(orderToCancel.Id);
+            var tickets = await _unitOfWork.GetRepository<KitchenTicket>().GetAllAsync(kitchenTicketSpec);
+            foreach (var ticket in tickets)
+            {
+                ticket.IsDeleted = true;
+                ticket.DeletedAt = DateTime.Now;
+            }
+            // 4. If Delivery, mark delivery as cancelled (or deleted)
+            if (orderToCancel.Delivery is not null)
+            {
+                var delivery = await _unitOfWork.GetRepository<Delivery>().GetByIdAsync(orderToCancel.Delivery.Id);
+                if (delivery is not null)
+                {
+                    delivery.IsDeleted = true;
+                    delivery.DeletedAt = DateTime.Now;
+                }
+            }
+            // 5. If payment was already made, mark payment as refunded
+            if (orderToCancel.Payment is not null)
+            {
+                var payment = await _unitOfWork.GetRepository<Payment>().GetByIdAsync(orderToCancel.Payment.Id);
+                if (payment is not null && payment.PaymentStatus == PaymentStatus.Paid)
+                {
+                    payment.PaymentStatus = PaymentStatus.Refunded;
+                    payment.UpdatedAt = DateTime.Now;
+                }
+            }
+
+            Dictionary<int, decimal> ingredientConsumption = await CalculateIngredientConsumptionAsync(orderToCancel.OrderItems, orderToCancel.BranchId);
+            await RevertStockForCancelledOrderAsync(ingredientConsumption, orderToCancel.BranchId);
+
+            orderToCancel.UpdatedAt = DateTime.Now;
+            var updatedResult = await _unitOfWork.SaveChangesAsync();
+
+            if (!(updatedResult > 0))
+                throw new FailedUpdatingStatusException();
+
+            var orderData = _mapper.Map<OrderDTO>(orderToCancel);
+            await _restaurantNotifier.SendAsync(
+                     "OrderCancelled",
+                     orderData,
+                     $"kitchen_branch_{orderToCancel.BranchId}",
+                            $"waiters_branch_{orderToCancel.BranchId}",
+                            $"cashiers_branch_{orderToCancel.BranchId}",
+                            $"customers_id_{orderToCancel.UserId}",
+                            "admins"
+                    );
+            await BranchStockNotifierAsync(ingredientConsumption, orderToCancel.BranchId);
+
+        }
+
+        private async Task<Dictionary<int, decimal>> CalculateIngredientConsumptionAsync(IEnumerable<OrderItem> orderItems, int branchId)
+        {
+            var ingredientConsumption = new Dictionary<int, decimal>();
+            var menuItemRepo = _unitOfWork.GetRepository<MenuItem>();
+            foreach (var item in orderItems)
+            {
+                var menuItemSpec = new MenuItemWithBranchStockSpecification(item.MenuItemId);
+                var menuItem = await menuItemRepo.GetByIdAsync(menuItemSpec) ?? throw new MenuItemNotFoundException(item.MenuItemId);
+
+                foreach (var recipe in menuItem.Recipes)
+                {
+                    var totalRequired = recipe.QuantityRequired * item.Quantity;
+                    // Accumulate total required quantity for each ingredient across all items
+                    if (ingredientConsumption.ContainsKey(recipe.IngredientId))
+                        ingredientConsumption[recipe.IngredientId] += totalRequired;
+                    else
+                        ingredientConsumption[recipe.IngredientId] = totalRequired;
+                }
+            }
+            return ingredientConsumption;
+        }
+
+        private async Task RevertStockForCancelledOrderAsync(Dictionary<int, decimal> ingredientConsumption, int branchId)
+        {
+            var stockRepo = _unitOfWork.GetRepository<BranchStock>();
+            foreach (var (ingredientId, quantity) in ingredientConsumption)
+            {
+                var stockSpec = new BranchStockWithBranchAndIngredient(branchId, ingredientId);
+                var stockItems = await stockRepo.GetAllAsync(stockSpec);
+                var stockItem = stockItems.FirstOrDefault();
+                if (stockItem != null)
+                {
+                    stockItem.QuantityAvailable += quantity;
+
+                }
+            }
+        }
+
+
+        private async Task BranchStockNotifierAsync(Dictionary<int, decimal> ingredientConsumption, int branchId)
+        {
+            var stockRepo = _unitOfWork.GetRepository<BranchStock>();
+            foreach (var (ingredientId, quantity) in ingredientConsumption)
+            {
+                var stockSpec = new BranchStockWithBranchAndIngredient(branchId, ingredientId);
+                var stockItems = await stockRepo.GetAllAsync(stockSpec);
+                var stockItem = stockItems.FirstOrDefault();
+
+                if (stockItem != null)
+                {
+                    var stockItemdto = _mapper.Map<BranchStockDTO>(stockItem!);
+                    if (stockItemdto != null)
+                    {
+                        await _restaurantNotifier.SendAsync(
+                        "BranchStockUpdated",
+                        stockItemdto,
+                        $"kitchen_branch_{branchId}",
+                        "admins");
+                    }
+                }
+            }
+        }
+
+
+        public async Task<OrderDTO> MarkOrderAsPaidAsync(int orderId)
+        {
+            var orderRepo = _unitOfWork.GetRepository<Order>();
+
+            var spec = new OrderWithItemsAndPaymentAndDeliveryAndKitchenTicketsSpecification(orderId);
+            var order = await orderRepo.GetByIdAsync(spec);
+
+            if (order == null)
+                throw new OrderNotFoundException(orderId);
+
+
+            // لو already paid
+            if (order.Payment?.PaymentStatus == PaymentStatus.Paid)
+                throw new OrderAlreadyPaidException(orderId);
+
+            // update payment
+            if (order.Payment == null)
+                throw new PaymentNotFoundException(orderId);
+
+            order.Payment.PaymentStatus = PaymentStatus.Paid;
+            order.Payment.UpdatedAt = DateTime.Now;
+
+            // optional: update order status
+            if (order.Status == OrderStatus.AwaitingPayment)
+                order.Status = OrderStatus.Received;
+
+            order.UpdatedAt = DateTime.Now;
+
+            var result = await _unitOfWork.SaveChangesAsync();
+
+            if (result <= 0)
+                throw new FailedUpdatingStatusException();
+
+            var orderDto = _mapper.Map<OrderDTO>(order);
+
+            await _restaurantNotifier.SendAsync(
+                "PaymentUpdated",
+                orderDto,
+                $"cashiers_branch_{order.BranchId}",
+                $"admins"
+            );
+
+            return orderDto;
+        }
+    }
+}

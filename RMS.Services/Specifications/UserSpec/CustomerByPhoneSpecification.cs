@@ -2,8 +2,6 @@
 using RMS.Services.Specifications;
 using RMS.Shared.DTOs.Utility;
 using RMS.Shared.QueryParams;
-using System.ComponentModel;
-using System.Linq.Expressions;
 
 public class CustomerByPhoneSpecification : BaseSpecifications<User>
 {

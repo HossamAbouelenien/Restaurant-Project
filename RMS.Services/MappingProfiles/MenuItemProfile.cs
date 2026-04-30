@@ -2,12 +2,6 @@
 using RMS.Domain.Entities;
 using RMS.Shared.DTOs.MenuItemDTOs;
 using RMS.Shared.DTOs.MenuItemsDTOs;
-using RMS.Shared.DTOs.RecipeDTOs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RMS.Services.MappingProfiles
 {
@@ -24,13 +18,6 @@ namespace RMS.Services.MappingProfiles
                 .ForMember(dest => dest.CategoryName,opt => opt.MapFrom(src => src.Category!.Name))
                 .ForMember(dest => dest.CategoryArabicName, opt => opt.MapFrom(src => src.Category!.ArabicName))
                 .ForMember(dest => dest.ImageUrl,opt => opt.MapFrom<MenuItemImagesUrlResolver<MenuItemDetailsDTO>>()); 
-
-            //CreateMap<Recipe, RecipesListDTO>()
-            //    .ForMember(dest => dest.IngredientName,
-            //        opt => opt.MapFrom(src => src.Ingredient!.Name))
-            //    .ForMember(dest => dest.Unit,
-            //        opt => opt.MapFrom(src => src.Ingredient!.Unit.ToString()));
-
 
             CreateMap<CreateMenuItemDTO, MenuItem>()
                 .ForMember(dest => dest.ImageUrl, opt => opt.Ignore())  // handled manually

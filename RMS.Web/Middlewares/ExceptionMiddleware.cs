@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using RMS.Services.Exceptions.Base;
 using RMS.Shared.SharedResources;
@@ -32,29 +31,6 @@ public class ExceptionMiddleware
 
 
         }
-        //catch (KeyNotFoundException ex)
-        //{
-
-        //    context.Response.StatusCode = 404;
-
-        //    var message = _localizer[ex.Message];
-
-        //    await context.Response.WriteAsJsonAsync(new
-        //    {
-        //        message
-        //    });
-        //}
-        //catch (Exception ex)
-        //{
-        //    context.Response.StatusCode = 400;
-
-        //    var message = _localizer[ex.Message];
-
-        //    await context.Response.WriteAsJsonAsync(new
-        //    {
-        //        message
-        //    });
-        //}
 
         catch (Exception ex)
         {

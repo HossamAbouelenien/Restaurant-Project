@@ -1,11 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using RMS.Domain.Contracts;
-using RMS.Domain.Entities;
-using RMS.Services.PaymobServices;
-using RMS.ServicesAbstraction.IPaymentServices;
-using RMS.Shared.DTOs.PaymentsDTOS;
+using RMS.Services.Services.PaymobServices;
+using RMS.ServicesAbstraction.IServices.IPaymentServices;
 using RMS.Shared.QueryParams;
 using System.Security.Claims;
 
