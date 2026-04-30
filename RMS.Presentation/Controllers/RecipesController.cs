@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using RMS.ServicesAbstraction.IServices.IRecipeServices;
 using RMS.Shared;
 using RMS.Shared.DTOs.RecipeDTOs;
@@ -13,16 +14,19 @@ namespace RMS.Presentation.Controllers
     public class RecipesController : ControllerBase
     {
         private readonly IRecipeService _recipeService;
+        private readonly ILogger<RecipesController> _logger;
 
-        public RecipesController(IRecipeService recipeService)
+        public RecipesController(IRecipeService recipeService, ILogger<RecipesController> logger)
         {
             _recipeService = recipeService;
+            _logger = logger;
         }
 
         [Authorize(Roles = SD.Role_Admin + "" + SD.Role_Chef)]
         [HttpGet]
         public async Task<ActionResult<PaginatedResult<RecipesListDTO>>> GetAllRecipes([FromQuery] RecipesQueryParams queryParams)
         {
+            _logger.LogInformation("GetAllRecipes request started");
             var result = await _recipeService.GetAllRecipesAsync(queryParams);
             return Ok(result);
         }
@@ -31,8 +35,8 @@ namespace RMS.Presentation.Controllers
         [HttpPost]
         public async Task<ActionResult<RecipesListDTO>> AddRecipeToMenuItem([FromBody] AddRecipeToMenuItemDTO dto)
         {
-            
-                var addedRecipe = await _recipeService.AddRecipeToMenuItemAsync(dto);
+            _logger.LogInformation("AddRecipeToMenuItem request started");
+            var addedRecipe = await _recipeService.AddRecipeToMenuItemAsync(dto);
                 return Ok(addedRecipe);
            
         }
@@ -41,8 +45,8 @@ namespace RMS.Presentation.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<RecipesListDTO>> UpdateRecipeQuantity(int id, [FromBody] UpdateRecipeQuantityDTO dto)
         {
-            
-                var updatedRecipe = await _recipeService.UpdateRecipeQuantityRequiredAsync(id, dto);
+            _logger.LogInformation("UpdateRecipeQuantity request started");
+            var updatedRecipe = await _recipeService.UpdateRecipeQuantityRequiredAsync(id, dto);
                 return Ok(updatedRecipe);
            
         }
@@ -50,6 +54,7 @@ namespace RMS.Presentation.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRecipe(int id)
         {
+            _logger.LogInformation("DeleteRecipe request started");
             await _recipeService.DeleteRecipeAsync(id);
 
             return Ok();

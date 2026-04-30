@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using RMS.ServicesAbstraction.IServices.IBranchServices;
 using RMS.Shared;
 using RMS.Shared.DTOs.BranchDTOs;
@@ -13,9 +14,12 @@ namespace RMS.Presentation.Controllers
     public class BranchController : ControllerBase
     {
         private readonly IBranchService _branchService;
-        public BranchController(IBranchService branchService)
+        private readonly ILogger<BranchController> _logger;
+
+        public BranchController(IBranchService branchService, ILogger<BranchController> logger) 
         {
             _branchService = branchService;
+            _logger = logger;
         }
 
 
@@ -23,6 +27,7 @@ namespace RMS.Presentation.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<BranchDTO>>> GetAllBranches()
         {
+            _logger.LogInformation("Branch request started");
             var BranchStocks = await _branchService.GetAllBranchesAsync();
             return Ok(BranchStocks);
         }
@@ -32,6 +37,7 @@ namespace RMS.Presentation.Controllers
         [HttpGet("GetAllBranchesWithTables")]
         public async Task<ActionResult<PaginatedResult<GetBranchDTO>>> GetAllBranchesWithOrdersAndTablesAsync([FromQuery] BranchQueryParams param)
         {
+            _logger.LogInformation("GetAllBranchesWithOrdersAndTables request started");
             var result = await _branchService.GetAllBranchesWithOrdersAndTablesAsync(param);
             return Ok(result);
         }
@@ -40,6 +46,7 @@ namespace RMS.Presentation.Controllers
         [HttpGet("{id:int}")]
         public async Task<ActionResult<GetBranchDTO>> GetBranchById(int id)
         {
+            _logger.LogInformation("GetBranchById request started");
             var result = await _branchService.GetBranchByIdAsync(id);
             return Ok(result);
         }
@@ -49,6 +56,7 @@ namespace RMS.Presentation.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<UpdateBranchDTO>> UpdateBranch(int id, UpdateBranchDTO updateBranch)
         {
+            _logger.LogInformation("UpdateBranch request started");
             var Branch = await _branchService.UpdateBranchAsync(id, updateBranch);
             return Ok(Branch);
         }
@@ -59,6 +67,7 @@ namespace RMS.Presentation.Controllers
         [HttpPost]
         public async Task<ActionResult<CreateBranchDTO>> CreateBranch(CreateBranchDTO BranchDTO)
         {
+            _logger.LogInformation("CreateBranch request started");
             var Branch = await _branchService.CreateBranchAsync(BranchDTO);
              return Ok(Branch);
         }
@@ -69,6 +78,7 @@ namespace RMS.Presentation.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteBranch(int id)
         {
+            _logger.LogInformation("DeleteBranch request started");
             await _branchService.DeleteBranchAsync(id);
             return Ok();
         }
@@ -78,6 +88,7 @@ namespace RMS.Presentation.Controllers
         [HttpPatch("{id}/toggle-status")]
         public async Task<ActionResult> ToggleBranchStatus(int id)
         {
+            _logger.LogInformation("ToggleBranchStatus request started");
             await _branchService.ToggleBranchStatusAsync(id);
             return Ok();
         }

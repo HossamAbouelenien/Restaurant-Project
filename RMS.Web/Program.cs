@@ -62,6 +62,7 @@ using RMS.ServicesAbstraction.IServices.IUserServices;
 using RMS.Shared.Utility;
 using RMS.Web.Extensions;
 using RMS.Web.Factories;
+using Serilog;
 using Serilog.Context;
 using StackExchange.Redis;
 using System.Globalization;
@@ -260,10 +261,10 @@ namespace RMS.Web
             builder.Services.AddScoped<IPaymentService, PaymentService>();
             builder.Services.AddHttpClient<IPaymobService, PaymobService>();
 
-            //builder.Host.UseSerilog((context, services, configuration) =>
-            //{
-            //    configuration.ReadFrom.Configuration(context.Configuration);
-            //});
+            builder.Host.UseSerilog((context, services, configuration) =>
+            {
+                configuration.ReadFrom.Configuration(context.Configuration);
+            });
             //builder.Host.UseSerilog((context, services, configuration) =>
             //{
             //    configuration
@@ -446,10 +447,10 @@ namespace RMS.Web
                 await next();
             });
 
-            //app.UseSerilogRequestLogging(options =>
-            //{
-            //    options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms";
-            //});
+            app.UseSerilogRequestLogging(options =>
+            {
+                options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed} ms";
+            });
 
 
             app.UseAuthentication();
