@@ -28,7 +28,7 @@ namespace RMS.Presentation.Controllers
             return Ok(result);
         }
 
-        [Authorize(Roles = SD.Role_Admin)]
+        //[Authorize(Roles = SD.Role_Admin)]
         [HttpPost("sync")]
         public async Task<IActionResult> Sync()
         {

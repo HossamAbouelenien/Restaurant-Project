@@ -39,7 +39,7 @@ namespace RMS.Presentation.Controllers
             return Ok(Category);
         }
 
-        [Authorize(Roles = SD.Role_Admin)]
+        //[Authorize(Roles = SD.Role_Admin)]
         [HttpPost]
         public async Task<ActionResult<CategoryDTO>> AddCategory(CreateCategoryDTO DTO)
         {
@@ -48,7 +48,7 @@ namespace RMS.Presentation.Controllers
             return Ok(Category);
         }
 
-        [Authorize(Roles = SD.Role_Admin)]
+        //[Authorize(Roles = SD.Role_Admin)]
         [HttpPut("{id}")]
         public async Task<ActionResult<CategoryDTO>> UpdateCategory(int id, UpdateCategoryDTO DTO)
         {
@@ -58,7 +58,7 @@ namespace RMS.Presentation.Controllers
             return Ok(result);
         }
 
-        [Authorize(Roles = SD.Role_Admin)]
+        //[Authorize(Roles = SD.Role_Admin)]
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteCategory(int id)
         {

@@ -107,7 +107,7 @@ public class AuthController(IAuthService authService, ILogger<AuthController> lo
         });
     }
 
-    [Authorize]
+    //[Authorize]
     [HttpGet("CurrentUser")]
     public async Task<ActionResult<UserDTO>> GetCurrentUser()
     {
@@ -129,7 +129,7 @@ public class AuthController(IAuthService authService, ILogger<AuthController> lo
         return Ok(user);
     }
 
-    [Authorize]
+    //[Authorize]
     [HttpPut]
     public async Task<ActionResult<UserDTO>> UpdateCurrentUserAsync(string email, [FromBody] UpdateCurrentUserDTO dto)
     {

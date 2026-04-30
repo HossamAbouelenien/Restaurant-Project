@@ -22,7 +22,7 @@ namespace RMS.Presentation.Controllers
         }
 
 
-        [Authorize(Roles = SD.Role_Admin + "" + SD.Role_Chef)]
+        //[Authorize(Roles = SD.Role_Admin + "" + SD.Role_Chef)]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<BranchStockDTO>>> GetAllBranchStock([FromQuery]BrandStockQueryParams queryParams)
         {
@@ -31,7 +31,7 @@ namespace RMS.Presentation.Controllers
             return Ok(BranchStocks);
         }
 
-        [Authorize(Roles = SD.Role_Admin + "" + SD.Role_Chef)]
+        //[Authorize(Roles = SD.Role_Admin + "" + SD.Role_Chef)]
         [HttpGet("{id}")]
         public async Task<ActionResult<BranchStockDTO>> GetBranchStock(int id)
         {
@@ -40,7 +40,7 @@ namespace RMS.Presentation.Controllers
             return Ok(BranchStock);
         }
 
-        [Authorize(Roles = SD.Role_Admin + "" + SD.Role_Chef)]
+        //[Authorize(Roles = SD.Role_Admin + "" + SD.Role_Chef)]
         [HttpPatch("{id}")]
         public async Task<ActionResult<BranchStockDTO>> UpdateBranchStock(int id, UpdateBranchStockDTO updateBranchStock)
         {

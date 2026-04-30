@@ -22,7 +22,7 @@ namespace RMS.Presentation.Controllers
             _logger = logger;
         }
 
-        [Authorize(Roles = SD.Role_Admin + "" + SD.Role_Chef)]
+        //[Authorize(Roles = SD.Role_Admin + "" + SD.Role_Chef)]
         [HttpGet]
         public async Task<ActionResult<PaginatedResult<RecipesListDTO>>> GetAllRecipes([FromQuery] RecipesQueryParams queryParams)
         {
@@ -31,7 +31,7 @@ namespace RMS.Presentation.Controllers
             return Ok(result);
         }
 
-        [Authorize(Roles = SD.Role_Admin)]
+        //[Authorize(Roles = SD.Role_Admin)]
         [HttpPost]
         public async Task<ActionResult<RecipesListDTO>> AddRecipeToMenuItem([FromBody] AddRecipeToMenuItemDTO dto)
         {
@@ -41,7 +41,7 @@ namespace RMS.Presentation.Controllers
            
         }
 
-        [Authorize(Roles = SD.Role_Admin)]
+        //[Authorize(Roles = SD.Role_Admin)]
         [HttpPut("{id}")]
         public async Task<ActionResult<RecipesListDTO>> UpdateRecipeQuantity(int id, [FromBody] UpdateRecipeQuantityDTO dto)
         {
@@ -50,7 +50,7 @@ namespace RMS.Presentation.Controllers
                 return Ok(updatedRecipe);
            
         }
-        [Authorize(Roles = SD.Role_Admin)]
+        //[Authorize(Roles = SD.Role_Admin)]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRecipe(int id)
         {

@@ -21,7 +21,7 @@ namespace RMS.Presentation.Controllers
             _logger = logger;
         }
 
-        [Authorize(Roles = SD.Role_Admin + "" + SD.Role_Waiter)]
+        //[Authorize(Roles = SD.Role_Admin + "" + SD.Role_Waiter)]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TableOrderDTO>>> GetAllTableOrders([FromQuery] TableOrderQueryParams queryParams)
         {
@@ -30,7 +30,7 @@ namespace RMS.Presentation.Controllers
             return Ok(tableOrders);
         }
 
-        [Authorize(Roles = SD.Role_Admin + "" + SD.Role_Cashier)]
+        //[Authorize(Roles = SD.Role_Admin + "" + SD.Role_Cashier)]
         [HttpPatch("{id}/complete")]
         public async Task<ActionResult<TableOrderDTO>> CompleteTableOrder(int id)
         {

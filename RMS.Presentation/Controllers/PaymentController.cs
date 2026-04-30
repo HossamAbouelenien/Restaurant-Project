@@ -25,7 +25,7 @@ namespace RMS.Presentation.Controllers
             _logger = logger;
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpPost("pay/{orderId:int}")]
         public async Task<IActionResult> Pay(int orderId)
         {
@@ -80,7 +80,7 @@ namespace RMS.Presentation.Controllers
             return Ok();
         }
 
-        [Authorize]
+        //[Authorize]
         [HttpPost("confirm-cash/{orderId}")]
         public async Task<IActionResult> ConfirmCashPayment(int orderId, [FromBody] decimal dto)
         {
@@ -89,7 +89,7 @@ namespace RMS.Presentation.Controllers
             return Ok();
         }
 
-        [Authorize(Roles = SD.Role_Admin + "" + SD.Role_Cashier)]
+        //[Authorize(Roles = SD.Role_Admin + "" + SD.Role_Cashier)]
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] PaymentQueryParams queryParams)
         {
@@ -98,7 +98,7 @@ namespace RMS.Presentation.Controllers
             return Ok(result);
         }
 
-        [Authorize(Roles = SD.Role_Admin + "" + SD.Role_Cashier)]
+        //[Authorize(Roles = SD.Role_Admin + "" + SD.Role_Cashier)]
         [HttpGet("all")]
         public async Task<IActionResult> GetAllWithoutPagination()
         {
