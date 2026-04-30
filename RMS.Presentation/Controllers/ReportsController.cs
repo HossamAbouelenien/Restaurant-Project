@@ -67,6 +67,12 @@ namespace RMS.Presentation.Controllers
             return Ok(result);
         }
 
+        [HttpGet("daily-revenue")]
+        public async Task<IActionResult> GetDailyRevenue([FromQuery] int? branchId)
+        {
+            var result = await _reportService.GetDailyRevenueLast7DaysAsync(branchId);
+            return Ok(result);
+        }
 
 
 

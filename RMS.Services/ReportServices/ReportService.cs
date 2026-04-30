@@ -2,6 +2,7 @@
 using RMS.Domain.Entities;
 using RMS.Domain.Enums;
 using RMS.Services.Exceptions;
+using RMS.Services.Specifications.OrderSpec;
 using RMS.Services.Specifications.ReportSpec;
 using RMS.ServicesAbstraction;
 using RMS.Shared.DTOs.ReportsDTOs;
@@ -28,7 +29,11 @@ namespace RMS.Services.ReportServices
             var today = DateTime.Today;
             var tomorrow = today.AddDays(1);
 
-            var orders = await _unitOfWork.GetRepository<Order>().GetAllAsync();
+            var spec = new OrdersWithPaymentSpecForDashboard();
+
+            var orders = await _unitOfWork
+                .GetRepository<Order>()
+                .GetAllAsync(spec);
 
             if (orders == null)
                 throw new FailedToRetrieveOrdersException();
@@ -37,7 +42,8 @@ namespace RMS.Services.ReportServices
                 .Where(o => !o.IsDeleted &&
                             o.CreatedAt >= today &&
                             o.CreatedAt < tomorrow &&
-                            o.Status != OrderStatus.Cancelled)
+                            o.Payment != null &&
+                            o.Payment.PaymentStatus == PaymentStatus.Paid)
                 .ToList();
 
 
@@ -70,7 +76,12 @@ namespace RMS.Services.ReportServices
             var today = DateTime.Today;
             var tomorrow = today.AddDays(1);
 
-            var orders = await _unitOfWork.GetRepository<Order>().GetAllAsync();
+            var spec = new OrdersWithPaymentSpecForDashboard();
+
+
+            var orders = await _unitOfWork
+                .GetRepository<Order>()
+                .GetAllAsync(spec);
 
 
             if (orders is null)
@@ -80,7 +91,9 @@ namespace RMS.Services.ReportServices
                 !o.IsDeleted &&
                 o.Status != OrderStatus.Cancelled &&
                 o.CreatedAt >= today &&
-                o.CreatedAt < tomorrow
+                o.CreatedAt < tomorrow &&
+                o.Payment != null &&
+                o.Payment.PaymentStatus == PaymentStatus.Paid
             );
 
             return new OrdersByTypeDTO
@@ -215,6 +228,43 @@ namespace RMS.Services.ReportServices
                     IngredientArabicName = g.Key.IngredientArabicName,
                     Unit = g.Key.Unit, 
                     QuantityUsed = g.Sum(x => x.QuantityUsed)
+                })
+                .OrderBy(x => x.Date)
+                .ToList();
+
+            return result;
+        }
+        public async Task<IEnumerable<DailyRevenueDTO>> GetDailyRevenueLast7DaysAsync(int? branchId)
+        {
+            var from = DateTime.Today.AddDays(-6);
+            var to = DateTime.Today.AddDays(1);
+
+            var spec = new OrdersWithPaymentSpecForDashboard();
+
+            var orders = await _unitOfWork
+                .GetRepository<Order>()
+                .GetAllAsync(spec);
+
+            if (orders is null)
+                throw new FailedToRetrieveOrdersException();
+
+            var filtered = orders.Where(o =>
+                !o.IsDeleted &&
+                o.Payment != null &&
+                o.Payment.PaymentStatus == PaymentStatus.Paid &&
+                o.CreatedAt >= from &&
+                o.CreatedAt < to
+            );
+
+            if (branchId.HasValue)
+                filtered = filtered.Where(o => o.BranchId == branchId.Value);
+
+            var result = filtered
+                .GroupBy(o => o.CreatedAt.Date)
+                .Select(g => new DailyRevenueDTO
+                {
+                    Date = g.Key,
+                    TotalRevenue = g.Sum(x => x.TotalAmount)
                 })
                 .OrderBy(x => x.Date)
                 .ToList();
