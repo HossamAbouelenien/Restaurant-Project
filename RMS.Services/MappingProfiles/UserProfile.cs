@@ -12,7 +12,9 @@ namespace RMS.Services.MappingProfiles
             CreateMap<User, UserDTO>().ReverseMap();
 
             CreateMap<User, GetUserDTO>()
-                .ForMember(dest => dest.BranchName, opt => opt.MapFrom(src => src.Branch!.Name));
+                .ForMember(dest => dest.BranchName, opt => opt.MapFrom(src => src.Branch!.Name))
+                .ForMember(dest => dest.BranchArabicName, opt => opt.MapFrom(src => src.Branch!.ArabicName));
+
 
             CreateMap<User, UserDetailsDTO>()
                 .ForMember(dest => dest.BranchName, opt => opt.MapFrom(src => src.Branch!.Name))
@@ -57,7 +59,9 @@ namespace RMS.Services.MappingProfiles
 
             CreateMap<User, UserDTO>()
             .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.RoleId))
-            .ForMember(dest => dest.BranchName, opt => opt.MapFrom(src => src.Branch!.Name));
+            .ForMember(dest => dest.BranchName, opt => opt.MapFrom(src => src.Branch!.Name))
+            .ForMember(dest => dest.BranchArabicName, opt => opt.MapFrom(src => src.Branch!.ArabicName));
+
 
 
         }
