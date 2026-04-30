@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RMS.ServicesAbstraction.IServices.ITableServices;
 using RMS.Shared.DTOs.TableDTOs;
+using RMS.Shared.DTOs.Utility;
 using RMS.Shared.QueryParams;
 
 namespace RMS.Presentation.Controllers
@@ -16,7 +18,7 @@ namespace RMS.Presentation.Controllers
             _tableService = tableService;
         }
 
-
+        [Authorize(Roles = SD.Role_Admin)]
         [HttpPost]
         public async Task<ActionResult<TableDTO>> CreateTable(CreateTableDTO createTable)
         {
@@ -24,7 +26,7 @@ namespace RMS.Presentation.Controllers
             return Ok(table);
         }
 
-
+        [Authorize(Roles = SD.Role_Admin + "" + SD.Role_Cashier + "" + SD.Role_Waiter)]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TableDTO>>> GetAllTables([FromQuery] TableQueryParams queryParams)
         {
@@ -33,7 +35,7 @@ namespace RMS.Presentation.Controllers
         }
 
 
-
+        [Authorize(Roles = SD.Role_Admin + "" + SD.Role_Waiter)]
         [HttpGet("{id}")]
         public async Task<ActionResult<TableDTO>> GetTableById(int id)
         {
@@ -42,13 +44,14 @@ namespace RMS.Presentation.Controllers
         }
 
 
-
+        [Authorize(Roles = SD.Role_Admin )]
         [HttpPatch("{id}")]
         public async Task<ActionResult<TableDTO>>UpdateTable(int id,UpdateTableDTO dto) { 
             var table= await _tableService.UpdateTableAsync(id, dto);
             return Ok(table);
         }
 
+        [Authorize(Roles = SD.Role_Admin)]
         [HttpDelete("{id}")]
        
         public async Task<ActionResult> DeleteTable(int id)
@@ -57,7 +60,7 @@ namespace RMS.Presentation.Controllers
             return Ok();
         }
 
-
+        [Authorize(Roles = SD.Role_Admin + "" + SD.Role_Waiter)]
         [HttpPatch("{id}/status")]
         public async Task<ActionResult> UpdateTableStatus(int id)
         {

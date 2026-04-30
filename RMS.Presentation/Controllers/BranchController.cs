@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RMS.ServicesAbstraction.IServices.IBranchServices;
 using RMS.Shared;
 using RMS.Shared.DTOs.BranchDTOs;
+using RMS.Shared.DTOs.Utility;
 using RMS.Shared.QueryParams;
 
 namespace RMS.Presentation.Controllers
@@ -17,7 +19,7 @@ namespace RMS.Presentation.Controllers
         }
 
 
-
+        [Authorize(Roles = SD.Role_Admin)]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<BranchDTO>>> GetAllBranches()
         {
@@ -26,15 +28,15 @@ namespace RMS.Presentation.Controllers
         }
 
 
-
+        [Authorize(Roles = SD.Role_Admin)]
         [HttpGet("GetAllBranchesWithTables")]
         public async Task<ActionResult<PaginatedResult<GetBranchDTO>>> GetAllBranchesWithOrdersAndTablesAsync([FromQuery] BranchQueryParams param)
         {
             var result = await _branchService.GetAllBranchesWithOrdersAndTablesAsync(param);
             return Ok(result);
         }
-     
 
+        [Authorize(Roles = SD.Role_Admin)]
         [HttpGet("{id:int}")]
         public async Task<ActionResult<GetBranchDTO>> GetBranchById(int id)
         {
@@ -43,7 +45,7 @@ namespace RMS.Presentation.Controllers
         }
 
 
-
+        [Authorize(Roles = SD.Role_Admin)]
         [HttpPut("{id}")]
         public async Task<ActionResult<UpdateBranchDTO>> UpdateBranch(int id, UpdateBranchDTO updateBranch)
         {
@@ -53,7 +55,7 @@ namespace RMS.Presentation.Controllers
 
 
 
-
+        [Authorize(Roles = SD.Role_Admin)]
         [HttpPost]
         public async Task<ActionResult<CreateBranchDTO>> CreateBranch(CreateBranchDTO BranchDTO)
         {
@@ -63,7 +65,7 @@ namespace RMS.Presentation.Controllers
 
 
 
-
+        [Authorize(Roles = SD.Role_Admin)]
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteBranch(int id)
         {
@@ -72,7 +74,7 @@ namespace RMS.Presentation.Controllers
         }
 
 
-
+        [Authorize(Roles = SD.Role_Admin)]
         [HttpPatch("{id}/toggle-status")]
         public async Task<ActionResult> ToggleBranchStatus(int id)
         {

@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RMS.ServicesAbstraction.IServices.ICategoryServices;
 using RMS.Shared.DTOs.CategoryDTOs;
+using RMS.Shared.DTOs.Utility;
 
 namespace RMS.Presentation.Controllers
 {
@@ -16,7 +18,7 @@ namespace RMS.Presentation.Controllers
             this._categoryService = categoryService;
         }
 
-
+        
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CategoryDTO>>> GetAllCategories()
         {
@@ -24,7 +26,7 @@ namespace RMS.Presentation.Controllers
             return Ok(Categories);
         }
 
-
+       
         [HttpGet("{id}")]
         public async Task<ActionResult<CategoryDTO>> GetCategoryById(int id)
         {
@@ -32,7 +34,7 @@ namespace RMS.Presentation.Controllers
             return Ok(Category);
         }
 
-
+        [Authorize(Roles = SD.Role_Admin)]
         [HttpPost]
         public async Task<ActionResult<CategoryDTO>> AddCategory(CreateCategoryDTO DTO)
         {
@@ -40,7 +42,7 @@ namespace RMS.Presentation.Controllers
             return Ok(Category);
         }
 
-
+        [Authorize(Roles = SD.Role_Admin)]
         [HttpPut("{id}")]
         public async Task<ActionResult<CategoryDTO>> UpdateCategory(int id, UpdateCategoryDTO DTO)
         {
@@ -49,7 +51,7 @@ namespace RMS.Presentation.Controllers
             return Ok(result);
         }
 
-
+        [Authorize(Roles = SD.Role_Admin)]
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteCategory(int id)
         {

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RMS.Services.Exceptions;
 using RMS.ServicesAbstraction.IServices.IDeliveryServices;
 using RMS.Shared;
@@ -20,7 +21,7 @@ namespace RMS.Presentation.Controllers
             _deliveryService = deliveryService;
         }
 
-
+        [Authorize(Roles = SD.Role_Admin)]
         [HttpGet("GetAll")]
         public async Task<ActionResult<PaginatedResult<DeliveryDetailsDto>>> GetAllDeliveries([FromQuery] DeliveryQueryParams queryParams)
         {
@@ -28,7 +29,7 @@ namespace RMS.Presentation.Controllers
             return Ok(deliveries);
         }
 
-
+        [Authorize(Roles = SD.Role_Driver   +"" + SD.Role_Admin)]
         [HttpGet("OwnAssignedDeliveries")]
         public async Task<ActionResult<IEnumerable<DeliveryDetailsDto>>> GetOwnAssignedDeliveriesAsync()
         {
@@ -37,7 +38,7 @@ namespace RMS.Presentation.Controllers
 
         }
 
-
+        [Authorize(Roles = SD.Role_Driver + "" + SD.Role_Admin + "" + SD.Role_Customer)]
         [HttpGet("DeliveryById")]
         public async Task<ActionResult<DeliveryDetailsDto>> GetDeliveryByIdAsync([FromQuery] int id)
         {
@@ -46,7 +47,7 @@ namespace RMS.Presentation.Controllers
         }
 
 
-
+        [Authorize(Roles = SD.Role_Driver + "" + SD.Role_Admin)]
         [HttpPost("assign")]
         public async Task<ActionResult<DeliveryDetailsDto>> AssignDelivery([FromBody] AssignDeliveryDto dto)
         {
@@ -55,11 +56,11 @@ namespace RMS.Presentation.Controllers
             return Ok(result);
         }
 
-       
-           
 
-         [HttpPatch("{id}/status")]
-         //[Authorize(Roles = "Driver,Admin")]
+
+        [Authorize(Roles = SD.Role_Driver + "" + SD.Role_Admin)]
+        [HttpPatch("{id}/status")]
+        
          public async Task<ActionResult<DeliveryDetailsDto>> UpdateStatus(int id,[FromBody] UpdateDeliveryStatusDto dto)    
          {
                
@@ -74,7 +75,7 @@ namespace RMS.Presentation.Controllers
          }
 
 
-
+        [Authorize(Roles = SD.Role_Driver + "" + SD.Role_Admin)]
         [HttpGet("unassigned")]
         public async Task<IActionResult> GetUnAssignedDeliveries()
         {
@@ -84,7 +85,7 @@ namespace RMS.Presentation.Controllers
         }
 
 
-
+        [Authorize(Roles = SD.Role_Driver + "" + SD.Role_Admin)]
         [HttpGet("available-drivers")]
         public async Task<ActionResult<PaginatedResult<AvailableDriverDto>>> GetAvailableDrivers([FromQuery] AvailableDriversQueryParams query)
         {
