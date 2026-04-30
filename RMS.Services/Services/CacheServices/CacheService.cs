@@ -1,5 +1,5 @@
 ﻿using RMS.Domain.Contracts;
-using RMS.ServicesAbstraction;
+using RMS.ServicesAbstraction.IServices.ICacheServices;
 using System.Text.Json;
 
 namespace RMS.Services.Services.CacheServices

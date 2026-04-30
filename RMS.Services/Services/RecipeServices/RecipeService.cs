@@ -3,7 +3,7 @@ using RMS.Domain.Contracts;
 using RMS.Domain.Entities;
 using RMS.Services.Exceptions;
 using RMS.Services.Specifications.RecipeSpec;
-using RMS.ServicesAbstraction;
+using RMS.ServicesAbstraction.IServices.IRecipeServices;
 using RMS.Shared;
 using RMS.Shared.DTOs.RecipeDTOs;
 using RMS.Shared.QueryParams;

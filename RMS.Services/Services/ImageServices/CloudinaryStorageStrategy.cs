@@ -2,7 +2,7 @@
 using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using RMS.ServicesAbstraction.IImageServices;
+using RMS.ServicesAbstraction.IServices.IImageServices;
 using RMS.Shared.DTOs.ImageDTOs;
 using System.Net;
 using ResourceType = CloudinaryDotNet.Actions.ResourceType;

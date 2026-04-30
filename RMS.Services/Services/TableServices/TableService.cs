@@ -3,7 +3,7 @@ using RMS.Domain.Contracts;
 using RMS.Domain.Entities;
 using RMS.Services.Exceptions;
 using RMS.Services.Specifications.Tablespec;
-using RMS.ServicesAbstraction;
+using RMS.ServicesAbstraction.IServices.ITableServices;
 using RMS.Shared;
 using RMS.Shared.DTOs.TableDTOs;
 using RMS.Shared.QueryParams;

@@ -4,7 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using RMS.Domain.Contracts;
 using RMS.Domain.Entities;
 using RMS.Services.Specifications.RefreshTokenSpec;
-using RMS.ServicesAbstraction.IIdentityService;
+using RMS.ServicesAbstraction.IServices.IIdentityService;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;

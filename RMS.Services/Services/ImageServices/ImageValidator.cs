@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
-using RMS.ServicesAbstraction.IImageServices;
+using RMS.ServicesAbstraction.IServices.IImageServices;
 
 namespace RMS.Services.Services.ImageServices
 {

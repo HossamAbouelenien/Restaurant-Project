@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using RMS.ServicesAbstraction.IAiServices;
+using RMS.ServicesAbstraction.IServices.IAiServices;
 using RMS.Shared.DTOs.AiDTOs;
 using System;
 using System.Collections.Generic;

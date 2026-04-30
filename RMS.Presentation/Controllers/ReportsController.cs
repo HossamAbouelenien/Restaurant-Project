@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using RMS.ServicesAbstraction;
+using RMS.ServicesAbstraction.IServices.IReportServices;
 using System;
 using System.Collections.Generic;
 using System.Linq;

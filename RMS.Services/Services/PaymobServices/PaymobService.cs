@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
-using RMS.ServicesAbstraction;
+using RMS.ServicesAbstraction.IServices.IPaymobServices;
 using RMS.Shared.Utility;
 using System.Net.Http.Json;
 using System.Text.Json;

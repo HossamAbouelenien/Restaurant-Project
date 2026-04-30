@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using RMS.ServicesAbstraction.ICategoriesService;
+using RMS.ServicesAbstraction.IServices.ICategoryServices;
 using RMS.Shared.DTOs.CategoryDTOs;
 
 namespace RMS.Presentation.Controllers

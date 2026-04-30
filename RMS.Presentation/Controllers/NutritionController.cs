@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using RMS.ServicesAbstraction.IAiServices;
+using RMS.ServicesAbstraction.IServices.IAiServices;
 using RMS.Shared.DTOs.NutritionDTOs;
 using System;
 using System.Collections.Generic;

@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using RMS.ServicesAbstraction;
+using RMS.ServicesAbstraction.IServices.IIngredientServices;
 using RMS.Shared.DTOs.IngredientDTOs;
 using System;
 using System.Collections.Generic;

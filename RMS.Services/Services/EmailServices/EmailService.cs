@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
-using RMS.ServicesAbstraction.IEmailServices;
+using RMS.ServicesAbstraction.IServices.IEmailServices;
 using RMS.Shared.DTOs.Utility;
 using System.Net;
 using System.Net.Mail;

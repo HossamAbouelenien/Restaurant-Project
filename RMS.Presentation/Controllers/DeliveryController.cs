@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using RMS.Services.Exceptions;
 using RMS.ServicesAbstraction;
-using RMS.ServicesAbstraction.IDeliveryServices;
+using RMS.ServicesAbstraction.IServices.IDeliveryServices;
 using RMS.Shared;
 using RMS.Shared.DTOs.BranchStockDTOs;
 using RMS.Shared.DTOs.DeliveryDTOs;

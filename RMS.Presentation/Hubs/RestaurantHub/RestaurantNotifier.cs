@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using RMS.ServicesAbstraction.IHubServices.IRestaurantNotifier;
+using RMS.ServicesAbstraction.IServices.IHubServices.IRestaurantNotifier;
 using System;
 using System.Collections.Generic;
 using System.Linq;
