@@ -1,11 +1,6 @@
 ﻿using RMS.Shared.DTOs.BranchStockDTOs;
 using RMS.Shared.DTOs.IdentityDTOs;
 using RMS.Shared.DTOs.TableDTOs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RMS.Shared.DTOs.BranchDTOs
 {

@@ -1,10 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using RMS.ServicesAbstraction.IServices.IHubServices.INotificationServices;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RMS.Presentation.Hubs.Notification
 {

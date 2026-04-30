@@ -1,13 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
-
-namespace RMS.Shared.DTOs.MenuItemsDTOs
+﻿namespace RMS.Shared.DTOs.MenuItemsDTOs
 {
     public class MenuItemDTO
     {
