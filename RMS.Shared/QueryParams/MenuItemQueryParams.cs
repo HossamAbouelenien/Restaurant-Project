@@ -24,7 +24,7 @@ namespace RMS.Shared.QueryParams
         }
 
         private const int DefaultPageSize = 5;
-        private const int MaxPageSize = 10;
+        private const int MaxPageSize = 15;
         private int _pageSize = DefaultPageSize;
 
         public int PageSize
