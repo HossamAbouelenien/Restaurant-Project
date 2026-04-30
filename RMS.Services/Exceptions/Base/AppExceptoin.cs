@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace RMS.Services.Exceptions.Base
+﻿namespace RMS.Services.Exceptions.Base
 {
     public abstract class AppException(string messageKey , params object[] args) : Exception(messageKey)
     {

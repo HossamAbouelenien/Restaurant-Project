@@ -1,0 +1,271 @@
+﻿using RMS.Domain.Contracts;
+using RMS.Domain.Entities;
+using RMS.Domain.Enums;
+using RMS.Services.Exceptions;
+using RMS.Services.Specifications.OrderSpec;
+using RMS.Services.Specifications.ReportSpec;
+using RMS.ServicesAbstraction;
+using RMS.Shared.DTOs.ReportsDTOs;
+
+namespace RMS.Services.Services.ReportServices
+{
+    public class ReportService : IReportService
+    {
+        private readonly IUnitOfWork _unitOfWork;
+        public ReportService(IUnitOfWork unitOfWork)
+        {
+            _unitOfWork = unitOfWork;
+
+        }
+
+        public async Task<DashboardDTO> GetDashboardAsync()
+        {
+            var today = DateTime.Today;
+            var tomorrow = today.AddDays(1);
+
+            var spec = new OrdersWithPaymentSpecForDashboard();
+
+            var orders = await _unitOfWork
+                .GetRepository<Order>()
+                .GetAllAsync(spec);
+
+            if (orders == null)
+                throw new FailedToRetrieveOrdersException();
+
+            var todayOrders = orders
+                .Where(o => !o.IsDeleted &&
+                            o.CreatedAt >= today &&
+                            o.CreatedAt < tomorrow &&
+                            o.Payment != null &&
+                            o.Payment.PaymentStatus == PaymentStatus.Paid)
+                .ToList();
+
+
+            var branchStocks = await _unitOfWork
+                .GetRepository<BranchStock>() 
+                .GetAllAsync();
+
+            if (branchStocks == null)
+                throw new FailedToRetrieveStockException();
+
+            var lowStockCount = branchStocks
+                .Count(bs => bs.QuantityAvailable < bs.LowThreshold);
+
+            return new DashboardDTO
+            {
+                OrdersToday = todayOrders.Count,
+                TotalRevenueToday = todayOrders.Sum(o => o.TotalAmount),
+                AvgOrderValueToday = todayOrders.Any()
+                    ? todayOrders.Average(o => o.TotalAmount)
+                    : 0,
+                LowStockIngredientsCount = lowStockCount
+
+            };
+        }
+
+
+
+        public async Task<OrdersByTypeDTO> GetOrdersByTypeAsync()
+        {
+            var today = DateTime.Today;
+            var tomorrow = today.AddDays(1);
+
+            var spec = new OrdersWithPaymentSpecForDashboard();
+
+
+            var orders = await _unitOfWork
+                .GetRepository<Order>()
+                .GetAllAsync(spec);
+
+
+            if (orders is null)
+                throw new FailedToRetrieveOrdersException();
+
+            var validOrders = orders.Where(o =>
+                !o.IsDeleted &&
+                o.Status != OrderStatus.Cancelled &&
+                o.CreatedAt >= today &&
+                o.CreatedAt < tomorrow &&
+                o.Payment != null &&
+                o.Payment.PaymentStatus == PaymentStatus.Paid
+            );
+
+            return new OrdersByTypeDTO
+            {
+                DineInCount = validOrders.Count(o => o.OrderType == OrderType.DineIn),
+                PickupCount = validOrders.Count(o => o.OrderType == OrderType.Pickup),
+                DeliveryCount = validOrders.Count(o => o.OrderType == OrderType.Delivery)
+            };
+
+
+        }
+
+
+
+        public async Task<IEnumerable<RevenueDTO>> GetRevenueAsync(int? branchId, DateTime? from, DateTime? to)
+        {
+            var today = DateTime.Today;
+            var tomorrow = today.AddDays(1);
+
+            var orders = await _unitOfWork.GetRepository<Order>().GetAllAsync();
+
+            if (orders is null)
+                throw new FailedToRetrieveOrdersException();
+
+            var filtered = orders.Where(o =>
+                !o.IsDeleted &&
+                o.Status != OrderStatus.Cancelled &&
+                o.CreatedAt >= today &&
+                o.CreatedAt < tomorrow
+            );
+
+            if (branchId.HasValue)
+            {
+                filtered = filtered.Where(o => o.BranchId == branchId.Value);
+            }
+
+            return filtered
+                .GroupBy(o => new { Date = o.CreatedAt.Date, o.BranchId })
+                .Select(g => new RevenueDTO
+                {
+                    Date = g.Key.Date,
+                    BranchId = g.Key.BranchId,
+                    TotalRevenue = g.Sum(o => o.TotalAmount)
+                })
+                .OrderBy(r => r.Date)
+                .ToList();
+        }
+
+
+
+
+        public async Task<IEnumerable<TopItemsDto>> GetTopItemsAsync(int top)
+        {
+            if (top <= 0)
+                throw new InvalidTopValueException();
+
+            var today = DateTime.Today;
+            var tomorrow = today.AddDays(1);
+
+            var spec = new OrdersWithItemsSpecification();
+
+            var orders = await _unitOfWork
+                .GetRepository<Order>()
+                .GetAllAsync(spec);
+
+
+            if (orders is null)
+                throw new FailedToRetrieveOrdersException();
+
+
+            var result = orders
+                .Where(o => o.CreatedAt >= today && o.CreatedAt < tomorrow)
+                .SelectMany(o => o.OrderItems)
+                .GroupBy(oi => new { oi.MenuItemId, oi.MenuItem.Name, oi.MenuItem.ArabicName })
+                .Select(g => new TopItemsDto
+                {
+                    MenuItemId = g.Key.MenuItemId,
+                    Name = g.Key.Name,
+                    ArabicName = g.Key.ArabicName,
+                    OrderCount = g.Count()
+                })
+                .OrderByDescending(x => x.OrderCount)
+                .Take(top)
+                .ToList();
+
+
+            return result;
+        }
+
+
+
+        public async Task<IEnumerable<InventoryUsageDTO>> GetInventoryUsageAsync()
+        {
+            var to = DateTime.Today.AddDays(1);
+            var from = DateTime.Today.AddDays(-7);
+
+            var spec = new OrdersWithFullDataSpecification(from, to);
+
+            var orders = await _unitOfWork
+                .GetRepository<Order>()
+                .GetAllAsync(spec);
+
+
+            if (orders is null)
+                throw new FailedToRetrieveOrdersException();
+
+            var result = orders
+                .SelectMany(o => o.OrderItems.SelectMany(oi =>
+                    oi.MenuItem.Recipes.Select(r => new
+                    {
+                        o.CreatedAt,
+                        r.IngredientId,
+                        IngredientName = r.Ingredient.Name,
+                        IngredientArabicName = r.Ingredient.ArabicName,
+                        Unit = r.Ingredient.Unit.ToString(), 
+                        QuantityUsed = r.QuantityRequired * oi.Quantity
+                    })
+                ))
+                .GroupBy(x => new
+                {
+                    Date = x.CreatedAt.Date,
+                    x.IngredientId,
+                    x.IngredientName,
+                    x.Unit ,
+                    x.IngredientArabicName
+                })
+                .Select(g => new InventoryUsageDTO
+                {
+                    Date = g.Key.Date,
+                    IngredientId = g.Key.IngredientId,
+                    IngredientName = g.Key.IngredientName,
+                    IngredientArabicName = g.Key.IngredientArabicName,
+                    Unit = g.Key.Unit, 
+                    QuantityUsed = g.Sum(x => x.QuantityUsed)
+                })
+                .OrderBy(x => x.Date)
+                .ToList();
+
+            return result;
+        }
+        public async Task<IEnumerable<DailyRevenueDTO>> GetDailyRevenueLast7DaysAsync(int? branchId)
+        {
+            var from = DateTime.Today.AddDays(-6);
+            var to = DateTime.Today.AddDays(1);
+
+            var spec = new OrdersWithPaymentSpecForDashboard();
+
+            var orders = await _unitOfWork
+                .GetRepository<Order>()
+                .GetAllAsync(spec);
+
+            if (orders is null)
+                throw new FailedToRetrieveOrdersException();
+
+            var filtered = orders.Where(o =>
+                !o.IsDeleted &&
+                o.Payment != null &&
+                o.Payment.PaymentStatus == PaymentStatus.Paid &&
+                o.CreatedAt >= from &&
+                o.CreatedAt < to
+            );
+
+            if (branchId.HasValue)
+                filtered = filtered.Where(o => o.BranchId == branchId.Value);
+
+            var result = filtered
+                .GroupBy(o => o.CreatedAt.Date)
+                .Select(g => new DailyRevenueDTO
+                {
+                    Date = g.Key,
+                    TotalRevenue = g.Sum(x => x.TotalAmount)
+                })
+                .OrderBy(x => x.Date)
+                .ToList();
+
+            return result;
+        }
+
+
+    }
+}

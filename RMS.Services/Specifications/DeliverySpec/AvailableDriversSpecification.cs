@@ -1,5 +1,4 @@
 ﻿using RMS.Domain.Entities;
-using RMS.Domain.Enums;
 using RMS.Services.Specifications;
 
 public class AvailableDriversSpecification : BaseSpecifications<User>
