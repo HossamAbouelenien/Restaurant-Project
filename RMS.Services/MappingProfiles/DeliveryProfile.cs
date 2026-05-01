@@ -19,6 +19,7 @@ namespace RMS.Services.MappingProfiles
             CreateMap<Order, OrderSummaryDto>()
                 .ForMember(dest => dest.ItemsCount,opt => opt.MapFrom(src => src.OrderItems.Count))
                 .ForMember(dest => dest.BranchName,opt => opt.MapFrom(src => src.Branch!.Name))
+                .ForMember(dest => dest.BranchArabicName, opt => opt.MapFrom(src => src.Branch!.ArabicName))
                 .ForMember(dest => dest.OrderType,opt => opt.MapFrom(src => src.OrderType.ToString()))
                 .ForMember(dest => dest.Status,opt => opt.MapFrom(src => src.Status.ToString()))
                 .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.OrderItems));
@@ -37,7 +38,9 @@ namespace RMS.Services.MappingProfiles
 
 
             CreateMap<OrderItem, OrderItemDto>()
-                .ForMember(dest => dest.MenuItemName,opt => opt.MapFrom(src => src.MenuItem!.Name));
+                .ForMember(dest => dest.MenuItemName,opt => opt.MapFrom(src => src.MenuItem!.Name))
+                .ForMember(dest => dest.MenuItemArabicName, opt => opt.MapFrom(src => src.MenuItem!.ArabicName));
+
 
             CreateMap<AssignDeliveryDto, Delivery>()
                 .ForMember(dest => dest.DeliveryAddress,opt => opt.MapFrom(src => src.DeliveryAddress))

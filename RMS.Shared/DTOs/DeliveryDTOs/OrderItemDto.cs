@@ -9,6 +9,8 @@ namespace RMS.Shared.DTOs.DeliveryDTOs
     public class OrderItemDto
     {
         public string MenuItemName { get; set; } = default!;
+        public string MenuItemArabicName { get; set; } = default!;
+
 
         public int Quantity { get; set; }
 
