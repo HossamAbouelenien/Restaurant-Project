@@ -60,26 +60,26 @@ public class PaymentService : IPaymentService
             if (existingPayment.PaymentStatus == PaymentStatus.Paid)
                 throw new OrderAlreadyPaidException(orderId);
 
+            var payment = new Payment
+            {
+                OrderId = order.Id,
+                PaymentMethod = PaymentMethod.Card,
+                PaymentStatus = PaymentStatus.Paid,
+                PaidAmount = order.TotalAmount
+            };
+
+            await paymentRepo.AddAsync(payment);
+
+            order.Status = OrderStatus.Received;
+
+
+
+            await _unitOfWork.SaveChangesAsync();
+
+
             var token = await _paymob.GetPaymentKeyAsync(order.TotalAmount, order.Id);
             return _paymob.BuildIframeUrl(token);
         }
-
-      
-        var payment = new Payment
-        {
-            OrderId = order.Id,
-            PaymentMethod = PaymentMethod.Card,
-            PaymentStatus = PaymentStatus.Pending,
-            PaidAmount = order.TotalAmount
-        };
-
-
-
-        await paymentRepo.AddAsync(payment);
-
-        order.Status = OrderStatus.AwaitingPayment;
-
-        await _unitOfWork.SaveChangesAsync();
 
         var newToken = await _paymob.GetPaymentKeyAsync(order.TotalAmount, order.Id);
 
