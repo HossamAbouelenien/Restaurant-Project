@@ -273,7 +273,7 @@ public class AuthController(IAuthService authService, ILogger<AuthController> lo
         _logger.LogInformation("External login successful for provider: {Provider}", provider);
 
         // ✅ Dynamic frontend URL from config instead of hardcoded localhost
-        var frontendUrl = _configuration["URLs:BaseURL"] ?? "http://localhost:4200";
+        var frontendUrl = _configuration["URLs:FrontendURL"] ?? "http://localhost:4200/";
         return Redirect($"{frontendUrl}auth/auth-callback");
     }
 
