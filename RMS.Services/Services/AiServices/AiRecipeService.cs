@@ -20,6 +20,10 @@ namespace RMS.Services.Services.AiServices
 
         public async Task<SuggestResponseDTO> SuggestRecipesAsync(SuggestRequestDTO request)
         {
+            var userIngredients = request.Ingredients?
+                .Select(i => i.ToLower())
+                .ToList() ?? new List<string>();
+
             var response = await _httpClient.PostAsJsonAsync("/suggest/internal", request);
             response.EnsureSuccessStatusCode();
 
@@ -30,8 +34,59 @@ namespace RMS.Services.Services.AiServices
                 PropertyNameCaseInsensitive = true
             };
 
-            return JsonSerializer.Deserialize<SuggestResponseDTO>(json, options)
-                   ?? new SuggestResponseDTO();
+            var result = JsonSerializer.Deserialize<SuggestResponseDTO>(json, options)
+                         ?? new SuggestResponseDTO();
+
+            
+            if (result.Results != null && result.Results.Any())
+            {
+                result.Results = result.Results
+                    .Where(r => r.MatchedIngredients != null &&
+                                r.MatchedIngredients.Any(i =>
+                                    userIngredients.Contains(i.ToLower())))
+                    .OrderByDescending(r => r.MatchScore)
+                    .ToList();
+
+                result.TotalResults = result.Results.Count;
+            }
+
+           
+            if (result.Results == null || !result.Results.Any())
+            {
+                var repo = _unitOfWork.GetRepository<Recipe>();
+                var menuItemRepo = _unitOfWork.GetRepository<MenuItem>();
+                var ingredientRepo = _unitOfWork.GetRepository<Ingredient>();
+
+                var recipes = await repo.GetAllAsync();
+                var menuItems = await menuItemRepo.GetAllAsync();
+                var ingredients = await ingredientRepo.GetAllAsync();
+
+                var ingredientDict = ingredients.ToDictionary(i => i.Id, i => i.Name.ToLower());
+                var menuItemDict = menuItems.ToDictionary(m => m.Id, m => m.Name);
+
+                var matchedMenuItems = recipes
+                    .Where(r => ingredientDict.ContainsKey(r.IngredientId) &&
+                                userIngredients.Contains(ingredientDict[r.IngredientId]))
+                    .Select(r => r.MenuItemId)
+                    .Distinct()
+                    .ToList();
+
+                var fallbackResults = matchedMenuItems
+                    .Select(id => new SuggestResultDTO
+                    {
+                        MenuItemId = id,
+                        MenuItemName = menuItemDict.ContainsKey(id) ? menuItemDict[id] : "Unknown",
+                        MatchScore = 0.3, 
+                        MatchedIngredients = request.Ingredients,
+                        MissingIngredients = new List<string>()
+                    })
+                    .ToList();
+
+                result.Results = fallbackResults;
+                result.TotalResults = fallbackResults.Count;
+            }
+
+            return result;
         }
 
         public async Task SyncRecipesToAiAsync()

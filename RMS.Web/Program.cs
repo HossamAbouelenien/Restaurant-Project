@@ -265,13 +265,7 @@ namespace RMS.Web
             {
                 configuration.ReadFrom.Configuration(context.Configuration);
             });
-            //builder.Host.UseSerilog((context, services, configuration) =>
-            //{
-            //    configuration
-            //        .ReadFrom.Configuration(context.Configuration)
-            //        .ReadFrom.Services(services)
-            //        .Enrich.FromLogContext();
-            //});
+          
 
             builder.Services.Configure<PaymobSettings>(
                 builder.Configuration.GetSection("Paymob")
