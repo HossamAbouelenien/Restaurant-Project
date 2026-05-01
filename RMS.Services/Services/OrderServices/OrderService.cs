@@ -425,7 +425,7 @@ namespace RMS.Services.Services.OrderServices
 
 
                 // If order is being cancelled, release reserved stock and free up table if DineIn
-                if (orderToUpdate.Status == OrderStatus.Cancelled)
+                if (orderToUpdate.Status == OrderStatus.Cancelled || orderToUpdate.Status == OrderStatus.Delivered)
                 {
                     orderToUpdate.TotalAmount = 0;
                     // Free up table if DineIn
@@ -435,6 +435,7 @@ namespace RMS.Services.Services.OrderServices
                         if (table != null)
                         {
                             table.IsOccupied = false;
+                            orderToUpdate.TableOrder.CompletedAt = DateTime.Now;
                         }
                     }
                     var kitchenTicketSpec = new TicketByOrderSpecification(orderToUpdate.Id);
