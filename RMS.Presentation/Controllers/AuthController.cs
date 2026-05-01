@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using RMS.Services.Exceptions;
 using RMS.ServicesAbstraction.IServices.IIdentityService;
@@ -11,10 +12,11 @@ using System.Security.Claims;
 
 [ApiController]
 [Route("api/[Controller]")]
-public class AuthController(IAuthService authService, ILogger<AuthController> logger) : ControllerBase
+public class AuthController(IAuthService authService, ILogger<AuthController> logger, IConfiguration configuration) : ControllerBase
 {
     private readonly IAuthService _authService = authService;
     private readonly ILogger<AuthController> _logger = logger;
+    private readonly IConfiguration _configuration = configuration;
 
     [HttpPost("register")]
     public async Task<ActionResult<UserDTO>> Register([FromBody] RegisterationRequestDTO registerationRequestDTO)
@@ -270,7 +272,9 @@ public class AuthController(IAuthService authService, ILogger<AuthController> lo
 
         _logger.LogInformation("External login successful for provider: {Provider}", provider);
 
-        return Redirect("http://localhost:4200/auth/auth-callback");
+        // ✅ Dynamic frontend URL from config instead of hardcoded localhost
+        var frontendUrl = _configuration["URLs:BaseURL"] ?? "http://localhost:4200";
+        return Redirect($"{frontendUrl}auth/auth-callback");
     }
 
     [HttpGet("external-cancelled")]

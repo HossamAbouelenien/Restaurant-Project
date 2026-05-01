@@ -951,6 +951,7 @@ namespace RMS.Services.Services.OrderServices
                 throw new PaymentNotFoundException(orderId);
 
             order.Payment.PaymentStatus = PaymentStatus.Paid;
+            order.Payment.PaidAmount = order.TotalAmount;
             order.Payment.UpdatedAt = DateTime.Now;
 
             // optional: update order status
