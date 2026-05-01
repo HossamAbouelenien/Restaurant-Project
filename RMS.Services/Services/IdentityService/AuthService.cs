@@ -164,7 +164,7 @@ namespace RMS.Services.Services.IdentityService
                
                 var baseUrl = _configuration["URLs:BaseURL"];
                 var confirmationLink = $"{baseUrl}api/Auth/confirm-email?userId={user.Id}&code={Uri.EscapeDataString(token)}";
-                await _emailService.SendEmailAsync(user.Email, "Confirm your email", $"Please confirm your email by clicking this link: {confirmationLink}");
+                await _emailService.SendEmailAsync(user.Email, "Confirm your email", $"Please confirm your email by clicking this link:\n {confirmationLink}");
 
                 return userDto;
             }
