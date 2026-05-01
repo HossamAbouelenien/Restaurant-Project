@@ -117,7 +117,7 @@ namespace RMS.Presentation.Controllers
         }
 
 
-        [Authorize(Roles = SD.Role_Admin + "" + SD.Role_Waiter )]
+        //[Authorize(Roles = SD.Role_Admin + "" + SD.Role_Waiter )]
         [HttpDelete("{orderId}/items/{itemId}")]
 
         public async Task<ActionResult<OrderDTO>> RemoveItemsFromOrder(int orderId, int itemId)
@@ -131,7 +131,7 @@ namespace RMS.Presentation.Controllers
 
 
 
-        [Authorize(Roles = SD.Role_Admin + "" + SD.Role_Customer )]
+        //[Authorize(Roles = SD.Role_Admin + "" + SD.Role_Customer )]
         [HttpPatch("{Id}/cancel")]
         public async Task<IActionResult> CancelOrder(int Id)
         {
@@ -143,7 +143,7 @@ namespace RMS.Presentation.Controllers
         }
 
 
-        [Authorize(Roles = SD.Role_Admin + "" + SD.Role_Waiter + "" + SD.Role_Cashier)]
+        //[Authorize(Roles = SD.Role_Admin + "" + SD.Role_Waiter + "" + SD.Role_Cashier)]
         [HttpPatch("{orderId}/mark-paid")]
         public async Task<IActionResult> MarkAsPaid(int orderId)
         {
