@@ -5,6 +5,9 @@
         public int Id { get; set; }
         public int BranchId { get; set; }
         public string? BranchName { get; set; }
+        public string? BranchArabicName { get; set; }
+
+
         public string? IngredientArabicName { get; set; }
 
         public string? Unit { get; set; }

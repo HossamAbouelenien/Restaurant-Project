@@ -13,6 +13,8 @@
         public int ItemsCount { get; set; }
 
         public string? BranchName { get; set; }
+        public string? BranchArabicName { get; set; }
+
 
         public DateTime CreatedAt { get; set; }
         public List<OrderItemDto> Items { get; set; } = new();
