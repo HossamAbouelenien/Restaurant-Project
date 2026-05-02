@@ -105,5 +105,21 @@ namespace RMS.Presentation.Controllers
             return Ok(result);
         }
 
+        //[HttpGet("confirm")]
+        //[HttpPost("confirm")]
+        //public async Task<IActionResult> Confirm(object? obj)
+        //{
+            
+        //    return Ok(obj);
+        //}
+
+        //[HttpGet("confirmpay")]
+        //[HttpPost("confirmpay")]
+        //public async Task<IActionResult> Confirmpay(object? obj)
+        //{
+
+        //    return Ok(obj);
+        //}
+
     }
 }

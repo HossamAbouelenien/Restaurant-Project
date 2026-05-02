@@ -77,8 +77,8 @@ public class PaymentService : IPaymentService
             await _unitOfWork.SaveChangesAsync();
 
 
-            var token = await _paymob.GetPaymentKeyAsync(order.TotalAmount, order.Id);
-            return _paymob.BuildIframeUrl(token);
+            //var token = await _paymob.GetPaymentKeyAsync(order.TotalAmount, order.Id);
+            //return _paymob.BuildIframeUrl(token);
         }
 
         var newToken = await _paymob.GetPaymentKeyAsync(order.TotalAmount, order.Id);

@@ -34,7 +34,7 @@ public class PaymobService : IPaymobService
                 amount_cents = (int)(amount * 100),
                 currency = "EGP",
                 delivery_needed = false,
-                merchant_order_id = $"{orderId}_Order",
+                merchant_order_id = $"{orderId}_{Guid.NewGuid():N}",
                 items = new object[] { }
             });
 
