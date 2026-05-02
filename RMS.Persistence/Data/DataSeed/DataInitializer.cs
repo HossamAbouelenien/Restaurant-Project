@@ -98,46 +98,46 @@ namespace RMS.Persistence.Data.DataSeed
                 }
 
                 // ── 8. Orders (depends on: Branches, Users) ──────────────────────────────
-                if (!hasOrders)
-                {
-                    await SeedDataFromJsonAsync<Order>("Orders.json", _dbContext.Orders);
-                    await _dbContext.SaveChangesAsync();
-                }
+                //if (!hasOrders)
+                //{
+                //    await SeedDataFromJsonAsync<Order>("Orders.json", _dbContext.Orders);
+                //    await _dbContext.SaveChangesAsync();
+                //}
 
                 // ── 9. OrderItems (depends on: Orders, MenuItems) ────────────────────────
-                if (!hasOrderItems)
-                {
-                    await SeedDataFromJsonAsync<OrderItem>("OrderItems.json", _dbContext.OrderItems);
-                    await _dbContext.SaveChangesAsync();
-                }
+                //if (!hasOrderItems)
+                //{
+                //    await SeedDataFromJsonAsync<OrderItem>("OrderItems.json", _dbContext.OrderItems);
+                //    await _dbContext.SaveChangesAsync();
+                //}
 
                 // ── 10. KitchenTickets (depends on: Orders) ───────────────────────────────
-                if (!hasKitchenTickets)
-                {
-                    await SeedDataFromJsonAsync<KitchenTicket>("KitchenTickets.json", _dbContext.KitchenTickets);
-                    await _dbContext.SaveChangesAsync();
-                }
+                //if (!hasKitchenTickets)
+                //{
+                //    await SeedDataFromJsonAsync<KitchenTicket>("KitchenTickets.json", _dbContext.KitchenTickets);
+                //    await _dbContext.SaveChangesAsync();
+                //}
 
                 // ── 11. Payments (depends on: Orders) — 1-to-1 ───────────────────────────
-                if (!hasPayments)
-                {
-                    await SeedDataFromJsonAsync<Payment>("Payments.json", _dbContext.Payments);
-                    await _dbContext.SaveChangesAsync();
-                }
+                //if (!hasPayments)
+                //{
+                //    await SeedDataFromJsonAsync<Payment>("Payments.json", _dbContext.Payments);
+                //    await _dbContext.SaveChangesAsync();
+                //}
 
                 // ── 12. Deliveries (depends on: Orders, Users[Driver]) — 1-to-1 ──────────
-                if (!hasDeliveries)
-                {
-                    await SeedDataFromJsonAsync<Delivery>("Deliveries.json", _dbContext.Deliveries);
-                    await _dbContext.SaveChangesAsync();
-                }
+                //if (!hasDeliveries)
+                //{
+                //    await SeedDataFromJsonAsync<Delivery>("Deliveries.json", _dbContext.Deliveries);
+                //    await _dbContext.SaveChangesAsync();
+                //}
 
                 // ── 13. TableOrders (depends on: Tables, Orders) — 1-to-1 ────────────────
-                if (!hasTableOrders)
-                {
-                    await SeedDataFromJsonAsync<TableOrder>("TableOrders.json", _dbContext.TableOrders);
-                    await _dbContext.SaveChangesAsync();
-                }
+                //if (!hasTableOrders)
+                //{
+                //    await SeedDataFromJsonAsync<TableOrder>("TableOrders.json", _dbContext.TableOrders);
+                //    await _dbContext.SaveChangesAsync();
+                //}
             }
             catch (Exception ex)
             {
@@ -211,6 +211,10 @@ namespace RMS.Persistence.Data.DataSeed
             {
                 var customerRole = string.Empty;
                 var adminRole = string.Empty;
+                var cahierRole = string.Empty;
+                var waiterRole = string.Empty;
+                var driverRole = string.Empty;
+                var chefRole = string.Empty;
 
                 if (!_roleManager.Roles.Any())
                 {
@@ -222,29 +226,93 @@ namespace RMS.Persistence.Data.DataSeed
                     await _roleManager.CreateAsync(new IdentityRole(SD.Role_Cashier));
                     customerRole = await _roleManager.GetRoleIdAsync(new IdentityRole(SD.Role_Customer));
                     adminRole = await _roleManager.GetRoleIdAsync(new IdentityRole(SD.Role_Admin));
+                    cahierRole = await _roleManager.GetRoleIdAsync(new IdentityRole(SD.Role_Cashier));
+                    waiterRole = await _roleManager.GetRoleIdAsync(new IdentityRole(SD.Role_Waiter));
+                    driverRole = await _roleManager.GetRoleIdAsync(new IdentityRole(SD.Role_Driver));
+                    chefRole = await _roleManager.GetRoleIdAsync(new IdentityRole(SD.Role_Chef));
                 }
                 if (!_userManager.Users.Any())
                 {
-                    var User01 = new User
+                    var password = "Mm123@#";
+
+                    var admin = new User
                     {
-                        Name = "Mustafa Saad",
-                        Email = "mustafa@gmai.com",
-                        UserName = "mustafasaad",
+                        Name = "admin",
+                        Email = "admin@gmail.com",
+                        UserName = "admin",
                         PhoneNumber = "0123456789",
-                        RoleId = adminRole
+                        RoleId = adminRole,
+                        EmailConfirmed = true,
+                        //BranchId = 1
                     };
 
-                    var User02 = new User
+                    var cashier = new User
                     {
-                        Name = "Areej Kammoush",
-                        Email = "areej@gmai.com",
-                        UserName = "areejkammoush",
+                        Name = "cashier",
+                        Email = "cashier@gmail.com",
+                        UserName = "cashier",
                         PhoneNumber = "0123456789",
-                        RoleId = customerRole
+                        RoleId = cahierRole,
+                        EmailConfirmed = true,
+                        //BranchId = 1
                     };
 
-                    await _userManager.CreateAsync(User01, "P@ssw0rd");
-                    await _userManager.CreateAsync(User02, "P@ssw0rd");
+                    var chef = new User
+                    {
+                        Name = "chef",
+                        Email = "chef@gmail.com",
+                        UserName = "chef",
+                        PhoneNumber = "0123456789",
+                        RoleId = chefRole,
+                        EmailConfirmed = true,
+                        //BranchId = 1
+                    };
+
+                    var customer = new User
+                    {
+                        Name = "customer",
+                        Email = "customer@gmail.com",
+                        UserName = "customer",
+                        PhoneNumber = "0123456789",
+                        RoleId = customerRole,
+                        EmailConfirmed = true,
+                        //BranchId = 1
+                    };
+
+                    var driver = new User
+                    {
+                        Name = "driver",
+                        Email = "driver@gmail.com",
+                        UserName = "driver",
+                        PhoneNumber = "0123456789",
+                        RoleId = driverRole,
+                        EmailConfirmed = true,
+                        //BranchId = 1
+                    };
+
+                    var waiter = new User
+                    {
+                        Name = "waiter",
+                        Email = "waiter@gmail.com",
+                        UserName = "waiter",
+                        PhoneNumber = "0123456789",
+                        RoleId = waiterRole,
+                        EmailConfirmed = true,
+                        //BranchId = 1
+                    };
+
+                    await _userManager.CreateAsync(admin, password);
+                    await _userManager.CreateAsync(cashier, password);
+                    await _userManager.CreateAsync(chef, password);
+                    await _userManager.CreateAsync(customer, password);
+                    await _userManager.CreateAsync(driver, password);
+                    await _userManager.CreateAsync(waiter, password);
+                    await _userManager.AddToRoleAsync(admin, SD.Role_Admin);
+                    await _userManager.AddToRoleAsync(cashier, SD.Role_Cashier);
+                    await _userManager.AddToRoleAsync(chef, SD.Role_Chef);
+                    await _userManager.AddToRoleAsync(customer, SD.Role_Customer);
+                    await _userManager.AddToRoleAsync(driver, SD.Role_Driver);
+                    await _userManager.AddToRoleAsync(waiter, SD.Role_Waiter);
                 }
                 await _dbContext.SaveChangesAsync();
             }
