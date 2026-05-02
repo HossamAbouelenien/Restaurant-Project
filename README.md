@@ -84,12 +84,14 @@ Update `appsettings.json` in the `RMS.Web` project with your connection strings 
 ---
 
 ## 👥 Contributors
-- **Mahmoud**
-- **Amr**
-- **Mustafa**
-- **Hossam**
-- **Arwa**
-- **Areej**
+
+* [Mahmoud Ali](https://github.com/mahmoudali2429)
+* [Amr Alaraby](https://github.com/AmrAlaraby)
+* [Mustafa Saad](https://github.com/mustafas3aad)
+* [Hossam Abouelenien](https://github.com/HossamAbouelenien)
+* [Arwa Hassan](https://github.com/arwainme)
+* [Areej Kammoush](https://github.com/areejkammoush10)
+
 
 ---
 *Just Food – Empowering Modern Restaurant Excellence.*
