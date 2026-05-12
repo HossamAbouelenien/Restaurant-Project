@@ -11,6 +11,14 @@ This project was developed as an ITI Graduation Project and implements advanced 
 
 ---
 
+## 🌐 Frontend & Live Demo
+
+[![Frontend Repo](https://img.shields.io/badge/Frontend-GitHub-black?logo=github)](https://github.com/AmrAlaraby/Restaurant-Project-Front)
+
+[![Live Demo](https://img.shields.io/badge/Live-Demo-green?logo=netlify)](https://restaurantmanagesys.netlify.app/)
+
+---
+
 ## ✨ Key Features
 - **Authentication & Authorization:** Secure JWT-based authentication with role-based access control (RBAC), supporting both native Identity and external OAuth (Google and Facebook).
 - **Ordering System:** Supports multiple order types including Dine-In, Pickup, and Delivery, with centralized shopping baskets managed in Redis.
