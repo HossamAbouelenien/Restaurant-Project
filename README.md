@@ -1,21 +1,49 @@
-# Just Food – Restaurant Management System API
+<h1 align="center">
+  🍽️ Just Food – Restaurant Management System API
+</h1>
 
-![Project Status](https://img.shields.io/badge/Status-Active-brightgreen)
-![.NET Version](https://img.shields.io/badge/.NET-Core-blue)
-![Architecture](https://img.shields.io/badge/Architecture-Clean_Architecture-purple)
+<p align="center">
+  <img src="https://img.shields.io/badge/Status-Active-22c55e?style=flat-square" />
+  <img src="https://img.shields.io/badge/.NET-8-512BD4?style=flat-square&logo=dotnet&logoColor=white" />
+  <img src="https://img.shields.io/badge/Architecture-Onion_Architecture-9333EA?style=flat-square" />
+  <img src="https://img.shields.io/badge/Angular-20-DD0031?style=flat-square&logo=angular&logoColor=white" />
+  <img src="https://img.shields.io/badge/SignalR-RealTime-0ea5e9?style=flat-square" />
+  <img src="https://img.shields.io/badge/Redis-Caching-dc2626?style=flat-square&logo=redis&logoColor=white" />
+  <img src="https://img.shields.io/badge/SQL_Server-Database-CC2927?style=flat-square&logo=microsoftsqlserver&logoColor=white" />
+  <img src="https://img.shields.io/badge/Paymob-Payment-orange?style=flat-square" />
+  <img src="https://img.shields.io/badge/Cloudinary-Media-2563eb?style=flat-square" />
+  <img src="https://img.shields.io/badge/Auth-JWT-black?style=flat-square" />
+  <img src="https://img.shields.io/badge/AI-Powered-10b981?style=flat-square" />
+</p>
+
+---
+
+<h2 align="center">🌐 Frontend & Live Demo</h2>
+
+<div align="center">
+
+<a href="https://github.com/AmrAlaraby/Restaurant-Project-Front" target="_blank">
+  <img src="https://img.shields.io/badge/💻_Frontend_Repository-181717?style=for-the-badge&logo=github&logoColor=white" />
+</a>
+
+<br/>
+
+<a href="https://restaurantmanagesys.netlify.app/" target="_blank">
+  <img src="https://img.shields.io/badge/🚀_Live_Demo-00C7B7?style=for-the-badge&logo=netlify&logoColor=white" />
+</a>
+
+
+
+
+
+</div>
+
+---
 
 ## 📖 Overview
 **Just Food** is a comprehensive, scalable, and secure backend RESTful API built using **ASP.NET Core**. It is designed using Clean Architecture principles to manage the complete lifecycle of a restaurant's operations, from ordering and kitchen management to inventory tracking, delivery, and real-time notifications.
 
 This project was developed as an ITI Graduation Project and implements advanced integrations including AI-based nutrition analysis (via Groq/LLaMA), real-time messaging (SignalR), caching (Redis), cloud storage (Cloudinary), and automated payment gateways (Paymob).
-
----
-
-## 🌐 Frontend & Live Demo
-
-[![Frontend Repo](https://img.shields.io/badge/Frontend-GitHub-black?logo=github)](https://github.com/AmrAlaraby/Restaurant-Project-Front)
-
-[![Live Demo](https://img.shields.io/badge/Live-Demo-green?logo=netlify)](https://restaurantmanagesys.netlify.app/)
 
 ---
 
