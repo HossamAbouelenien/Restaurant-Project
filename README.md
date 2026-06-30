@@ -28,8 +28,8 @@
 
 <br/>
 
-<a href="https://restaurantmanagesys.netlify.app/" target="_blank">
-  <img src="https://img.shields.io/badge/🚀_Live_Demo-00C7B7?style=for-the-badge&logo=netlify&logoColor=white" />
+<a href="https://rms-chi-two.vercel.app/customer/home" target="_blank">
+  <img src="https://img.shields.io/badge/🚀_Live_Demo-00C7B7?style=for-the-badge&logo=vercel&logoColor=white" />
 </a>
 
 
