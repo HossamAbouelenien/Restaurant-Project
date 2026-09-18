@@ -302,7 +302,7 @@ namespace RMS.Web
                 options.AddPolicy("AllowAll",
                     policy =>
                     {
-                        policy.WithOrigins("http://localhost:4200", "https://restaurantmanagesys.netlify.app")
+                        policy.WithOrigins("http://localhost:4200", "https://restaurantmanagesys.netlify.app", "https://rms-gpb7ezaot-amralarabys-projects.vercel.app")
                               .AllowAnyMethod()
                               .AllowAnyHeader()
                               .AllowCredentials();
