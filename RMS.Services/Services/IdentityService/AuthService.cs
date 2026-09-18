@@ -212,6 +212,7 @@ namespace RMS.Services.Services.IdentityService
                     return null;
                 }
 
+                //Note: return not used
                 await _tokenService.RevokeRefreshTokenAsync(refreshTokenRequestDTO.RefreshToken);
 
                 var token = await _tokenService.GenerateJwtTokenAsync(user);

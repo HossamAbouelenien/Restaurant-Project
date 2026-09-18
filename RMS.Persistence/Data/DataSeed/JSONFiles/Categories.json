@@ -1,26 +1,26 @@
 [
   {
     "Name": "Burgers",
-    "ArabicName": "ا"
+    "ArabicName": "برجر"
   },
   {
     "Name": "Pizza",
-    "ArabicName": "ا"
+    "ArabicName": "بيتزا"
   },
   {
     "Name": "Grills",
-    "ArabicName": "ا"
+    "ArabicName": "مشويات"
   },
   {
     "Name": "Salads",
-    "ArabicName": "ا"
+    "ArabicName": "سلطات"
   },
   {
     "Name": "Drinks",
-    "ArabicName": "ا"
+    "ArabicName": "مشروبات"
   },
   {
     "Name": "Desserts",
-    "ArabicName": "ا"
+    "ArabicName": "حلويات"
   }
 ]

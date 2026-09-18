@@ -155,7 +155,12 @@ public class AuthController(IAuthService authService, ILogger<AuthController> lo
         var result = await _authService.ConfirmEmailAsync(userId, code);
 
         if (result == "Success")
-            return Ok("Email confirmed successfully");
+        {
+            // ✅ Dynamic frontend URL from config instead of hardcoded localhost
+            var frontendUrl = _configuration["URLs:FrontendURL"] ?? "http://localhost:4200/";
+            return Redirect($"{frontendUrl}auth/login");
+        }
+            //return Ok("Email confirmed successfully");
 
         return BadRequest("Error confirming email");
     }

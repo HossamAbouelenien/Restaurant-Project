@@ -1,6 +1,7 @@
 [
   {
     "Name": "Downtown Branch",
+    "ArabicName": "فرع وسط البلد",
     "Phone": "01012345678",
     "IsActive": true,
     "Address": {
@@ -9,11 +10,11 @@
       "City": "Cairo",
       "Note": "Main flagship branch",
       "SpecialMark": "Next to the metro station"
-    }, "ArabicName": "ا"
+    }
   },
   {
     "Name": "Maadi Branch",
-    "ArabicName": "ا",
+    "ArabicName": "فرع المعادي",
     "Phone": "01123456789",
     "IsActive": true,
     "Address": {
@@ -23,11 +24,10 @@
       "Note": null,
       "SpecialMark": "Opposite the Carrefour"
     }
-
   },
   {
-    "ArabicName": "ا",
     "Name": "Alexandria Branch",
+    "ArabicName": "فرع الإسكندرية",
     "Phone": "01234567890",
     "IsActive": true,
     "Address": {
@@ -37,6 +37,5 @@
       "Note": "Sea-view seating available",
       "SpecialMark": "Near Stanley Bridge"
     }
-
   }
-] 
+]

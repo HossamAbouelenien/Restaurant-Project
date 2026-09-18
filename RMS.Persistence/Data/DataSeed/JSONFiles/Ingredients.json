@@ -1,92 +1,92 @@
 [
   {
     "Name": "Beef Patty",
-    "ArabicName": "ا",
+    "ArabicName": "لحم برجر",
     "Unit": "Kg"
   },
   {
     "Name": "Burger Bun",
-    "ArabicName": "ا",
+    "ArabicName": "خبز برجر",
     "Unit": "Piece"
   },
   {
     "Name": "Cheddar Cheese",
-    "ArabicName": "ا",
+    "ArabicName": "جبن شيدر",
     "Unit": "Gram"
   },
   {
     "Name": "Lettuce",
-    "ArabicName": "ا",
+    "ArabicName": "خس",
     "Unit": "Gram"
   },
   {
     "Name": "Tomato",
-    "ArabicName": "ا",
+    "ArabicName": "طماطم",
     "Unit": "Gram"
   },
   {
     "Name": "Pizza Dough",
-    "ArabicName": "ا",
+    "ArabicName": "عجينة بيتزا",
     "Unit": "Gram"
   },
   {
     "Name": "Tomato Sauce",
-    "ArabicName": "ا",
+    "ArabicName": "صلصة طماطم",
     "Unit": "Liter"
   },
   {
     "Name": "Mozzarella",
-    "ArabicName": "ا",
+    "ArabicName": "جبن موتزاريلا",
     "Unit": "Gram"
   },
   {
     "Name": "Chicken Breast",
-    "ArabicName": "ا",
+    "ArabicName": "صدر دجاج",
     "Unit": "Kg"
   },
   {
     "Name": "Olive Oil",
-    "ArabicName": "ا",
+    "ArabicName": "زيت زيتون",
     "Unit": "Liter"
   },
   {
     "Name": "Cucumber",
-    "ArabicName": "ا",
+    "ArabicName": "خيار",
     "Unit": "Gram"
   },
   {
     "Name": "Feta Cheese",
-    "ArabicName": "ا",
+    "ArabicName": "جبن فيتا",
     "Unit": "Gram"
   },
   {
     "Name": "Soft Drink Can",
-    "ArabicName": "ا",
+    "ArabicName": "علبة مشروب غازي",
     "Unit": "Piece"
   },
   {
     "Name": "Mineral Water",
-    "ArabicName": "ا",
+    "ArabicName": "مياه معدنية",
     "Unit": "Liter"
   },
   {
     "Name": "Chocolate",
-    "ArabicName": "ا",
+    "ArabicName": "شوكولاتة",
     "Unit": "Gram"
   },
   {
     "Name": "Cream",
-    "ArabicName": "ا",
+    "ArabicName": "كريمة",
     "Unit": "Liter"
   },
   {
     "Name": "Mushrooms",
-    "ArabicName": "ا",
+    "ArabicName": "فطر",
     "Unit": "Gram"
   },
   {
     "Name": "Bell Pepper",
-    "ArabicName": "ا",
+    "ArabicName": "فلفل رومي",
     "Unit": "Gram"
   }
 ]
